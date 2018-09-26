@@ -1,0 +1,24 @@
+{
+  "debug": true,
+  "server": {
+      "address":"127.0.0.1:8080"
+  },
+  "development" : {
+      "DatabaseConfig" : {
+          "DBHost" : "fibear.cbdg6hqefjgu.us-east-1.rds.amazonaws.com",
+          "DBUser" : "userfibear",
+          "DBName" : "fibear",
+          "DBPort" : 3306,
+          "DBPassword" : "Fibear1234321xyz"
+      }
+  },
+  "production" : {
+      "DatabaseConfig" : {
+          "DBHost" : "fibear.cbdg6hqefjgu.us-east-1.rds.amazonaws.com",
+          "DBUser" : "userfibear",
+          "DBName" : "fibear",
+          "DBPort" : 3306,
+          "DBPassword" : "Fibear1234321xyz"
+      }
+  }
+}
