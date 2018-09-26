@@ -6,3 +6,9 @@ go-gin-boilerplate
 vendor/*
 !vendor/vendor.json
 
+# IDEs and editors
+/.idea
+.project
+.classpath
+*.launch
+.settings/
