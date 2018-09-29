@@ -7,7 +7,7 @@ import (
 	cfg "d2d-backend/config"
 	"net/url"
 	"d2d-backend/common"
-	"github.com/jinzhu/gorm"
+	"d2d-backend/accounts"
 	"d2d-backend/orders"
 )
 
@@ -40,10 +40,9 @@ func init(){
 //	db.Create(&category5)
 //}
 
-func Migrate(db *gorm.DB) {
-	//users.AutoMigrate()
-	db.AutoMigrate(&orders.Service{})
-	db.AutoMigrate(&orders.Category{})
+func Migrate() {
+	accounts.AutoMigrate()
+	orders.AutoMigrate()
 }
 
 func main() {
@@ -67,9 +66,7 @@ func main() {
 	dsn := fmt.Sprintf("%s?%s", connection, val.Encode())
 
 	db := common.Init(dsn)
-
-	Migrate(db)
-
+	Migrate()
 	fmt.Println()
 	defer db.Close()
 
