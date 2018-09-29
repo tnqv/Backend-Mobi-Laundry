@@ -6,6 +6,9 @@ import (
 	"gopkg.in/gin-gonic/gin.v1"
 	cfg "d2d-backend/config"
 	"net/url"
+	"d2d-backend/common"
+	"github.com/jinzhu/gorm"
+	"d2d-backend/orders"
 )
 
 var config cfg.Config
@@ -22,30 +25,54 @@ func init(){
 	}
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 }
+//
+//func insertTestExampleValue(db *gorm.DB){
+//	category1 := orders.Category{Name:"Combo Giặt + Sấy + Xả Quần áo",Description:"Combo Giặt + Sấy + Xả Quần áo"}
+//	category2 := orders.Category{Name:"Combo Chăn Màn",Description:"Combo Chăn Màn"}
+//	category3 := orders.Category{Name:"Combo Thú bông",Description:"Combo Thú bông"}
+//	category4 := orders.Category{Name:"Dịch vụ giặt hấp (không bao gồm ủi)",Description:"Dịch vụ giặt hấp (không bao gồm ủi)"}
+//	category5 := orders.Category{Name:"Combo Rèm Cửa",Description:"Combo Rèm Cửa"}
+//
+//	db.Create(&category1)
+//	db.Create(&category2)
+//	db.Create(&category3)
+//	db.Create(&category4)
+//	db.Create(&category5)
+//}
+
+func Migrate(db *gorm.DB) {
+	//users.AutoMigrate()
+	db.AutoMigrate(&orders.Service{})
+	db.AutoMigrate(&orders.Category{})
+}
 
 func main() {
 	var (
 		listenAddr string
 	)
 
-	// Migrate(db)
-	// defer db.Close()
 
 	listenAddr = config.GetString(`server.address`)
-	//dbHost := config.GetString(environmentDb + `.DatabaseConfig.DBHost`)
-	//dbUser := config.GetString(environmentDb + `.DatabaseConfig.DBUser`)
-	//dbName := config.GetString(environmentDb + `.DatabaseConfig.DBName`)
-	//dbPort := config.GetString(environmentDb + `.DatabaseConfig.DBPort`)
-	//dbPass := config.GetString(environmentDb + `.DatabaseConfig.DBPassword`)
+	dbHost := config.GetString(environmentDb + `.DatabaseConfig.DBHost`)
+	dbUser := config.GetString(environmentDb + `.DatabaseConfig.DBUser`)
+	dbName := config.GetString(environmentDb + `.DatabaseConfig.DBName`)
+	dbPort := config.GetString(environmentDb + `.DatabaseConfig.DBPort`)
+	dbPass := config.GetString(environmentDb + `.DatabaseConfig.DBPassword`)
 
-	//connection := fmt.Sprintf(common.TEMPLATE_DB_CONSTRING, dbUser, dbPass, dbHost, dbPort, dbName)
+	connection := fmt.Sprintf(common.TEMPLATE_DB_CONSTRING, dbUser, dbPass, dbHost, dbPort, dbName)
 	val := url.Values{}
 	val.Add("parseTime", "1")
 	val.Add("loc", "Asia/Saigon")
 
-	//dsn := fmt.Sprintf("%s?%s", connection, val.Encode())
+	dsn := fmt.Sprintf("%s?%s", connection, val.Encode())
 
-	//db := common.Init(dsn)
+	db := common.Init(dsn)
+
+	Migrate(db)
+
+	fmt.Println()
+	defer db.Close()
+
 
 	r := gin.Default()
 
