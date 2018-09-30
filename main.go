@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
-	"gopkg.in/gin-gonic/gin.v1"
+	"github.com/gin-gonic/gin"
 	cfg "d2d-backend/config"
 	"net/url"
 	"d2d-backend/common"
@@ -73,13 +73,13 @@ func main() {
 
 	r := gin.Default()
 
-	//v1 := r.Group("/api")
-	//users.UsersRegister(v1.Group("/users"))
-	//v1.Use(users.AuthMiddleware(false))
+	v1 := r.Group("/api/v1")
+	accounts.AccountsRegister(v1.Group("/accounts"))
+	v1.Use(accounts.AuthMiddleware(false))
 	// articles.ArticlesAnonymousRegister(v1.Group("/articles"))
 	// articles.TagsAnonymousRegister(v1.Group("/tags"))
 
-	//v1.Use(users.AuthMiddleware(true))
+	v1.Use(accounts.AuthMiddleware(true))
 	// users.UserRegister(v1.Group("/user"))
 	// users.ProfileRegister(v1.Group("/profiles"))
 
