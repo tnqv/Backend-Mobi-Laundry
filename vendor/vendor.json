@@ -165,6 +165,12 @@
 			"revisionTime": "2018-04-04T17:41:02Z"
 		},
 		{
+			"checksumSHA1": "tWTFUZBsolN06G9iKiO/kjR8T/E=",
+			"path": "github.com/huandu/facebook",
+			"revision": "e344d22ede2e56e440409a185063808dde25a649",
+			"revisionTime": "2018-09-09T15:40:21Z"
+		},
+		{
 			"checksumSHA1": "IqQmIPZbwgzbZD4k7YX6Rj230pY=",
 			"path": "github.com/jinzhu/gorm",
 			"revision": "2a1463811ee1dc85d168fd639a2d4251d030e6e5",

@@ -54,10 +54,11 @@ func NewUserModelValidatorFillWith(userModel Account) AccountModelValidator {
 type LoginValidator struct {
 	Account struct {
 		Email    string `form:"email" json:"email" binding:"exists,email"`
-		Password string `form:"password"json:"password" binding:"exists,min=8,max=255"`
+		Password string `form:"password" json:"password" binding:"exists,min=8,max=255"`
 	} `json:"account"`
 	accountModel Account `json:"-"`
 }
+
 
 func (self *LoginValidator) Bind(c *gin.Context) error {
 	err := common.Bind(c, self)
@@ -69,8 +70,32 @@ func (self *LoginValidator) Bind(c *gin.Context) error {
 	return nil
 }
 
+
+type FBLoginValidator struct {
+	Account struct {
+		Provider string	`form:"provider" json:"provider" binding:"exists"`
+		AccessToken string `form:"fb_access_token" json:"fb_access_token"`
+	} `json:"account"`
+	accountModel Account `json:"-"`
+}
+
+func (self *FBLoginValidator) Bind(c *gin.Context) error {
+	err := common.Bind(c, self)
+	if err != nil {
+		return err
+	}
+
+	self.accountModel.AccessToken = self.Account.AccessToken
+	return nil
+}
+
 // You can put the default value of a Validator here
 func NewLoginValidator() LoginValidator {
 	loginValidator := LoginValidator{}
 	return loginValidator
+}
+
+func FBNewLoginValidator() FBLoginValidator {
+	fbLoginValidator := FBLoginValidator{}
+	return fbLoginValidator
 }

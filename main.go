@@ -67,10 +67,8 @@ func main() {
 
 	db := common.Init(dsn)
 	Migrate()
-	fmt.Println()
+
 	defer db.Close()
-
-
 	r := gin.Default()
 
 	v1 := r.Group("/api/v1")

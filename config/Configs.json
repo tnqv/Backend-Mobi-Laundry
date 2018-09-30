@@ -20,5 +20,9 @@
           "DBPort" : 3306,
           "DBPassword" : "ldds21122018"
       }
+  },
+  "facebook_credentials": {
+     "appId" : "2259251500796826",
+     "appSecret":"xEnDIEGWy-vuupqrL9bcgrKnwC0"
   }
 }
