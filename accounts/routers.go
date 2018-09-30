@@ -14,7 +14,7 @@ const (
 	NormalProvider = "NORMAL"
 )
 
-func AccountsRegister(router *gin.RouterGroup){
+func AccountsRouterRegister(router *gin.RouterGroup){
 	router.POST("/login",AccountsLogin)
 	router.POST("/",AccountsRegistration)
 	router.POST("/facebook/auth",FacebookAccountsLogin)

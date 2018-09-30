@@ -8,23 +8,23 @@ import (
 )
 
 type Service struct {
-	gorm.Model
+	gorm.Model 				`json",omitempty"`
 	Name        string
 	Price       int64
 	Description string
 	CategoryID  uint
-	Categories  Category
+	//Categories  Category `gorm:"PRELOAD:false"`
 }
 
 type Category struct {
-	gorm.Model
+	gorm.Model 				 `json",omitempty"`
 	Name string
 	Description string
-	ServiceModels []Service
+	Services []Service
 }
 
 type ServiceOrder struct {
-	gorm.Model
+	gorm.Model				 `json",omitempty"`
 	PlacedOrderID uint
 	PlacedOrderModel PlacedOrder
 	ServiceID uint
@@ -94,4 +94,11 @@ func AutoMigrate() {
 	db.AutoMigrate(&Review{})
 	db.AutoMigrate(&PlacedOrder{})
 	db.AutoMigrate(&ServiceOrder{})
+}
+
+func getAllServicesBasedOnCategory()([]Category,error){
+	db := common.GetDB()
+	var category []Category
+	err := db.Set("gorm:auto_preload", true).Find(&category).Error
+	return category,err
 }

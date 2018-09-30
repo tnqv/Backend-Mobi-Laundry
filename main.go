@@ -72,8 +72,9 @@ func main() {
 	r := gin.Default()
 
 	v1 := r.Group("/api/v1")
-	accounts.AccountsRegister(v1.Group("/accounts"))
+	accounts.AccountsRouterRegister(v1.Group("/accounts"))
 	v1.Use(accounts.AuthMiddleware(false))
+	orders.ServicesRouterRegister(v1.Group("/services"))
 	// articles.ArticlesAnonymousRegister(v1.Group("/articles"))
 	// articles.TagsAnonymousRegister(v1.Group("/tags"))
 
