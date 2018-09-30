@@ -8,23 +8,23 @@ import (
 )
 
 type Service struct {
-	gorm.Model 				`json",omitempty"`
-	Name        string
-	Price       int64
-	Description string
-	CategoryID  uint
+	gorm.Model 				`json:"-"`
+	Name        string		`json:"name"`
+	Price       int64		`json:"price"`
+	Description string		`json:"description"`
+	CategoryID  uint		`json:"-"`
 	//Categories  Category `gorm:"PRELOAD:false"`
 }
 
 type Category struct {
-	gorm.Model 				 `json",omitempty"`
-	Name string
-	Description string
-	Services []Service
+	gorm.Model 				 `json:"-"`
+	Name string				 `json:"name"`
+	Description string		 `json:"description"`
+	Services []Service		 `json:"services"`
 }
 
 type ServiceOrder struct {
-	gorm.Model				 `json",omitempty"`
+	gorm.Model				 `json:",omitempty"`
 	PlacedOrderID uint
 	PlacedOrderModel PlacedOrder
 	ServiceID uint
@@ -49,6 +49,7 @@ type PlacedOrder struct {
 	CustomerID uint
 	CustomerModel accounts.Customer
 
+	Capacity float32
 	DeliveryAddress string
 	DeliveryLatitude float32
 	DeliveryLongitude float32
