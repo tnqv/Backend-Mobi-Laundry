@@ -27,10 +27,12 @@ func GetServices(c *gin.Context){
 
 func CreateOrder (c *gin.Context)  {
 	var order PlacedOrder
-	err := c.Bind(&order)
-	if err != nil {
-		c.AbortWithError(400, err)
+	orderModelValidator := NewOrderModelValidator()
+	if err := orderModelValidator.Bind(c); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewValidatorError(err))
+		return
 	}
+	c.Bind(&order)
 	createPlaceOrder(&order)
 	c.JSON(http.StatusCreated, order)
 }

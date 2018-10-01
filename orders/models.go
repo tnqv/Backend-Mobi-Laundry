@@ -112,4 +112,3 @@ func createPlaceOrder(order *PlacedOrder)  {
 	db.Create(&order)
 }
 
-//
