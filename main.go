@@ -75,10 +75,13 @@ func main() {
 	accounts.AccountsRouterRegister(v1.Group("/accounts"))
 	v1.Use(accounts.AuthMiddleware(false))
 	orders.ServicesRouterRegister(v1.Group("/services"))
+	orders.OrdersRouterRegister(v1.Group("/orders"))
+
 	// articles.ArticlesAnonymousRegister(v1.Group("/articles"))
 	// articles.TagsAnonymousRegister(v1.Group("/tags"))
 
 	v1.Use(accounts.AuthMiddleware(true))
+
 	// users.UserRegister(v1.Group("/user"))
 	// users.ProfileRegister(v1.Group("/profiles"))
 

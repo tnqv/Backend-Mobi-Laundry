@@ -1,10 +1,10 @@
 package orders
 
 import (
-	"github.com/jinzhu/gorm"
-	"time"
 	"d2d-backend/accounts"
 	"d2d-backend/common"
+	"github.com/jinzhu/gorm"
+	"time"
 )
 
 type Service struct {
@@ -13,6 +13,7 @@ type Service struct {
 	Price       int64		`json:"price"`
 	Description string		`json:"description"`
 	CategoryID  uint		`json:"-"`
+	Url			string		`json:"url"`
 	//Categories  Category `gorm:"PRELOAD:false"`
 }
 
@@ -50,6 +51,7 @@ type PlacedOrder struct {
 	CustomerModel accounts.Customer
 
 	Capacity float32
+	EstimatedCapacity float32
 	DeliveryAddress string
 	DeliveryLatitude float32
 	DeliveryLongitude float32
@@ -70,6 +72,7 @@ type PlacedOrder struct {
 // 6 : Order is in process
 // 7 : Order is finished laundry
 // 8 : Order is delivering
+// 9 : Order completed
 type OrderStatus struct {
 	gorm.Model
 	StatusID uint
@@ -103,3 +106,10 @@ func getAllServicesBasedOnCategory()([]Category,error){
 	err := db.Set("gorm:auto_preload", true).Find(&category).Error
 	return category,err
 }
+
+func createPlaceOrder(order *PlacedOrder)  {
+	db := common.GetDB()
+	db.Create(&order)
+}
+
+//
