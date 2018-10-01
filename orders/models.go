@@ -103,3 +103,17 @@ func getAllServicesBasedOnCategory()([]Category,error){
 	err := db.Set("gorm:auto_preload", true).Find(&category).Error
 	return category,err
 }
+
+func getAllOrdersBasedOnCustomerID(userid *uint)([]PlacedOrder,error){
+	db := common.GetDB()
+	var order []PlacedOrder
+	err := db.Set("gorm:auto_preload", true).Find(&order, "customer_id = ?", userid).Error
+	return order,err
+}
+
+func getTenOrders()([]PlacedOrder,error){
+	db := common.GetDB()
+	var order []PlacedOrder
+	err := db.Limit(10).Set("gorm:auto_preload", true).Find(&order).Error
+	return order,err
+}
