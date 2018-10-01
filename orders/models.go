@@ -13,6 +13,7 @@ type Service struct {
 	Price       int64		`json:"price"`
 	Description string		`json:"description"`
 	CategoryID  uint		`json:"-"`
+	ImageUrl			string		`json:"url"`
 	//Categories  Category `gorm:"PRELOAD:false"`
 }
 
@@ -24,7 +25,7 @@ type Category struct {
 }
 
 type ServiceOrder struct {
-	gorm.Model				 `json:",omitempty"`
+	gorm.Model				 `json:"-"`
 	PlacedOrderID uint
 	PlacedOrderModel PlacedOrder
 	ServiceID uint
@@ -35,26 +36,27 @@ type ServiceOrder struct {
 }
 
 type PlacedOrder struct {
-	gorm.Model
+	gorm.Model							`json:"-"`
 	//Store
-	StoreID uint
-	AssignedStore accounts.Store
-	TimePlaced time.Time
-	Detail string
+	StoreID uint						`json:"store_id"`
+	AssignedStore accounts.Store		`json:"store"`
+	TimePlaced time.Time				`json:"time"`
+	Detail string						`json:"note"`
 	//Order status
-	OrderStatusID uint
-	OrderStatusModel OrderStatus
+	OrderStatusID uint					`json:"status"`
+	OrderStatusModel OrderStatus		`json:"order_status"`
 
 	//Customer
-	CustomerID uint
-	CustomerModel accounts.Customer
+	CustomerID uint						`json:"-"`
+	CustomerModel accounts.Customer		`json:"customer"`
 
-	Capacity float32
-	DeliveryAddress string
-	DeliveryLatitude float32
-	DeliveryLongitude float32
-	ServiceTotalPrice float32
-	Priority int
+	Capacity float32					`json:"capacity"`
+	EstimatedCapacity float32			`json:"estimated_capacity"`
+	DeliveryAddress string				`json:"delivery_address"`
+	DeliveryLatitude float32			`json:"delivery_latitude"`
+	DeliveryLongitude float32			`json:"delivery_longitude"`
+	ServiceTotalPrice float32			`json:"total"`
+	Priority int						`json:"priority"`
 	//Review
 	ReviewID uint
 	OrderReview Review
@@ -70,15 +72,16 @@ type PlacedOrder struct {
 // 6 : Order is in process
 // 7 : Order is finished laundry
 // 8 : Order is delivering
+// 9 : Order completed
 type OrderStatus struct {
-	gorm.Model
+	gorm.Model						`json:"-"`
 	StatusID uint
 	StatusChangedTime time.Time
 	Description string
 }
 
 type Review struct {
-	gorm.Model
+	gorm.Model						`json:"-"`
 	Content string
 	Rate int
 	CustomerID uint
@@ -103,8 +106,12 @@ func getAllServicesBasedOnCategory()([]Category,error){
 	err := db.Set("gorm:auto_preload", true).Find(&category).Error
 	return category,err
 }
+func createPlaceOrder(order *PlacedOrder)  {
+	db := common.GetDB()
+	db.Create(&order)
+}
 
-func getAllOrdersBasedOnCustomerID(userid *uint)([]PlacedOrder,error){
+//func getAllOrdersBasedOnCustomerID(userid *uint)([]PlacedOrder,error){
 	db := common.GetDB()
 	var order []PlacedOrder
 	err := db.Set("gorm:auto_preload", true).Find(&order, "customer_id = ?", userid).Error

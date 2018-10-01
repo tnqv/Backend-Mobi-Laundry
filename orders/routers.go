@@ -1,16 +1,14 @@
 package orders
 
 import (
+	"d2d-backend/common"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"d2d-backend/common"
 )
-
 func OrdersRouterRegister(router *gin.RouterGroup){
 	//router.GET("/orders",AccountsLogin)
-	router.GET("/cusid",GetOrdersbyCustomerID)
-	router.GET("/tenorders",GetTenOrders)
-}
+	router.POST("/", CreateOrder)	router.GET("/cusid",GetOrdersbyCustomerID)
+	router.GET("/tenorders",GetTenOrders)}
 
 func ServicesRouterRegister(router *gin.RouterGroup){
 	router.GET("/",GetServices)
@@ -24,9 +22,15 @@ func GetServices(c *gin.Context){
 	}
 
 	c.JSON(http.StatusOK,data)
-}
-
-func GetOrdersbyCustomerID(c *gin.Context){
+func CreateOrder (c *gin.Context)  {
+	var order PlacedOrder
+	err := c.Bind(&order)
+	if err != nil {
+		c.AbortWithError(400, err)
+	}
+	createPlaceOrder(&order)
+	c.JSON(http.StatusCreated, order)
+}func GetOrdersbyCustomerID(c *gin.Context){
 	var userid uint
 	userid = 1
 	//c.Bind(&userid)
