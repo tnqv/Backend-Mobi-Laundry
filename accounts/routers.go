@@ -112,7 +112,6 @@ func AccountsRegistration(c *gin.Context) {
 		c.JSON(http.StatusUnprocessableEntity, common.NewValidatorError(err))
 		return
 	}
-
 	if err := SaveOne(&accountModelValidator.accountModel); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return

@@ -1,10 +1,10 @@
 package orders
 
 import (
-	"d2d-backend/accounts"
-	"d2d-backend/common"
 	"github.com/jinzhu/gorm"
 	"time"
+	"d2d-backend/accounts"
+	"d2d-backend/common"
 )
 
 type Service struct {
@@ -13,7 +13,7 @@ type Service struct {
 	Price       int64		`json:"price"`
 	Description string		`json:"description"`
 	CategoryID  uint		`json:"-"`
-	Url			string		`json:"url"`
+	ImageUrl			string		`json:"url"`
 	//Categories  Category `gorm:"PRELOAD:false"`
 }
 
@@ -25,7 +25,7 @@ type Category struct {
 }
 
 type ServiceOrder struct {
-	gorm.Model				 `json:",omitempty"`
+	gorm.Model				 `json:"-"`
 	PlacedOrderID uint
 	PlacedOrderModel PlacedOrder
 	ServiceID uint
@@ -36,27 +36,27 @@ type ServiceOrder struct {
 }
 
 type PlacedOrder struct {
-	gorm.Model
+	gorm.Model							`json:"-"`
 	//Store
-	StoreID uint
-	AssignedStore accounts.Store
-	TimePlaced time.Time
-	Detail string
+	StoreID uint						`json:"store_id"`
+	AssignedStore accounts.Store		`json:"store"`
+	TimePlaced time.Time				`json:"time"`
+	Detail string						`json:"note"`
 	//Order status
-	OrderStatusID uint
-	OrderStatusModel OrderStatus
+	OrderStatusID uint					`json:"status"`
+	OrderStatusModel OrderStatus		`json:"order_status"`
 
 	//Customer
-	CustomerID uint
-	CustomerModel accounts.Customer
+	CustomerID uint						`json:"-"`
+	CustomerModel accounts.Customer		`json:"customer"`
 
-	Capacity float32
-	EstimatedCapacity float32
-	DeliveryAddress string
-	DeliveryLatitude float32
-	DeliveryLongitude float32
-	ServiceTotalPrice float32
-	Priority int
+	Capacity float32					`json:"capacity"`
+	EstimatedCapacity float32			`json:"estimated_capacity"`
+	DeliveryAddress string				`json:"delivery_address"`
+	DeliveryLatitude float32			`json:"delivery_latitude"`
+	DeliveryLongitude float32			`json:"delivery_longitude"`
+	ServiceTotalPrice float32			`json:"total"`
+	Priority int						`json:"priority"`
 	//Review
 	ReviewID uint
 	OrderReview Review
@@ -74,14 +74,14 @@ type PlacedOrder struct {
 // 8 : Order is delivering
 // 9 : Order completed
 type OrderStatus struct {
-	gorm.Model
+	gorm.Model						`json:"-"`
 	StatusID uint
 	StatusChangedTime time.Time
 	Description string
 }
 
 type Review struct {
-	gorm.Model
+	gorm.Model						`json:"-"`
 	Content string
 	Rate int
 	CustomerID uint
