@@ -1,11 +1,11 @@
 package orders
 
 import (
+	"github.com/jinzhu/gorm"
+	"time"
 	"d2d-backend/accounts"
 	"d2d-backend/common"
 	"github.com/biezhi/gorm-paginator/pagination"
-	"github.com/jinzhu/gorm"
-	"time"
 )
 
 type Service struct {
@@ -60,7 +60,7 @@ type PlacedOrder struct {
 	Priority int						`json:"priority"`
 	//Review
 	ReviewID uint						`json:"-"`
-	OrderReview Review					`json:"-"`					
+	OrderReview Review					`json:"-"`
 
 }
 
@@ -128,10 +128,12 @@ func getCustomerInformations(accountID uint) (accounts.Customer) {
 }
 
 //Minh's function
-func getAllOrdersBasedOnCustomerID(userid *uint)([]PlacedOrder,error){
+func getAllOrdersBasedOnCustomerID(accountid *uint)([]PlacedOrder,error){
 	db := common.GetDB()
 	var order []PlacedOrder
-	err := db.Set("gorm:auto_preload", true).Find(&order, "customer_id = ?", userid).Error
+	var customer accounts.Customer
+	db.Find(&customer, "account_id = ?", accountid)
+	err := db.Set("gorm:auto_preload", true).Find(&order, "customer_id = ?", customer.ID).Error
 	return order,err
 }
 
