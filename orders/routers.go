@@ -13,7 +13,7 @@ func OrdersRouterRegister(router *gin.RouterGroup){
 	//router.GET("/orders",AccountsLogin)
 	router.POST("/createorder", CreateOrder)
 	router.GET("/cusid",GetOrdersbyCustomerID)
-	router.GET("/tenorders",GetTenOrders)}
+	router.POST("/tenorders",GetTenOrders)}
 
 func ServicesRouterRegister(router *gin.RouterGroup){
 	router.GET("/",GetServices)
@@ -41,6 +41,7 @@ func CreateOrder (c *gin.Context) {
 	//order.OrderStatusID = 1
 	//createPlaceOrder(&order)
 	//c.JSON(http.StatusCreated, order)
+	accountID, _ := strconv.ParseUint(c.PostForm("accountID"), 10, 64)
 	var order PlacedOrder
 	orderModelValidator := NewOrderModelValidator()
 	if err := orderModelValidator.Bind(c); err != nil {
@@ -49,7 +50,7 @@ func CreateOrder (c *gin.Context) {
 	}
 	c.Bind(&order)
 	order.TimePlaced = time.Now()
-	order.OrderStatusID = CreateOrderStatus(1, 1)
+	order.OrderStatusID = CreateOrderStatus(1, uint(accountID))
 	createPlaceOrder(&order)
 	c.JSON(http.StatusCreated, order)
 }
@@ -82,14 +83,13 @@ func GetTenOrders(c *gin.Context){
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database",err))
 		return
 	}
-	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	page, _ := strconv.Atoi(c.DefaultPostForm("page", "1"))
+	limit, _ := strconv.Atoi(c.DefaultPostForm("limit", "10"))
 	db := common.GetDB()
 	paginator := pagination.Pagging(&pagination.Param{
 		DB: db,
 		Page: page,
 		Limit: limit,
-		OrderBy: []string{"id desc"},
 		ShowSQL: true,
 	}, &orders)
 	c.JSON(http.StatusOK,paginator)

@@ -1,11 +1,10 @@
 package orders
 
 import (
-	"github.com/jinzhu/gorm"
-	"time"
 	"d2d-backend/accounts"
 	"d2d-backend/common"
-	"github.com/biezhi/gorm-paginator/pagination"
+	"github.com/jinzhu/gorm"
+	"time"
 )
 
 type Service struct {
@@ -141,9 +140,5 @@ func getOrders()([]PlacedOrder,error){
 	db := common.GetDB()
 	var order []PlacedOrder
 	err := db.Set("gorm:auto_preload", true).Find(&order).Error
-	pagination.Pagging(&pagination.Param{
-		DB: db,
-
-	}, &order)
 	return order,err
 }
