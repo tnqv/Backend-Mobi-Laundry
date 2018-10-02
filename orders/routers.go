@@ -5,40 +5,28 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
+
 func OrdersRouterRegister(router *gin.RouterGroup){
 	//router.GET("/orders",AccountsLogin)
-	router.POST("/createorder", CreateOrder)
 	router.GET("/cusid",GetOrdersbyCustomerID)
-	router.GET("/tenorders",GetTenOrders)}
+	router.GET("/tenorders",GetTenOrders)
+	router.POST("/", CreateOrder)
+}
 
 func ServicesRouterRegister(router *gin.RouterGroup){
 	router.GET("/",GetServices)
 }
 
-func GetServices(c *gin.Context) {
-	data, err := getAllServicesBasedOnCategory()
+func GetServices(c *gin.Context){
+	data,err := getAllServicesBasedOnCategory()
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database",err))
 		return
 	}
 
-	c.JSON(http.StatusOK, data)
+	c.JSON(http.StatusOK,data)
 }
 
-//DuyNQ's function
-func CreateOrder (c *gin.Context) {
-	var order PlacedOrder
-	orderModelValidator := NewOrderModelValidator()
-	if err := orderModelValidator.Bind(c); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, common.NewValidatorError(err))
-		return
-	}
-	c.Bind(&order)
-	createPlaceOrder(&order)
-	c.JSON(http.StatusCreated, order)
-}
-
-//Minh's function
 func GetOrdersbyCustomerID(c *gin.Context){
 	var userid uint
 	userid = 1
@@ -51,11 +39,20 @@ func GetOrdersbyCustomerID(c *gin.Context){
 	c.JSON(http.StatusOK,data)
 }
 
-func GetTenOrders(c *gin.Context){
-	data,err := getTenOrders()
+func GetTenOrders(c *gin.Context) {
+	data, err := getTenOrders()
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, common.NewError("database",err))
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
-	c.JSON(http.StatusOK,data)
+	c.JSON(http.StatusOK, data)
+}
+func CreateOrder(c *gin.Context) {
+	var order PlacedOrder
+	err := c.Bind(&order)
+	if err != nil {
+		c.AbortWithError(400, err)
+	}
+	createPlaceOrder(&order)
+	c.JSON(http.StatusCreated, order)
 }

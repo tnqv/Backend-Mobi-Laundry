@@ -107,17 +107,12 @@ func getAllServicesBasedOnCategory()([]Category,error){
 	return category,err
 }
 
-//DuyNQ's function
-func createPlaceOrder(order *PlacedOrder)  {
-	db := common.GetDB()
-	db.Create(&order)
-}
-
-//Minh's function
-func getAllOrdersBasedOnCustomerID(userid *uint)([]PlacedOrder,error){
+func getAllOrdersBasedOnCustomerID(accountid *uint)([]PlacedOrder,error){
 	db := common.GetDB()
 	var order []PlacedOrder
-	err := db.Set("gorm:auto_preload", true).Find(&order, "customer_id = ?", userid).Error
+	var customer accounts.Customer
+	db.Find(&customer, "account_id = ?", accountid)
+	err := db.Set("gorm:auto_preload", true).Find(&order, "customer_id = ?", customer.ID).Error
 	return order,err
 }
 
@@ -127,3 +122,9 @@ func getTenOrders()([]PlacedOrder,error){
 	err := db.Limit(10).Set("gorm:auto_preload", true).Find(&order).Error
 	return order,err
 }
+func createPlaceOrder(order *PlacedOrder)  {
+	db := common.GetDB()
+	db.Create(&order)
+}
+
+//
