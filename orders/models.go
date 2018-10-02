@@ -1,10 +1,11 @@
 package orders
 
 import (
-	"github.com/jinzhu/gorm"
-	"time"
 	"d2d-backend/accounts"
 	"d2d-backend/common"
+	"github.com/biezhi/gorm-paginator/pagination"
+	"github.com/jinzhu/gorm"
+	"time"
 )
 
 type Service struct {
@@ -38,17 +39,17 @@ type ServiceOrder struct {
 type PlacedOrder struct {
 	gorm.Model							`json:"-"`
 	//Store
-	StoreID uint						`json:"store_id"`
+	StoreID uint						`json:"-"`
 	AssignedStore accounts.Store		`json:"store"`
-	TimePlaced time.Time				`json:"time"`
+	TimePlaced time.Time				`json:"time_placed"`
 	Detail string						`json:"note"`
 	//Order status
 	OrderStatusID uint					`json:"status"`
-	OrderStatusModel OrderStatus		`json:"order_status"`
+	OrderStatusModel OrderStatus		`json:"-"`
 
 	//Customer
-	CustomerID uint						`json:"-"`
-	CustomerModel accounts.Customer		`json:"customer"`
+	CustomerID uint						`json:"customer_id"`
+	CustomerModel accounts.Customer		`json:"-"`
 
 	Capacity float32					`json:"capacity"`
 	EstimatedCapacity float32			`json:"estimated_capacity"`
@@ -58,8 +59,8 @@ type PlacedOrder struct {
 	ServiceTotalPrice float32			`json:"total"`
 	Priority int						`json:"priority"`
 	//Review
-	ReviewID uint
-	OrderReview Review
+	ReviewID uint						`json:"-"`
+	OrderReview Review					`json:"-"`					
 
 }
 
@@ -76,6 +77,7 @@ type PlacedOrder struct {
 type OrderStatus struct {
 	gorm.Model						`json:"-"`
 	StatusID uint
+	AccountID uint
 	StatusChangedTime time.Time
 	Description string
 }
@@ -113,6 +115,18 @@ func createPlaceOrder(order *PlacedOrder)  {
 	db.Create(&order)
 }
 
+func createOrderStatus(orderstatus *OrderStatus) {
+	db := common.GetDB()
+	db.Create(&orderstatus)
+}
+
+func getCustomerInformations(accountID uint) (accounts.Customer) {
+	db := common.GetDB()
+	var customer accounts.Customer
+	db.Find(&customer, "account_id = ?", accountID)
+	return customer
+}
+
 //Minh's function
 func getAllOrdersBasedOnCustomerID(userid *uint)([]PlacedOrder,error){
 	db := common.GetDB()
@@ -121,9 +135,13 @@ func getAllOrdersBasedOnCustomerID(userid *uint)([]PlacedOrder,error){
 	return order,err
 }
 
-func getTenOrders()([]PlacedOrder,error){
+func getOrders()([]PlacedOrder,error){
 	db := common.GetDB()
 	var order []PlacedOrder
-	err := db.Limit(10).Set("gorm:auto_preload", true).Find(&order).Error
+	err := db.Set("gorm:auto_preload", true).Find(&order).Error
+	pagination.Pagging(&pagination.Param{
+		DB: db,
+
+	}, &order)
 	return order,err
 }

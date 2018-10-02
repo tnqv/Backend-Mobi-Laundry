@@ -7,10 +7,10 @@ import (
 
 type OrderModelValidator struct {
 	Order struct{
-		DeliveryAddress string		`form:"delivery_address" json:"delivery_address" binding:"exists,min=4,max=255"`
-		DeliveryLatitude float32	`form:"delivery_latitude" json:"delivery_latitude" binding:"exists,min=4,max=255"`
-		DeliveryLongitude float32	`form:"delivery_longitude" json:"delivery_longitude" binding:"exists,min=4,max=255"`
-		EstimatedCapacity float32	`form:"estimated_capacity" json:"estimated_capacity" binding:"exists,min=4,max=255"`
+		DeliveryAddress string		`form:"DeliveryAddress" json:"delivery_address" binding:"exists,min=4,max=255"`
+		DeliveryLatitude float32	`form:"DeliveryLatitude" json:"delivery_latitude" binding:"exists,min=4,max=255"`
+		DeliveryLongitude float32	`form:"DeliveryLongitude" json:"delivery_longitude" binding:"exists,min=4,max=255"`
+		EstimatedCapacity float32	`form:"EstimatedCapacity" json:"estimated_capacity" binding:"exists,min=4,max=255"`
 	} `json:"order"`
 	orderModel PlacedOrder `json:"-"`
 }

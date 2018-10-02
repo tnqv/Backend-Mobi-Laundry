@@ -49,13 +49,13 @@ type StoreEmployee struct {
 }
 
 type Store struct {
-	gorm.Model
-	Name string
-	Description string
-	Longitude float32
-	Latitude float32
-	Address string
-	PhoneNumber string
+	gorm.Model				`json:"-"`
+	Name string				`json:"name"`
+	Description string		`json:"description"`
+	Longitude float32		`json:"longitude"`
+	Latitude float32		`json:"latitude"`
+	Address string			`json:"address"`
+	PhoneNumber string		`json:"phone_number"`
 }
 
 // Migrate the schema of database if needed
