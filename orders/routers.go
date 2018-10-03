@@ -13,7 +13,7 @@ func OrdersRouterRegister(router *gin.RouterGroup){
 	//router.GET("/orders",AccountsLogin)
 	router.POST("/createorder", CreateOrder)
 	router.GET("/cusid",GetOrdersbyCustomerID)
-	router.POST("/tenorders",GetTenOrders)}
+	router.POST("/getorders",GetOrders)}
 
 func ServicesRouterRegister(router *gin.RouterGroup){
 	router.GET("/",GetServices)
@@ -77,7 +77,7 @@ func GetOrdersbyCustomerID(c *gin.Context){
 	c.JSON(http.StatusOK,data)
 }
 
-func GetTenOrders(c *gin.Context){
+func GetOrders(c *gin.Context){
 	orders,err := getOrders()
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database",err))
