@@ -10,7 +10,6 @@ import (
 type Account struct {
 	gorm.Model
 	Email string		`form:"email"`
-	Username string		`form:"username"`
 	Password string		`form:"password"`
 	Salt string			`form:"-"`
 	Provider string		`form:"provider"`
@@ -19,16 +18,16 @@ type Account struct {
 }
 
 type User struct {
-	gorm.Model
-	Name string
-	Address string
-	PhoneNumber string
-	Longitude float32
-	Latitude float32
-	RoleID uint
-	AvatarUrl string
-	AccountID uint
-	AccountInfo Account
+	gorm.Model			`json:"-"`
+	Name string			`json:"name"`
+	Address string		`json:"-"`
+	PhoneNumber string	`json:"phone_number"`
+	Longitude float32	`json:"-"`
+	Latitude float32	`json:"-"`
+	RoleID uint			`json:"-"`
+	AvatarUrl string	`json:"-"`
+	AccountID uint		`json:"-"`
+	AccountInfo Account	`json:"-"`
 }
 
 type Role struct {
@@ -93,5 +92,19 @@ func (u *Account) setPassword(password string) error {
 func SaveOne(data interface{}) error {
 	db := common.GetDB()
 	err := db.Save(data).Error
+	return err
+}
+
+// get user information by accountID
+func GetUserInformations(accountID uint) (User) {
+	db := common.GetDB()
+	var user User
+	db.Find(&user, "account_id = ?", accountID)
+	return user
+}
+
+func CreateNewUser(user *User) error {
+	db := common.GetDB()
+	err := db.Save(user).Error
 	return err
 }

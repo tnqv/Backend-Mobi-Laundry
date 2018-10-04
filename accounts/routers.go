@@ -62,7 +62,6 @@ func FacebookAccountsLogin(c *gin.Context){
 	if err != nil {
 		var newAccount Account
 		newAccount.Email = fbEmail
-		newAccount.Username = fbName
 		newAccount.Provider = FacebookProvider
 		newAccount.AccessToken = fbLoginValidator.accountModel.AccessToken
 
@@ -101,7 +100,10 @@ func AccountsLogin(c *gin.Context){
 		}
 		UpdateContextUserModel(c, accountModel.ID)
 		serializer := AccountSerializer{c}
-		c.JSON(http.StatusOK, gin.H{"account": serializer.Response()})
+		c.JSON(http.StatusOK, gin.H{
+			"account": serializer.Response(),
+			"user": GetUserInformations(accountModel.ID),
+		})
 
 }
 
@@ -112,12 +114,22 @@ func AccountsRegistration(c *gin.Context) {
 		c.JSON(http.StatusUnprocessableEntity, common.NewValidatorError(err))
 		return
 	}
-
 	if err := SaveOne(&accountModelValidator.accountModel); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+	var user User
+	user.Name = c.PostForm("name")
+	user.PhoneNumber = c.PostForm("phone_number")
+	user.AccountID = accountModelValidator.accountModel.ID
+	if err := CreateNewUser(&user); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
 	c.Set("user_model", accountModelValidator.accountModel)
 	serializer := AccountSerializer{c}
-	c.JSON(http.StatusCreated, gin.H{"account": serializer.Response()})
+	c.JSON(http.StatusCreated, gin.H{
+		"account": serializer.Response(),
+		"user": user,
+	})
 }

@@ -10,17 +10,17 @@ type AccountSerializer struct {
 }
 
 type AccountResponse struct {
-	Username string  `json:"username"`
 	Email    string  `json:"email"`
 	Token    string  `json:"token"`
+	ID		 uint	  `json:"-"`
 }
 
 func (self *AccountSerializer) Response() AccountResponse {
 	accountModel := self.c.MustGet("user_model").(Account)
 	user := AccountResponse{
-		Username: accountModel.Username,
 		Email:    accountModel.Email,
 		Token:    common.GenToken(accountModel.ID),
+		ID:		  accountModel.ID,
 	}
 	return user
 }

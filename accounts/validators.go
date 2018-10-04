@@ -11,7 +11,6 @@ import (
 // Then, you can just call model.save() after the data is ready in DataModel.
 type AccountModelValidator struct {
 	Account struct {
-		Username string `form:"username" json:"username" binding:"exists,alphanum,min=4,max=255"`
 		Email    string `form:"email" json:"email" binding:"exists,email"`
 		Password string `form:"password" json:"password" binding:"exists,min=8,max=255"`
 	} `json:"account"`
@@ -26,7 +25,6 @@ func (self *AccountModelValidator) Bind(c *gin.Context) error {
 	if err != nil {
 		return err
 	}
-	self.accountModel.Username = self.Account.Username
 	self.accountModel.Email = self.Account.Email
 
 
@@ -44,7 +42,6 @@ func NewAccountModelValidator() AccountModelValidator {
 
 func NewUserModelValidatorFillWith(userModel Account) AccountModelValidator {
 	userModelValidator := NewAccountModelValidator()
-	userModelValidator.Account.Username = userModel.Username
 	userModelValidator.Account.Email = userModel.Email
 	userModelValidator.Account.Password = common.NBRandomPassword
 	return userModelValidator

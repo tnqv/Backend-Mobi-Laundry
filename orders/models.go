@@ -39,7 +39,7 @@ type PlacedOrder struct {
 	gorm.Model							`json:"-"`
 	//Store
 	StoreID uint						`json:"-"`
-	AssignedStore accounts.Store		`json:"store"`
+	AssignedStore accounts.Store		`json:"-"`
 	TimePlaced time.Time				`json:"time_placed"`
 	Detail string						`json:"note"`
 	//Order status
