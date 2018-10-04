@@ -127,7 +127,7 @@ func getCustomerInformations(accountID uint) (accounts.Customer) {
 }
 
 //Minh's function
-func getAllOrdersBasedOnCustomerID(accountid *uint)([]PlacedOrder,error){
+func getAllOrdersBasedOnAccountID(accountid uint)([]PlacedOrder,error){
 	db := common.GetDB()
 	var order []PlacedOrder
 	var customer accounts.Customer
