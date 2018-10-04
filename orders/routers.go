@@ -12,7 +12,8 @@ import (
 func OrdersRouterRegister(router *gin.RouterGroup){
 	//router.GET("/orders",AccountsLogin)
 	router.POST("/createorder", CreateOrder)
-router.POST("/accountid",GetOrdersbyAccountID)	router.POST("/getorders",GetOrders)}
+    router.POST("/accountid",GetOrdersbyAccountID)
+	router.POST("/getorders",GetOrders)}
 
 func ServicesRouterRegister(router *gin.RouterGroup){
 	router.GET("/",GetServices)
@@ -69,7 +70,8 @@ func CreateOrderStatus(statusID uint, accountID uint) (uint) {
 
 func GetOrdersbyAccountID(c *gin.Context){
 	accountID, _ := strconv.ParseUint(c.PostForm("accountID"),10,64)
-	data,err := getAllOrdersBasedOnAccountID(uint(accountID))	if err != nil {
+	data,err := getAllOrdersBasedOnAccountID(uint(accountID))
+	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database",err))
 		return
 	}
