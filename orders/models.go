@@ -127,10 +127,10 @@ func getCustomerInformations(accountID uint) (accounts.User) {
 }
 
 //Minh's function
-func getAllOrdersBasedOnCustomerID(accountid uint)([]PlacedOrder,error){
-	db := common.GetDB()
+
+func getAllOrdersBasedOnAccountID(accountid uint)([]PlacedOrder,error){	db := common.GetDB()
 	var order []PlacedOrder
-	var customer accounts.User
+	var customer accounts.Customer
 	db.Find(&customer, "account_id = ?", accountid)
 	err := db.Set("gorm:auto_preload", true).Find(&order, "customer_id = ?", customer.ID).Error
 	return order,err
