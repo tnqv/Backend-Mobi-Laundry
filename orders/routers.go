@@ -12,7 +12,7 @@ import (
 func OrdersRouterRegister(router *gin.RouterGroup){
 	//router.GET("/orders",AccountsLogin)
 	router.POST("/createorder", CreateOrder)
-	router.GET("/cusid",GetOrdersbyCustomerID)
+	router.POST("/cusid",GetOrdersbyCustomerID)
 	router.POST("/getorders",GetOrders)}
 
 func ServicesRouterRegister(router *gin.RouterGroup){
@@ -49,7 +49,9 @@ func CreateOrder (c *gin.Context) {
 		return
 	}
 	c.Bind(&order)
+	order.CustomerID = getCustomerInformations(uint(accountID)).ID
 	order.TimePlaced = time.Now()
+	order.OrderCode = time.Now().Format("20060102150405")
 	order.OrderStatusID = CreateOrderStatus(1, uint(accountID))
 	createPlaceOrder(&order)
 	c.JSON(http.StatusCreated, order)
@@ -66,10 +68,8 @@ func CreateOrderStatus(statusID uint, accountID uint) (uint) {
 
 //Minh's function
 func GetOrdersbyCustomerID(c *gin.Context){
-	var userid uint
-	userid = 1
-	//c.Bind(&userid)
-	data,err := getAllOrdersBasedOnCustomerID(&userid)
+	accountID, _ := strconv.ParseUint(c.PostForm("accountID"), 10, 64)
+	data,err := getAllOrdersBasedOnCustomerID(uint(accountID))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database",err))
 		return

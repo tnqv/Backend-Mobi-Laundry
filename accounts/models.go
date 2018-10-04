@@ -18,34 +18,23 @@ type Account struct {
 	FcmToken string		`form:"fcm_token"`
 }
 
-type Customer struct {
+type User struct {
 	gorm.Model
 	Name string
-	ShippingAddress string
+	Address string
+	PhoneNumber string
 	Longitude float32
 	Latitude float32
+	RoleID uint
 	AvatarUrl string
 	AccountID uint
 	AccountInfo Account
 }
 
-type Delivery struct {
+type Role struct {
 	gorm.Model
 	Name string
-	Capacity uint
-	IdentifyNumber string
-	Address string
-	PhoneNumber string
-	ImageUrl string
-	AccountID uint
-	AccountInfo Account
-}
-
-type StoreEmployee struct {
-	gorm.Model
-	Name string
-	AccountID uint
-	AccountInfo Account
+	Description string
 }
 
 type Store struct {
@@ -63,9 +52,8 @@ func AutoMigrate() {
 	db := common.GetDB()
 
 	db.AutoMigrate(&Account{})
-	db.AutoMigrate(&Customer{})
-	db.AutoMigrate(&Delivery{})
-	db.AutoMigrate(&StoreEmployee{})
+	db.AutoMigrate(&User{})
+	db.AutoMigrate(&Role{})
 	db.AutoMigrate(&Store{})
 
 }

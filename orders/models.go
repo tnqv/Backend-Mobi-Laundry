@@ -48,7 +48,7 @@ type PlacedOrder struct {
 
 	//Customer
 	CustomerID uint						`json:"customer_id"`
-	CustomerModel accounts.Customer		`json:"-"`
+	UserModel accounts.User				`json:"-"`
 
 	Capacity float32					`json:"capacity"`
 	EstimatedCapacity float32			`json:"estimated_capacity"`
@@ -60,7 +60,7 @@ type PlacedOrder struct {
 	//Review
 	ReviewID uint						`json:"-"`
 	OrderReview Review					`json:"-"`
-
+	OrderCode string					`json:"order_code"`
 }
 
 //Status ID
@@ -86,7 +86,7 @@ type Review struct {
 	Content string
 	Rate int
 	CustomerID uint
-	CustomerMode accounts.Customer
+	CustomerMode accounts.User
 }
 
 // Migrate the schema of database if needed
@@ -119,18 +119,18 @@ func createOrderStatus(orderstatus *OrderStatus) {
 	db.Create(&orderstatus)
 }
 
-func getCustomerInformations(accountID uint) (accounts.Customer) {
+func getCustomerInformations(accountID uint) (accounts.User) {
 	db := common.GetDB()
-	var customer accounts.Customer
+	var customer accounts.User
 	db.Find(&customer, "account_id = ?", accountID)
 	return customer
 }
 
 //Minh's function
-func getAllOrdersBasedOnCustomerID(accountid *uint)([]PlacedOrder,error){
+func getAllOrdersBasedOnCustomerID(accountid uint)([]PlacedOrder,error){
 	db := common.GetDB()
 	var order []PlacedOrder
-	var customer accounts.Customer
+	var customer accounts.User
 	db.Find(&customer, "account_id = ?", accountid)
 	err := db.Set("gorm:auto_preload", true).Find(&order, "customer_id = ?", customer.ID).Error
 	return order,err
