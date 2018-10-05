@@ -30,6 +30,9 @@ type User struct {
 	AccountInfo Account	`json:"-"`
 }
 
+//Role : 1 : Customer
+//       2 : Delivery
+//		 3 : StoreEmployeee
 type Role struct {
 	gorm.Model
 	Name string

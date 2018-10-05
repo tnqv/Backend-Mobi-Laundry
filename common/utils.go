@@ -31,6 +31,11 @@ func RandString(n int) string {
 const NBSecretPassword = "A String Very Very Very Strong!!@##$!@#$"
 const NBRandomPassword = "A String Very Very Very Niubilty!!@##$!@#4"
 
+const Page = "page";
+const Limit = "limit";
+const PageDefault = "1";
+const LimitDefault = "10";
+
 // A Util function to generate jwt_token which can be used in the request header
 func GenToken(id uint) string {
 	jwt_token := jwt.New(jwt.GetSigningMethod("HS256"))

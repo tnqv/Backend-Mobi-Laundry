@@ -7,13 +7,14 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"fmt"
 )
 
 func OrdersRouterRegister(router *gin.RouterGroup){
 	//router.GET("/orders",AccountsLogin)
-	router.POST("/createorder", CreateOrder)
-    router.POST("/accountid",GetOrdersbyAccountID)
-	router.POST("/getorders",GetOrders)}
+	router.POST("/", CreateOrder)
+    router.GET("/user/:userId",GetOrdersbyAccountID)
+	router.GET("/",GetOrders)}
 
 func ServicesRouterRegister(router *gin.RouterGroup){
 	router.GET("/",GetServices)
@@ -41,7 +42,7 @@ func CreateOrder (c *gin.Context) {
 	//order.OrderStatusID = 1
 	//createPlaceOrder(&order)
 	//c.JSON(http.StatusCreated, order)
-	accountID, _ := strconv.ParseUint(c.PostForm("accountID"), 10, 64)
+	accountID, _ := strconv.ParseUint(c.PostForm("userID"), 10, 64)
 	var order PlacedOrder
 	orderModelValidator := NewOrderModelValidator()
 	if err := orderModelValidator.Bind(c); err != nil {
@@ -49,7 +50,7 @@ func CreateOrder (c *gin.Context) {
 		return
 	}
 	c.Bind(&order)
-	order.CustomerID = getCustomerInformations(uint(accountID)).ID
+	order.UserID = getCustomerInformations(uint(accountID)).ID
 	order.TimePlaced = time.Now()
 	order.OrderCode = time.Now().Format("20060102150405")
 	order.OrderStatusID = CreateOrderStatus(1, uint(accountID))
@@ -60,7 +61,7 @@ func CreateOrder (c *gin.Context) {
 func CreateOrderStatus(statusID uint, accountID uint) (uint) {
 	var orderStatus OrderStatus
 	orderStatus.StatusID = statusID
-	orderStatus.AccountID = accountID
+	orderStatus.UserID = accountID
 	orderStatus.StatusChangedTime = time.Now()
 	createOrderStatus(&orderStatus)
 	return orderStatus.ID
@@ -69,23 +70,42 @@ func CreateOrderStatus(statusID uint, accountID uint) (uint) {
 //Minh's function
 
 func GetOrdersbyAccountID(c *gin.Context){
-	accountID, _ := strconv.ParseUint(c.PostForm("accountID"),10,64)
-	data,err := getAllOrdersBasedOnAccountID(uint(accountID))
-	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, common.NewError("database",err))
-		return
-	}
-	c.JSON(http.StatusOK,data)
+	userID, _ := strconv.ParseUint(c.Param("userId"),10,64)
+	fmt.Println(userID)
+	//data,err := getAllOrdersBasedOnAccountID(uint(accountID))
+	//if err != nil {
+	//	c.JSON(http.StatusUnprocessableEntity, common.NewError("database",err))
+	//	return
+	//}
+	var orders []PlacedOrder
+	page, _ := strconv.Atoi(c.DefaultQuery(common.Page, common.PageDefault))
+	limit, _ := strconv.Atoi(c.DefaultQuery(common.Limit, common.LimitDefault))
+	db := common.GetDB()
+
+	db = db.Where("user_id = ?", userID)
+
+	paginator := pagination.Pagging(&pagination.Param{
+		DB: db,
+		Page: page,
+		Limit: limit,
+		ShowSQL: true,
+	}, &orders)
+
+
+	c.JSON(http.StatusOK,paginator)
 }
 
 func GetOrders(c *gin.Context){
-	orders,err := getOrders()
-	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, common.NewError("database",err))
-		return
-	}
-	page, _ := strconv.Atoi(c.DefaultPostForm("page", "1"))
-	limit, _ := strconv.Atoi(c.DefaultPostForm("limit", "10"))
+	//orders,err := getOrders()
+	//if err != nil {
+	//	c.JSON(http.StatusUnprocessableEntity, common.NewError("database",err))
+	//	return
+	//}
+
+	var orders []PlacedOrder
+
+	page, _ := strconv.Atoi(c.DefaultQuery(common.Page, common.PageDefault))
+	limit, _ := strconv.Atoi(c.DefaultQuery(common.Limit, common.LimitDefault))
 	db := common.GetDB()
 	paginator := pagination.Pagging(&pagination.Param{
 		DB: db,

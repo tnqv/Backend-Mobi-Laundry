@@ -47,7 +47,7 @@ type PlacedOrder struct {
 	OrderStatusModel OrderStatus		`json:"-"`
 
 	//Customer
-	CustomerID uint						`json:"customer_id"`
+	UserID uint					    	`json:"user_id"`
 	UserModel accounts.User				`json:"-"`
 
 	Capacity float32					`json:"capacity"`
@@ -76,7 +76,7 @@ type PlacedOrder struct {
 type OrderStatus struct {
 	gorm.Model						`json:"-"`
 	StatusID uint
-	AccountID uint
+	UserID uint
 	StatusChangedTime time.Time
 	Description string
 }
@@ -85,8 +85,8 @@ type Review struct {
 	gorm.Model						`json:"-"`
 	Content string
 	Rate int
-	CustomerID uint
-	CustomerMode accounts.User
+	UserID uint
+	UserModel accounts.User
 }
 
 // Migrate the schema of database if needed
@@ -130,9 +130,9 @@ func getCustomerInformations(accountID uint) (accounts.User) {
 func getAllOrdersBasedOnAccountID(accountid uint)([]PlacedOrder,error){
 	db := common.GetDB()
 	var order []PlacedOrder
-	var customer accounts.User
-	db.Find(&customer, "account_id = ?", accountid)
-	err := db.Set("gorm:auto_preload", true).Find(&order, "customer_id = ?", customer.ID).Error
+	//var customer accounts.User
+	//db.Find(&customer, "user_id = ?", accountid)
+	err := db.Set("gorm:auto_preload", true).Find(&order, "user_id = ?", accountid).Error
 	return order,err
 }
 
