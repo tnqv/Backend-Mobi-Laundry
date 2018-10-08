@@ -126,25 +126,6 @@ func getCustomerInformations(accountID uint) (accounts.User) {
 	return customer
 }
 
-func updateQuantity(serviceOrderID uint, quantity uint) (error) {
-	db := common.GetDB()
-	err := db.Model(&ServiceOrder{}).Where("id = ?", serviceOrderID).Update("quantity", quantity).Error
-	return err
-}
-
-func deleteServiceOrder(serviceOrderID uint) (error) {
-	db := common.GetDB()
-	err := db.Delete(&ServiceOrder{}, "id = ?", serviceOrderID).Error
-	return err
-}
-
-func updateOrderStatus(orderID uint, orderStatusID uint) (PlacedOrder, error) {
-	db := common.GetDB()
-	var order PlacedOrder
-	err := db.Model(&order).Where("id = ?", orderID).Update("order_status_id", orderStatusID).Error
-	return order, err
-}
-
 //Minh's function
 func getAllOrdersBasedOnAccountID(accountid uint)([]PlacedOrder,error){
 	db := common.GetDB()
@@ -160,4 +141,33 @@ func getOrders()([]PlacedOrder,error){
 	var order []PlacedOrder
 	err := db.Set("gorm:auto_preload", true).Find(&order).Error
 	return order,err
+}
+
+func createOrderService(orderservice *ServiceOrder){
+	db := common.GetDB()
+	db.Create(&orderservice)
+}
+
+func createCategory(category *Category){
+	db := common.GetDB()
+	db.Create(&category)
+}
+
+func updateCategory(category *Category)(error){
+	db := common.GetDB()
+	err := db.Model(&category).Update(map[string]interface{}{"name":category.Name,"description":category.Description}).Error
+	return err
+}
+
+func getCategory(cateId uint)(Category, error){
+	db := common.GetDB()
+	var cate Category
+	err := db.First(&cate, cateId).Error
+	return cate, err
+}
+
+func deleteCategory(cateId uint) (error) {
+	db := common.GetDB()
+	err := db.Delete(&Category{}, "id = ?", cateId).Error
+	return err
 }
