@@ -25,14 +25,14 @@ type Category struct {
 }
 
 type ServiceOrder struct {
-	gorm.Model				 `json:"-"`
-	PlacedOrderID uint
-	PlacedOrderModel PlacedOrder
-	ServiceID uint
-	ServiceModel Service
-	Description string
-	Quantity uint
-	Price float32
+	gorm.Model				 		`json:"-"`
+	PlacedOrderID uint				`json:"placed_order_id"`
+	PlacedOrderModel PlacedOrder	`json:"-"`
+	ServiceID uint					`json:"service_id"`
+	ServiceModel Service			`json:"-"`
+	Description string				`json:"description"`
+	Quantity uint					`json:"quantity"`
+	Price float32					`json:"price"`
 }
 
 type PlacedOrder struct {
@@ -126,6 +126,25 @@ func getCustomerInformations(accountID uint) (accounts.User) {
 	return customer
 }
 
+func updateQuantity(serviceOrderID uint, quantity uint) (error) {
+	db := common.GetDB()
+	err := db.Model(&ServiceOrder{}).Where("id = ?", serviceOrderID).Update("quantity", quantity).Error
+	return err
+}
+
+func deleteServiceOrder(serviceOrderID uint) (error) {
+	db := common.GetDB()
+	err := db.Delete(&ServiceOrder{}, "id = ?", serviceOrderID).Error
+	return err
+}
+
+func updateOrderStatus(orderID uint, orderStatusID uint) (PlacedOrder, error) {
+	db := common.GetDB()
+	var order PlacedOrder
+	err := db.Model(&order).Where("id = ?", orderID).Update("order_status_id", orderStatusID).Error
+	return order, err
+}
+
 //Minh's function
 func getAllOrdersBasedOnAccountID(accountid uint)([]PlacedOrder,error){
 	db := common.GetDB()
@@ -171,3 +190,20 @@ func deleteCategory(cateId uint) (error) {
 	err := db.Delete(&Category{}, "id = ?", cateId).Error
 	return err
 }
+
+
+//SERVICE_ORDERS ENTITY
+func getListServiceOrders() ([]ServiceOrder, error) {
+	db := common.GetDB()
+	var list []ServiceOrder
+	err := db.Find(&list).Error
+	return list, err
+}
+
+func getServiceOrder(serviceOrderId uint) (ServiceOrder, error) {
+	db := common.GetDB()
+	var serviceOrder ServiceOrder
+	err := db.First(&serviceOrder, serviceOrderId).Error
+	return serviceOrder, err
+}
+//END SERVICE_ORDERS ENTITY

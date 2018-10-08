@@ -194,3 +194,4 @@ func DeleteRole(c *gin.Context)  {
 	}
 	c.JSON(http.StatusOK, "Deleted!")
 }
+//END ROLE ENTITY
