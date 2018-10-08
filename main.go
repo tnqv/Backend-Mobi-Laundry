@@ -76,6 +76,7 @@ func main() {
 	v1.Use(accounts.AuthMiddleware(false))
 	orders.ServicesRouterRegister(v1.Group("/services"))
 	orders.OrdersRouterRegister(v1.Group("/orders"))
+	orders.ServiceOrderRouterRegister(v1.Group("/serviceorder"))
 	// articles.ArticlesAnonymousRegister(v1.Group("/articles"))
 	// articles.TagsAnonymousRegister(v1.Group("/tags"))
 

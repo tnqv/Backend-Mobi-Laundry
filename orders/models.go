@@ -126,6 +126,25 @@ func getCustomerInformations(accountID uint) (accounts.User) {
 	return customer
 }
 
+func updateQuantity(serviceOrderID uint, quantity uint) (error) {
+	db := common.GetDB()
+	err := db.Model(&ServiceOrder{}).Where("id = ?", serviceOrderID).Update("quantity", quantity).Error
+	return err
+}
+
+func deleteServiceOrder(serviceOrderID uint) (error) {
+	db := common.GetDB()
+	err := db.Delete(&ServiceOrder{}, "id = ?", serviceOrderID).Error
+	return err
+}
+
+func updateOrderStatus(orderID uint, orderStatusID uint) (PlacedOrder, error) {
+	db := common.GetDB()
+	var order PlacedOrder
+	err := db.Model(&order).Where("id = ?", orderID).Update("order_status_id", orderStatusID).Error
+	return order, err
+}
+
 //Minh's function
 func getAllOrdersBasedOnAccountID(accountid uint)([]PlacedOrder,error){
 	db := common.GetDB()

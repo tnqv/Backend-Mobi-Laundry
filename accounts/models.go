@@ -111,3 +111,4 @@ func CreateNewUser(user *User) error {
 	err := db.Save(user).Error
 	return err
 }
+
