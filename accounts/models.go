@@ -34,9 +34,9 @@ type User struct {
 //       2 : Delivery
 //		 3 : StoreEmployeee
 type Role struct {
-	gorm.Model
-	Name string
-	Description string
+	gorm.Model				`json:"-"`
+	Name string				`json:"name"`
+	Description string		`json:"description"`
 }
 
 type Store struct {
@@ -112,3 +112,35 @@ func CreateNewUser(user *User) error {
 	return err
 }
 
+//ROLE ENTITY
+func getListRoles() ([]Role, error) {
+	db := common.GetDB()
+	var list []Role
+	err := db.Find(&list).Error
+	return list, err
+}
+
+func getRole(roleId uint) (Role, error) {
+	db := common.GetDB()
+	var role Role
+	err := db.First(&role, roleId).Error
+	return role, err
+}
+
+func createRole(role *Role) (error) {
+	db := common.GetDB()
+	err := db.Create(&role).Error
+	return err
+}
+
+func updateRole(role *Role) (error) {
+	db := common.GetDB()
+	err := db.Model(&role).Updates(map[string]interface{}{"name": role.Name, "description": role.Description}).Error
+	return err
+}
+
+func deleteRole(roleId uint) (error) {
+	db := common.GetDB()
+	err := db.Delete(&Role{}, "id = ?", roleId).Error
+	return err
+}

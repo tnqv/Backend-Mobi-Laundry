@@ -7,6 +7,7 @@ import (
 	"errors"
 	"github.com/huandu/facebook"
 	"fmt"
+	"strconv"
 )
 
 const (
@@ -18,6 +19,14 @@ func AccountsRouterRegister(router *gin.RouterGroup){
 	router.POST("/login",AccountsLogin)
 	router.POST("/",AccountsRegistration)
 	router.POST("/facebook/auth",FacebookAccountsLogin)
+}
+
+func RolesRouterRegister(router *gin.RouterGroup)  {
+	router.GET("/:roleId", GetRole)
+	router.GET("/", GetListRoles)
+	router.POST("/", CreateRole)
+	router.PUT("/", UpdateRole)
+	router.DELETE("/:roleId", DeleteRole)
 }
 
 func FacebookAccountsLogin(c *gin.Context){
@@ -132,4 +141,56 @@ func AccountsRegistration(c *gin.Context) {
 		"account": serializer.Response(),
 		"user": user,
 	})
+}
+
+//ROLE ENTITY
+func GetListRoles(c *gin.Context)  {
+	list, err := getListRoles()
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+	c.JSON(http.StatusOK, list)
+}
+
+func GetRole(c *gin.Context)  {
+	roleId, _ := strconv.ParseUint(c.Params.ByName("roleId"), 10, 64)
+	role, err := getRole(uint(roleId))
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+	c.JSON(http.StatusOK, role)
+}
+
+func CreateRole(c *gin.Context)  {
+	var role Role
+	c.Bind(&role)
+	err := createRole(&role)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+	c.JSON(http.StatusOK, role)
+}
+
+func UpdateRole(c *gin.Context)  {
+	var role Role
+	c.Bind(&role)
+	err := updateRole(&role)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+	c.JSON(http.StatusOK, role)
+}
+
+func DeleteRole(c *gin.Context)  {
+	roleId, _ := strconv.ParseUint(c.Params.ByName("roleId"), 10, 64)
+	err := deleteRole(uint(roleId))
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+	c.JSON(http.StatusOK, "Deleted!")
 }
