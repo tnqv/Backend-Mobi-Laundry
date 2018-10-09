@@ -9,6 +9,12 @@ import (
 	"d2d-backend/common"
 	"d2d-backend/accounts"
 	"d2d-backend/orders"
+	storeHandler "d2d-backend/store/handler"
+	reviewHandler "d2d-backend/review/handler"
+	reviewRepository "d2d-backend/review/repository"
+	reviewService "d2d-backend/review/service"
+	storeRepository "d2d-backend/store/repository"
+	storeService "d2d-backend/store/service"
 )
 
 var config cfg.Config
@@ -70,6 +76,7 @@ func main() {
 
 	defer db.Close()
 	r := gin.Default()
+	//Init repository
 
 	v1 := r.Group("/api/v1")
 	accounts.AccountsRouterRegister(v1.Group("/accounts"))
@@ -82,14 +89,24 @@ func main() {
 	orders.OrderStatusesRouterRegister(v1.Group("/orderstatuses"))
 	orders.OrderStatusesRouterRegister(v1.Group("/notifications"))
 
-	// articles.ArticlesAnonymousRegister(v1.Group("/articles"))
-	// articles.TagsAnonymousRegister(v1.Group("/tags"))
+
+	//Review
+	reviewRepository := reviewRepository.NewMysqlReviewRepository()
+	reviewService := reviewService.NewReviewService(reviewRepository)
+	reviewHttpHandler := reviewHandler.NewReviewHttpHandler(v1.Group("/review"),reviewService)
+
+	//Store
+	storeRepository := storeRepository.NewMysqlStoreRepository()
+	storeService := storeService.NewStoreService(storeRepository)
+	storeHttpHandler := storeHandler.NewStoreHttpHandler(v1.Group("/store"),storeService)
+
 
 	v1.Use(accounts.AuthMiddleware(true))
+	storeHttpHandler.AuthorizedRequiredRoutes(v1.Group("/store"))
+	reviewHttpHandler.AuthorizedRequiredRoutes(v1.Group("/review"))
 	// users.UserRegister(v1.Group("/user"))
 	// users.ProfileRegister(v1.Group("/profiles"))
 
-	// articles.ArticlesRegister(v1.Group("/articles"))
 
 	testAuth := r.Group("/api/ping")
 
