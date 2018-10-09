@@ -85,8 +85,8 @@ func main() {
 	v1.Use(accounts.AuthMiddleware(false))
 	orders.ServicesRouterRegister(v1.Group("/services"))
 	orders.OrdersRouterRegister(v1.Group("/orders"))
-	orders.ServiceOrdersRouterRegister(v1.Group("/serviceorders"))
-	orders.OrderStatusesRouterRegister(v1.Group("/orderstatuses"))
+	orders.ServiceOrdersRouterRegister(v1.Group("/services/orders"))
+	orders.OrderStatusesRouterRegister(v1.Group("/orders/statuses"))
 	orders.OrderStatusesRouterRegister(v1.Group("/notifications"))
 
 
