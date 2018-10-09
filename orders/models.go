@@ -241,16 +241,16 @@ func getServiceOrder(serviceOrderId uint) (ServiceOrder, error) {
 //END SERVICE_ORDERS ENTITY
 
 //Notification
-func getListNotifications() ([]Notification, error) {
-	db := common.GetDB()
-	var list []Notification
-	err := db.Find(&list).Error
-	return list, err
-}
-
-func getNotifications(notificationId uint) (Notification, error) {
-	db := common.GetDB()
-	var serviceOrder ServiceOrder
-	err := db.First(&serviceOrder, notificationId).Error
-	return serviceOrder, err
-}
+//func getListNotifications() ([]Notification, error) {
+//	db := common.GetDB()
+//	var list []Notification
+//	err := db.Find(&list).Error
+//	return list, err
+//}
+//
+//func getNotifications(notificationId uint) (Notification, error) {
+//	db := common.GetDB()
+//	var serviceOrder ServiceOrder
+//	err := db.First(&serviceOrder, notificationId).Error
+//	return serviceOrder, err
+//}

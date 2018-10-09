@@ -95,7 +95,7 @@ func  (s *HttpReviewHandler) CreateReview(c *gin.Context){
 	_,err = s.reviewService.CreateNewReview(&newReview)
 
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, common.NewError("Invalid user_id", err))
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("Invalid user", err))
 		return
 	}
 

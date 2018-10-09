@@ -45,7 +45,7 @@ func OrderStatusesRouterRegister(router *gin.RouterGroup)  {
 }
 
 func NotificationsRouterRegister(router *gin.RouterGroup)  {
-	router.GET("/", GetListNotifications)
+	//router.GET("/", GetListNotifications)
 	router.GET("/:notificationId", GetNotifications)
 
 }
@@ -300,11 +300,11 @@ func GetNotifications(c *gin.Context){
 	c.JSON(http.StatusOK, notification)
 }
 
-func GetListNotifications(c *gin.Context)  {
-	list, err := getListNotifications()
-	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
-		return
-	}
-	c.JSON(http.StatusOK, list)
-}
+//func GetListNotifications(c *gin.Context)  {
+//	list, err := getListNotifications()
+//	if err != nil {
+//		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+//		return
+//	}
+//	c.JSON(http.StatusOK, list)
+//}

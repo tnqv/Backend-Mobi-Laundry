@@ -5,11 +5,11 @@ import (
 )
 
 type Store struct {
-	gorm.Model
-	Name           string       `json:"name"`
-	Description    string       `json:"description"`
-	Longitude      float32		`json:"longitude"`
-	Latitude 	   float32		`json:"latitude"`
-	Address        string   	`json:"address"`
-	PhoneNumber    string  		`json:"phone_number"`
+	gorm.Model					`json:"-"`
+	Name           string       `form:"name" json:"name" binding:"exists"`
+	Description    string       `form:"description" json:"description" binding:"exists"`
+	Longitude      float32		`form:"longitude" json:"longitude" binding:"exists"`
+	Latitude 	   float32		`form:"latitude" json:"latitude" binding:"exists"`
+	Address        string   	`form:"address" json:"address" binding:"exists"`
+	PhoneNumber    string  		`form:"phone_number" json:"phone_number" binding:"exists"`
 }
