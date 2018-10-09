@@ -15,10 +15,10 @@ func OrdersRouterRegister(router *gin.RouterGroup){
 	router.POST("/", CreateOrder)
     router.GET("/user/:userId",GetOrdersbyAccountID)
 	router.GET("/",GetOrders)
-	router.POST("/createorderservice", CreateOrderServicesForPlacedOrder)
-	router.POST("/createcategory", CreateCategory)
-	router.PUT("/updatecategory", UpdateCategory)
-	router.GET("/getcategory/:categoryId", GetCategory)
+	router.POST("/order/service", CreateOrderServicesForPlacedOrder)
+	router.POST("/category", CreateCategory)
+	router.PUT("/category", UpdateCategory)
+	router.GET("/category/:categoryId", GetCategory)
 	router.DELETE("/:categoryId", DeleteCategory)}
 
 func ServicesRouterRegister(router *gin.RouterGroup){
@@ -44,7 +44,6 @@ func GetServices(c *gin.Context) {
 	c.JSON(http.StatusOK, data)
 }
 
-//DuyNQ's function
 func CreateOrder (c *gin.Context) {
 	userID, _ := strconv.ParseUint(c.PostForm("userID"), 10, 64)
 	var order PlacedOrder

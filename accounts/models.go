@@ -112,6 +112,18 @@ func CreateNewUser(user *User) error {
 	return err
 }
 
+func UpdateAccountFcmToken(accountID int,fcmToken string) error {
+	db := common.GetDB()
+	var account Account
+	if err := db.Where("id = ?",accountID).First(&account).Error; err != nil {
+		return err
+	}
+	account.FcmToken = fcmToken
+
+	db.Save(&account)
+	return nil
+}
+
 //ROLE ENTITY
 func getListRoles() ([]Role, error) {
 	db := common.GetDB()

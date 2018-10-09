@@ -19,6 +19,38 @@ func AccountsRouterRegister(router *gin.RouterGroup){
 	router.POST("/login",AccountsLogin)
 	router.POST("/",AccountsRegistration)
 	router.POST("/facebook/auth",FacebookAccountsLogin)
+	router.PUT("/:id/token/refresh",FcmTokenUpdate)
+}
+
+func FcmTokenUpdate(c *gin.Context){
+	id := c.Params.ByName(`id`)
+
+	if id == ""{
+		c.JSON(http.StatusUnprocessableEntity, errors.New("Account not specified"))
+		return
+	}
+	fcmTokenValidator := NewFcmTokenValidator()
+	if err := fcmTokenValidator.Bind(c);err != nil{
+		c.JSON(http.StatusUnprocessableEntity, common.NewValidatorError(err))
+		return
+	}
+
+	if fcmTokenValidator.accountModel.FcmToken == ""{
+		c.JSON(http.StatusForbidden,common.NewError("token",errors.New("FCM token not found")))
+		return
+
+	}
+
+	idNum,_ := strconv.Atoi(id)
+
+	UpdateAccountFcmToken(idNum,fcmTokenValidator.accountModel.FcmToken)
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": "Update token successfully",
+	})
+
+
+
 }
 
 func RolesRouterRegister(router *gin.RouterGroup)  {

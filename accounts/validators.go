@@ -86,7 +86,29 @@ func (self *FBLoginValidator) Bind(c *gin.Context) error {
 	return nil
 }
 
+type FcmTokenValidator struct {
+	Account struct {
+		FcmToken string `form:"fcm_token" json:"fcm_token" binding:"exists"`
+	} `json:"account"`
+	accountModel Account `json:"-"`
+}
+
+func (self *FcmTokenValidator) Bind(c *gin.Context) error {
+	err := common.Bind(c, self)
+	if err != nil {
+		return err
+	}
+
+	self.accountModel.FcmToken = self.Account.FcmToken
+	return nil
+}
+
+
 // You can put the default value of a Validator here
+func NewFcmTokenValidator() FcmTokenValidator{
+	 fcmtokenValidator := FcmTokenValidator{}
+	 return fcmtokenValidator
+}
 func NewLoginValidator() LoginValidator {
 	loginValidator := LoginValidator{}
 	return loginValidator
