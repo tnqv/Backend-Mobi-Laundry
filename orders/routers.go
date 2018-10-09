@@ -34,6 +34,20 @@ func ServiceOrdersRouterRegister(router *gin.RouterGroup)  {
 	router.DELETE("/:serviceOrderId", DeleteServiceOrder)
 }
 
+func OrderStatusesRouterRegister(router *gin.RouterGroup)  {
+	router.GET("/", GetListOrderStatuses)
+	router.GET("/:orderStatusId", GetOrderStatus)
+	router.POST("/", CreateOrderStatus)
+	router.PUT("/", UpdateOrderStatus)
+	router.DELETE("/:orderStatusId", DeleteOrderStatus)
+}
+
+func NotificationsRouterRegister(router *gin.RouterGroup)  {
+	router.GET("/", GetListNotifications)
+	router.GET("/:notificationId", GetNotifications)
+
+}
+
 func GetServices(c *gin.Context) {
 	data, err := getAllServicesBasedOnCategory()
 	if err != nil {
@@ -44,6 +58,7 @@ func GetServices(c *gin.Context) {
 	c.JSON(http.StatusOK, data)
 }
 
+//DuyNQ's function
 func CreateOrder (c *gin.Context) {
 	userID, _ := strconv.ParseUint(c.PostForm("userID"), 10, 64)
 	var order PlacedOrder
@@ -56,12 +71,12 @@ func CreateOrder (c *gin.Context) {
 	order.UserID = getCustomerInformations(uint(userID)).ID
 	order.TimePlaced = time.Now()
 	order.OrderCode = time.Now().Format("20060102150405")
-	order.OrderStatusID = CreateOrderStatus(1, uint(userID))
+	//order.OrderStatusID = CreateOrderStatus(1, uint(userID))
 	createPlaceOrder(&order)
 	c.JSON(http.StatusCreated, order)
 }
 
-func UpdateOrderStatus(c * gin.Context) {
+/*func UpdateOrderStatus(c * gin.Context) {
 	userID, _ := strconv.ParseUint(c.PostForm("userID"), 10, 64)
 	statusID, _ := strconv.ParseUint(c.PostForm("statusID"), 10, 64)
 	orderID, _ := strconv.ParseUint(c.PostForm("orderID"), 10, 64)
@@ -81,7 +96,7 @@ func CreateOrderStatus(statusID uint, userID uint) (uint) {
 	orderStatus.StatusChangedTime = time.Now()
 	createOrderStatus(&orderStatus)
 	return orderStatus.ID
-}
+}*/
 
 
 //Minh's function
@@ -182,6 +197,55 @@ func DeleteCategory(c *gin.Context){
 	}
 	c.JSON(http.StatusOK, "The category has been deleted!")
 }
+
+//Order Status
+func CreateOrderStatus(c *gin.Context){
+	var orderstatus OrderStatus
+	c.Bind(&orderstatus)
+	orderstatus.StatusChangedTime = time.Now()
+	createOrderStatus(&orderstatus)
+	c.JSON(http.StatusCreated, orderstatus)
+}
+
+func UpdateOrderStatus(c *gin.Context)  {
+	var orderstatus OrderStatus
+	c.Bind(&orderstatus)
+	err := updateOrderStatus(&orderstatus)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+	c.JSON(http.StatusOK, orderstatus)
+}
+
+func GetOrderStatus(c *gin.Context){
+	orderStatusID, _ := strconv.ParseUint(c.Params.ByName("orderStatusId"),10,64)
+	orderstatus,err := getOrderStatus(uint(orderStatusID))
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+	c.JSON(http.StatusOK, orderstatus)
+}
+
+func GetListOrderStatuses(c *gin.Context)  {
+	list, err := getListOrderStatuses()
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+	c.JSON(http.StatusOK, list)
+}
+
+func DeleteOrderStatus(c *gin.Context){
+	orderstatusID, _ := strconv.ParseUint(c.Params.ByName("orderStatusId"), 10, 64)
+	err := deleteOrderStatus(uint(orderstatusID))
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+	c.JSON(http.StatusOK, "The order status has been deleted!")
+}
 //SERVICE_ORDERS ENTITY
 func GetListServiceOrders(c *gin.Context)  {
 	list, err := getListServiceOrders()
@@ -222,3 +286,23 @@ func DeleteServiceOrder(c * gin.Context)  {
 	}
 }
 //END SERVICE_ORDERS ENTITY
+
+//Notification
+func GetNotifications(c *gin.Context){
+	notificationID, _ := strconv.ParseUint(c.Params.ByName("notificationId"),10,64)
+	notification,err := getOrderStatus(uint(notificationID))
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+	c.JSON(http.StatusOK, notification)
+}
+
+func GetListNotifications(c *gin.Context)  {
+	list, err := getListNotifications()
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+	c.JSON(http.StatusOK, list)
+}

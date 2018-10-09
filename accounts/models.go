@@ -156,3 +156,11 @@ func deleteRole(roleId uint) (error) {
 	err := db.Delete(&Role{}, "id = ?", roleId).Error
 	return err
 }
+
+//User
+func getListUser() ([]User, error) {
+	db := common.GetDB()
+	var list []User
+	err := db.Find(&list).Error
+	return list, err
+}

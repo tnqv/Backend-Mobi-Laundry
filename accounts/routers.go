@@ -61,6 +61,10 @@ func RolesRouterRegister(router *gin.RouterGroup)  {
 	router.DELETE("/:roleId", DeleteRole)
 }
 
+func UsersRouterRegister(router *gin.RouterGroup)  {
+	router.GET("/", GetListUser)
+}
+
 func FacebookAccountsLogin(c *gin.Context){
 	fbLoginValidator := FBNewLoginValidator()
 	if err := fbLoginValidator.Bind(c); err != nil {
@@ -227,3 +231,13 @@ func DeleteRole(c *gin.Context)  {
 	c.JSON(http.StatusOK, "Deleted!")
 }
 //END ROLE ENTITY
+
+//User
+func GetListUser(c *gin.Context)  {
+	list, err := getListUser()
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+	c.JSON(http.StatusOK, list)
+}

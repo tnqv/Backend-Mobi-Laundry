@@ -114,10 +114,10 @@ func createPlaceOrder(order *PlacedOrder)  {
 	db.Create(&order)
 }
 
-func createOrderStatus(orderstatus *OrderStatus) {
+/*func createOrderStatus(orderstatus *OrderStatus) {
 	db := common.GetDB()
 	db.Create(&orderstatus)
-}
+}*/
 
 func getCustomerInformations(accountID uint) (accounts.User) {
 	db := common.GetDB()
@@ -138,12 +138,12 @@ func deleteServiceOrder(serviceOrderID uint) (error) {
 	return err
 }
 
-func updateOrderStatus(orderID uint, orderStatusID uint) (PlacedOrder, error) {
+/*func updateOrderStatus(orderID uint, orderStatusID uint) (PlacedOrder, error) {
 	db := common.GetDB()
 	var order PlacedOrder
 	err := db.Model(&order).Where("id = ?", orderID).Update("order_status_id", orderStatusID).Error
 	return order, err
-}
+}*/
 
 //Minh's function
 func getAllOrdersBasedOnAccountID(accountid uint)([]PlacedOrder,error){
@@ -167,6 +167,7 @@ func createOrderService(orderservice *ServiceOrder){
 	db.Create(&orderservice)
 }
 
+//Category
 func createCategory(category *Category){
 	db := common.GetDB()
 	db.Create(&category)
@@ -191,6 +192,37 @@ func deleteCategory(cateId uint) (error) {
 	return err
 }
 
+//Order Status
+func createOrderStatus(orderstatus *OrderStatus){
+	db := common.GetDB()
+	db.Create(&orderstatus)
+}
+
+func updateOrderStatus(orderstatus *OrderStatus)(error){
+	db := common.GetDB()
+	err := db.Model(&orderstatus).Update(map[string]interface{}{"description":orderstatus.Description}).Error
+	return err
+}
+
+func getOrderStatus(orderstatusId uint)(OrderStatus, error){
+	db := common.GetDB()
+	var orderstatus OrderStatus
+	err := db.First(&orderstatus, orderstatusId).Error
+	return orderstatus, err
+}
+
+func getListOrderStatuses() ([]OrderStatus, error) {
+	db := common.GetDB()
+	var list []OrderStatus
+	err := db.Find(&list).Error
+	return list, err
+}
+
+func deleteOrderStatus(orderstatusId uint) (error) {
+	db := common.GetDB()
+	err := db.Delete(&OrderStatus{}, "id = ?", orderstatusId).Error
+	return err
+}
 
 //SERVICE_ORDERS ENTITY
 func getListServiceOrders() ([]ServiceOrder, error) {
@@ -207,3 +239,18 @@ func getServiceOrder(serviceOrderId uint) (ServiceOrder, error) {
 	return serviceOrder, err
 }
 //END SERVICE_ORDERS ENTITY
+
+//Notification
+func getListNotifications() ([]Notification, error) {
+	db := common.GetDB()
+	var list []Notification
+	err := db.Find(&list).Error
+	return list, err
+}
+
+func getNotifications(notificationId uint) (Notification, error) {
+	db := common.GetDB()
+	var serviceOrder ServiceOrder
+	err := db.First(&serviceOrder, notificationId).Error
+	return serviceOrder, err
+}

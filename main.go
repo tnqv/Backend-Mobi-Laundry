@@ -74,10 +74,13 @@ func main() {
 	v1 := r.Group("/api/v1")
 	accounts.AccountsRouterRegister(v1.Group("/accounts"))
 	accounts.RolesRouterRegister(v1.Group("/roles"))
+	accounts.UsersRouterRegister(v1.Group("/users"))
 	v1.Use(accounts.AuthMiddleware(false))
 	orders.ServicesRouterRegister(v1.Group("/services"))
 	orders.OrdersRouterRegister(v1.Group("/orders"))
 	orders.ServiceOrdersRouterRegister(v1.Group("/serviceorders"))
+	orders.OrderStatusesRouterRegister(v1.Group("/orderstatuses"))
+	orders.OrderStatusesRouterRegister(v1.Group("/notifications"))
 
 	// articles.ArticlesAnonymousRegister(v1.Group("/articles"))
 	// articles.TagsAnonymousRegister(v1.Group("/tags"))
