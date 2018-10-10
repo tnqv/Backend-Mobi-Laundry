@@ -18,6 +18,9 @@ import (
 	serviceHandler "d2d-backend/service/handler"
 	serviceService "d2d-backend/service/service"
 	serviceRepository "d2d-backend/service/repository"
+	roleHandler "d2d-backend/role/handler"
+	roleService "d2d-backend/role/service"
+	roleRepository "d2d-backend/role/repository"
 )
 
 var config cfg.Config
@@ -108,11 +111,17 @@ func main() {
 	serviceService := serviceService.NewServiceService(serviceRepository)
 	serviceHttpHandler := serviceHandler.NewServiceHttpHandler(v1.Group("/service"), serviceService)
 
+	//Role
+	roleRepository := roleRepository.NewMysqlRoleRepository()
+	roleService := roleService.NewRoleService(roleRepository)
+	roleHttpHandler := roleHandler.NewRoleHttpHandler(v1.Group("/role"), roleService)
+
 
 	v1.Use(accounts.AuthMiddleware(true))
 	storeHttpHandler.AuthorizedRequiredRoutes(v1.Group("/store"))
 	reviewHttpHandler.AuthorizedRequiredRoutes(v1.Group("/review"))
 	serviceHttpHandler.AuthorizedRequiredRoutes(v1.Group("/service"))
+	roleHttpHandler.AuthorizedRequiredRoutes(v1.Group("/role"))
 	// users.UserRegister(v1.Group("/user"))
 	// users.ProfileRegister(v1.Group("/profiles"))
 
