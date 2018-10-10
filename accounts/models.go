@@ -156,6 +156,16 @@ func deleteRole(roleId uint) (error) {
 	err := db.Delete(&Role{}, "id = ?", roleId).Error
 	return err
 }
+//END ROLE ENTITY
+
+//ACCOUNT ENTITY
+func getListAccount() ([]Role, error) {
+	db := common.GetDB()
+	var list []Role
+	err := db.Find(&list).Error
+	return list, err
+}
+//END ACCOUNT ENTITY
 
 //User
 func getListUser() ([]User, error) {

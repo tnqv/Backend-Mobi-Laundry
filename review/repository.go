@@ -7,6 +7,6 @@ type ReviewRepository interface{
 	FindReviewByRate(rate int) (*Review, error)
 	FindAll(limit int, page int) (*pagination.Paginator, error)
 	Create(review *Review) (*Review,error)
-	Update(store *Review) error
+	Update(review *Review) error
 	Delete(id int) (bool,error)
 }

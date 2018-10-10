@@ -13,7 +13,7 @@ type Service struct {
 	Price       int64		`json:"price"`
 	Description string		`json:"description"`
 	CategoryID  uint		`json:"-"`
-	ImageUrl			string		`json:"url"`
+	ImageUrl	string		`json:"url"`
 	//Categories  Category `gorm:"PRELOAD:false"`
 }
 
@@ -21,7 +21,7 @@ type Category struct {
 	gorm.Model 				 `json:"-"`
 	Name string				 `json:"name"`
 	Description string		 `json:"description"`
-	Services []Service		 `json:"services"`
+	Services []Service		 `json:"service"`
 }
 
 type ServiceOrder struct {
@@ -126,18 +126,6 @@ func getCustomerInformations(accountID uint) (accounts.User) {
 	return customer
 }
 
-func updateQuantity(serviceOrderID uint, quantity uint) (error) {
-	db := common.GetDB()
-	err := db.Model(&ServiceOrder{}).Where("id = ?", serviceOrderID).Update("quantity", quantity).Error
-	return err
-}
-
-func deleteServiceOrder(serviceOrderID uint) (error) {
-	db := common.GetDB()
-	err := db.Delete(&ServiceOrder{}, "id = ?", serviceOrderID).Error
-	return err
-}
-
 /*func updateOrderStatus(orderID uint, orderStatusID uint) (PlacedOrder, error) {
 	db := common.GetDB()
 	var order PlacedOrder
@@ -238,7 +226,59 @@ func getServiceOrder(serviceOrderId uint) (ServiceOrder, error) {
 	err := db.First(&serviceOrder, serviceOrderId).Error
 	return serviceOrder, err
 }
+
+func createServiceOrder(serviceOrder *ServiceOrder) (error) {
+	db := common.GetDB()
+	err := db.Create(&serviceOrder).Error
+	return err
+}
+
+func updateServiceOrder(serviceOrder *ServiceOrder) (error) {
+	db := common.GetDB()
+	err := db.Model(&ServiceOrder{}).Where("id = ?", serviceOrder.ID).Update("quantity", serviceOrder.Quantity).Error
+	return err
+}
+
+func deleteServiceOrder(serviceOrderID uint) (error) {
+	db := common.GetDB()
+	err := db.Delete(&ServiceOrder{}, "id = ?", serviceOrderID).Error
+	return err
+}
 //END SERVICE_ORDERS ENTITY
+
+//SERVICE ENTITY
+func getListServices() ([]Service, error) {
+	db := common.GetDB()
+	var list []Service
+	err := db.Find(&list).Error
+	return list, err
+}
+
+func getService(serviceId uint) (Service, error) {
+	db := common.GetDB()
+	var service Service
+	err := db.First(&service, serviceId).Error
+	return service, err
+}
+
+func createService(service *Service) (error) {
+	db := common.GetDB()
+	err := db.Create(&service).Error
+	return err
+}
+
+func updateService(service *Service) (error) {
+	db := common.GetDB()
+	err := db.Save(&service).Error
+	//err := db.Model(&service).Updates(map[string]interface{}{"name": service.Name, "description": service.Description}).Error
+	return err
+}
+
+func deleteService(serviceId uint) (error) {
+	db := common.GetDB()
+	err := db.Delete(&Service{}, "id = ?", serviceId).Error
+	return err
+}
 
 //Notification
 //func getListNotifications() ([]Notification, error) {

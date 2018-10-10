@@ -15,24 +15,25 @@ func OrdersRouterRegister(router *gin.RouterGroup){
 	router.POST("/", CreateOrder)
     router.GET("/user/:userId",GetOrdersbyAccountID)
 	router.GET("/",GetOrders)
-	router.POST("/order/service", CreateOrderServicesForPlacedOrder)
+	//router.POST("/order/service", CreateOrderServicesForPlacedOrder)
 	router.POST("/category", CreateCategory)
 	router.PUT("/category", UpdateCategory)
 	router.GET("/category/:categoryId", GetCategory)
 	router.DELETE("/:categoryId", DeleteCategory)}
 
 func ServicesRouterRegister(router *gin.RouterGroup){
-	router.GET("/",GetServices)
-	router.DELETE("/")
+	router.GET("/", GetListServices)
+	router.GET("/:serviceId", GetService)
+	router.POST("/", CreateService)
+	router.PUT("/", UpdateService)
+	router.DELETE("/:serviceId", DeleteService)
 }
-
-
 
 func ServiceOrdersRouterRegister(router *gin.RouterGroup)  {
 	router.GET("/", GetListServiceOrders)
 	router.GET("/:serviceOrderId", GetServiceOrder)
-	router.POST("/", UpdateServiceOrder)
-	router.PUT("/")
+	router.POST("/", CreateServiceOrder)
+	router.PUT("/", UpdateServiceOrder)
 	router.DELETE("/:serviceOrderId", DeleteServiceOrder)
 }
 
@@ -150,19 +151,6 @@ func GetOrders(c *gin.Context){
 	c.JSON(http.StatusOK,paginator)
 }
 
-func CreateOrderServicesForPlacedOrder(c *gin.Context){
-	orderserviceID, _ := strconv.ParseUint(c.PostForm("service_id"),10,64)
-	placedorderID, _ := strconv.ParseUint(c.PostForm("placed_order_id"),10,64)
-	quantity, _ := strconv.ParseUint(c.PostForm("quantity"),10,64)
-	var orderservice ServiceOrder
-	c.Bind(&orderservice)
-	orderservice.ServiceID = uint(orderserviceID)
-	orderservice.PlacedOrderID = uint(placedorderID)
-	orderservice.Quantity = uint(quantity)
-	createOrderService(&orderservice)
-	c.JSON(http.StatusCreated, orderservice)
-}
-
 func CreateCategory(c *gin.Context){
 	var category Category
 	c.Bind(&category)
@@ -268,15 +256,26 @@ func GetServiceOrder(c *gin.Context)  {
 	c.JSON(http.StatusOK, serviceOrder)
 }
 
-func UpdateServiceOrder(c * gin.Context)  {
-	id, _ := strconv.ParseUint(c.Params.ByName("serviceOrderId"), 10, 64)
-	quantity, _ := strconv.ParseUint(c.PostForm("quantity"), 10, 64)
-	err := updateQuantity(uint(id), uint(quantity))
+func CreateServiceOrder(c *gin.Context){
+	var serviceOrder ServiceOrder
+	c.Bind(&serviceOrder)
+	err := createServiceOrder(&serviceOrder)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
-	c.JSON(http.StatusOK, "Deleted")
+	c.JSON(http.StatusOK, serviceOrder)
+}
+
+func UpdateServiceOrder(c * gin.Context)  {
+	var serviceOrder ServiceOrder
+	c.Bind(&serviceOrder)
+	err := updateServiceOrder(&serviceOrder)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+	c.JSON(http.StatusOK, serviceOrder)
 }
 
 func DeleteServiceOrder(c * gin.Context)  {
@@ -288,6 +287,59 @@ func DeleteServiceOrder(c * gin.Context)  {
 	}
 }
 //END SERVICE_ORDERS ENTITY
+
+//SERVICE ENTITY
+func GetListServices(c *gin.Context) {
+	list, err := getListServices()
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+	c.JSON(http.StatusOK, list)
+}
+
+func GetService(c *gin.Context)  {
+	serviceId, _ := strconv.ParseUint(c.Params.ByName("serviceId"), 10, 64)
+	service, err := getService(uint(serviceId))
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+	c.JSON(http.StatusOK, service)
+}
+
+func CreateService(c *gin.Context)  {
+	var service Service
+	c.Bind(&service)
+	err := createService(&service)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+	c.JSON(http.StatusOK, service)
+}
+
+func UpdateService(c *gin.Context)  {
+	var service Service
+	c.Bind(&service)
+	err := updateService(&service)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+	c.JSON(http.StatusOK, service)
+}
+
+func DeleteService(c *gin.Context)  {
+	serviceId, _ := strconv.ParseUint(c.Params.ByName("serviceId"), 10, 64)
+	err := deleteService(uint(serviceId))
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+	c.JSON(http.StatusOK, "Deleted!")
+}
+//END SERVICE ENTITY
 
 //Notification
 func GetNotifications(c *gin.Context){

@@ -241,3 +241,7 @@ func GetListUser(c *gin.Context)  {
 	}
 	c.JSON(http.StatusOK, list)
 }
+
+//ACCOUNT ENTITY
+
+//END ACCOUNT ENTITY

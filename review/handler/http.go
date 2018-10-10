@@ -13,6 +13,7 @@ import (
 type ResponseError struct {
 	Message string `json:"message"`
 }
+
 type HttpReviewHandler struct {
 	reviewService review.ReviewService
 }
@@ -100,7 +101,6 @@ func  (s *HttpReviewHandler) CreateReview(c *gin.Context){
 	}
 
 	c.JSON(http.StatusOK,newReview)
-
 }
 
 func  (s *HttpReviewHandler) UpdateReview(c *gin.Context){

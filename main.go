@@ -15,6 +15,9 @@ import (
 	reviewService "d2d-backend/review/service"
 	storeRepository "d2d-backend/store/repository"
 	storeService "d2d-backend/store/service"
+	serviceHandler "d2d-backend/service/handler"
+	serviceService "d2d-backend/service/service"
+	serviceRepository "d2d-backend/service/repository"
 )
 
 var config cfg.Config
@@ -83,10 +86,10 @@ func main() {
 	accounts.RolesRouterRegister(v1.Group("/roles"))
 	accounts.UsersRouterRegister(v1.Group("/users"))
 	v1.Use(accounts.AuthMiddleware(false))
-	orders.ServicesRouterRegister(v1.Group("/services"))
+	//orders.ServicesRouterRegister(v1.Group("/service"))
 	orders.OrdersRouterRegister(v1.Group("/orders"))
 	orders.ServiceOrdersRouterRegister(v1.Group("/services/orders"))
-	orders.OrderStatusesRouterRegister(v1.Group("/orders/statuses"))
+	//orders.OrderStatusesRouterRegister(v1.Group("/orders/statuses"))
 	orders.OrderStatusesRouterRegister(v1.Group("/notifications"))
 
 
@@ -100,10 +103,16 @@ func main() {
 	storeService := storeService.NewStoreService(storeRepository)
 	storeHttpHandler := storeHandler.NewStoreHttpHandler(v1.Group("/store"),storeService)
 
+	//Service
+	serviceRepository := serviceRepository.NewMysqlServiceRepository()
+	serviceService := serviceService.NewServiceService(serviceRepository)
+	serviceHttpHandler := serviceHandler.NewServiceHttpHandler(v1.Group("/service"), serviceService)
+
 
 	v1.Use(accounts.AuthMiddleware(true))
 	storeHttpHandler.AuthorizedRequiredRoutes(v1.Group("/store"))
 	reviewHttpHandler.AuthorizedRequiredRoutes(v1.Group("/review"))
+	serviceHttpHandler.AuthorizedRequiredRoutes(v1.Group("/service"))
 	// users.UserRegister(v1.Group("/user"))
 	// users.ProfileRegister(v1.Group("/profiles"))
 
