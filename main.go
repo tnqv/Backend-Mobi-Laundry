@@ -1,13 +1,17 @@
 package main
 
 import (
+	"fmt"
+	"github.com/gin-gonic/gin"
+	"log"
+	"net/url"
 	"d2d-backend/accounts"
-	categoryHandler "d2d-backend/category/handler"
-	categoryRepository "d2d-backend/category/repository"
-	categoryService "d2d-backend/category/service"
 	"d2d-backend/common"
 	cfg "d2d-backend/config"
 	"d2d-backend/orders"
+	categoryHandler "d2d-backend/category/handler"
+	categoryRepository "d2d-backend/category/repository"
+	categoryService "d2d-backend/category/service"
 	reviewHandler "d2d-backend/review/handler"
 	reviewRepository "d2d-backend/review/repository"
 	reviewService "d2d-backend/review/service"
@@ -17,10 +21,9 @@ import (
 	storeHandler "d2d-backend/store/handler"
 	storeRepository "d2d-backend/store/repository"
 	storeService "d2d-backend/store/service"
-	"fmt"
-	"github.com/gin-gonic/gin"
-	"log"
-	"net/url"
+	roleHandler "d2d-backend/role/handler"
+	roleService "d2d-backend/role/service"
+	roleRepository "d2d-backend/role/repository"
 )
 
 var config cfg.Config
@@ -111,16 +114,21 @@ func main() {
 	serviceService := serviceService.NewServiceService(serviceRepository)
 	serviceHttpHandler := serviceHandler.NewServiceHttpHandler(v1.Group("/service"), serviceService)
 
+	//Role
+	roleRepository := roleRepository.NewMysqlRoleRepository()
+	roleService := roleService.NewRoleService(roleRepository)
+	roleHttpHandler := roleHandler.NewRoleHttpHandler(v1.Group("/role"), roleService)
+
 	//Category
 	categoryRepository := categoryRepository.NewMysqlCategoryRepository()
 	categoryService := categoryService.NewCategoryService(categoryRepository)
 	categoryHttpHandler := categoryHandler.NewStoreHttpHandler(v1.Group("/category"),categoryService)
 
-
 	v1.Use(accounts.AuthMiddleware(true))
 	storeHttpHandler.AuthorizedRequiredRoutes(v1.Group("/store"))
 	reviewHttpHandler.AuthorizedRequiredRoutes(v1.Group("/review"))
 	serviceHttpHandler.AuthorizedRequiredRoutes(v1.Group("/service"))
+	roleHttpHandler.AuthorizedRequiredRoutes(v1.Group("/role"))
 	categoryHttpHandler.AuthorizedRequiredRoutes(v1.Group("/category"))
 	// users.UserRegister(v1.Group("/user"))
 	// users.ProfileRegister(v1.Group("/profiles"))
