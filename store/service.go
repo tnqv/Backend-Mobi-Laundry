@@ -10,4 +10,3 @@ type StoreService interface {
 	UpdateStore(updateStore *Store)(*Store,error)
 	DeleteStore(id int)(bool,error)
 }
-

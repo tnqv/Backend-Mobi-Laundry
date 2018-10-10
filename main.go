@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"log"
+	"github.com/gin-gonic/gin"
+	cfg "d2d-backend/config"
 	"net/url"
 	"d2d-backend/accounts"
 	"d2d-backend/common"
-	cfg "d2d-backend/config"
 	"d2d-backend/orders"
 	categoryHandler "d2d-backend/category/handler"
 	categoryRepository "d2d-backend/category/repository"
@@ -27,6 +27,9 @@ import (
 	orderStatusHandler "d2d-backend/orderStatus/handler"
 	orderStatusService "d2d-backend/orderStatus/service"
 	orderStatusRepository "d2d-backend/orderStatus/repository"
+	serviceOrderService "d2d-backend/serviceOrder/service"
+	serviceOrderRepository "d2d-backend/serviceOrder/repository"
+	serviceOrderHandler "d2d-backend/serviceOrder/handler"
 )
 
 var config cfg.Config
@@ -45,11 +48,11 @@ func init(){
 }
 //
 //func insertTestExampleValue(db *gorm.DB){
-//	category1 := orders.category{Name:"Combo Giặt + Sấy + Xả Quần áo",Description:"Combo Giặt + Sấy + Xả Quần áo"}
-//	category2 := orders.category{Name:"Combo Chăn Màn",Description:"Combo Chăn Màn"}
-//	category3 := orders.category{Name:"Combo Thú bông",Description:"Combo Thú bông"}
-//	category4 := orders.category{Name:"Dịch vụ giặt hấp (không bao gồm ủi)",Description:"Dịch vụ giặt hấp (không bao gồm ủi)"}
-//	category5 := orders.category{Name:"Combo Rèm Cửa",Description:"Combo Rèm Cửa"}
+//	category1 := orders.Category{Name:"Combo Giặt + Sấy + Xả Quần áo",Description:"Combo Giặt + Sấy + Xả Quần áo"}
+//	category2 := orders.Category{Name:"Combo Chăn Màn",Description:"Combo Chăn Màn"}
+//	category3 := orders.Category{Name:"Combo Thú bông",Description:"Combo Thú bông"}
+//	category4 := orders.Category{Name:"Dịch vụ giặt hấp (không bao gồm ủi)",Description:"Dịch vụ giặt hấp (không bao gồm ủi)"}
+//	category5 := orders.Category{Name:"Combo Rèm Cửa",Description:"Combo Rèm Cửa"}
 //
 //	db.Create(&category1)
 //	db.Create(&category2)
@@ -132,6 +135,12 @@ func main() {
 	orderStatusService := orderStatusService.NewOrderStatusService(orderStatusRepository)
 	orderStatusHttpHandler := orderStatusHandler.NewOrderStatusHttpHandler(v1.Group("/orderstatus"),orderStatusService)
 
+	//ServiceOrder
+	serviceOrderRepository := serviceOrderRepository.NewMysqlServiceOrderRepository()
+	serviceOrderService := serviceOrderService.NewServiceOrderService(serviceOrderRepository)
+	serviceOrderHttpHandler := serviceOrderHandler.NewServiceOrderHttpHandler(v1.Group("/serviceorder"), serviceOrderService)
+
+
 	v1.Use(accounts.AuthMiddleware(true))
 	storeHttpHandler.AuthorizedRequiredRoutes(v1.Group("/store"))
 	reviewHttpHandler.AuthorizedRequiredRoutes(v1.Group("/review"))
@@ -139,6 +148,7 @@ func main() {
 	roleHttpHandler.AuthorizedRequiredRoutes(v1.Group("/role"))
 	categoryHttpHandler.AuthorizedRequiredRoutes(v1.Group("/category"))
 	orderStatusHttpHandler.AuthorizedRequiredRoutes(v1.Group("/orderstatus"))
+	serviceOrderHttpHandler.AuthorizedRequiredRoutes(v1.Group("/serviceorder"))
 	// users.UserRegister(v1.Group("/user"))
 	// users.ProfileRegister(v1.Group("/profiles"))
 

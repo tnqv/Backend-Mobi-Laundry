@@ -36,10 +36,6 @@ func (s *HttpCategoryHandler) UnauthorizedRoutes(e *gin.RouterGroup){
 func (s *HttpCategoryHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
 
 
-	/*e.POST("/", s.CreateCategory)
-	e.GET("/:id", s.GetCategoryById)
-	e.PUT("/:id",s.UpdateCategory)
-	e.DELETE("/:id", s.DeleteCategory)*/
 }
 
 func (s *HttpCategoryHandler) GetAllCategory(c *gin.Context) {
@@ -149,4 +145,3 @@ func (s *HttpCategoryHandler) DeleteCategory(c *gin.Context){
 	}
 	c.JSON(http.StatusOK,ResponseError{Message: strconv.FormatBool(bool)})
 }
-
