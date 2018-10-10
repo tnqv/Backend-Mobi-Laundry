@@ -24,6 +24,9 @@ import (
 	roleHandler "d2d-backend/role/handler"
 	roleService "d2d-backend/role/service"
 	roleRepository "d2d-backend/role/repository"
+	orderStatusHandler "d2d-backend/orderStatus/handler"
+	orderStatusService "d2d-backend/orderStatus/service"
+	orderStatusRepository "d2d-backend/orderStatus/repository"
 )
 
 var config cfg.Config
@@ -122,7 +125,12 @@ func main() {
 	//Category
 	categoryRepository := categoryRepository.NewMysqlCategoryRepository()
 	categoryService := categoryService.NewCategoryService(categoryRepository)
-	categoryHttpHandler := categoryHandler.NewStoreHttpHandler(v1.Group("/category"),categoryService)
+	categoryHttpHandler := categoryHandler.NewCategoryHttpHandler(v1.Group("/category"),categoryService)
+
+	//OrderStatus
+	orderStatusRepository := orderStatusRepository.NewMysqlOrderStatusRepository()
+	orderStatusService := orderStatusService.NewOrderStatusService(orderStatusRepository)
+	orderStatusHttpHandler := orderStatusHandler.NewOrderStatusHttpHandler(v1.Group("/orderstatus"),orderStatusService)
 
 	v1.Use(accounts.AuthMiddleware(true))
 	storeHttpHandler.AuthorizedRequiredRoutes(v1.Group("/store"))
@@ -130,6 +138,7 @@ func main() {
 	serviceHttpHandler.AuthorizedRequiredRoutes(v1.Group("/service"))
 	roleHttpHandler.AuthorizedRequiredRoutes(v1.Group("/role"))
 	categoryHttpHandler.AuthorizedRequiredRoutes(v1.Group("/category"))
+	orderStatusHttpHandler.AuthorizedRequiredRoutes(v1.Group("/orderstatus"))
 	// users.UserRegister(v1.Group("/user"))
 	// users.ProfileRegister(v1.Group("/profiles"))
 

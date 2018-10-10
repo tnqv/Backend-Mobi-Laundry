@@ -1,61 +1,60 @@
 package handler
 
 import (
-	"d2d-backend/category"
 	"d2d-backend/common"
+	"d2d-backend/orderStatus"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type ResponseError struct {
 	Message string `json:"message"`
 }
-type HttpCategoryHandler struct {
-	categoryService category.CategoryService
+type HttpOrderStatusHandler struct {
+	orderStatusService orderStatus.OrderStatusService
 }
 
-func NewCategoryHttpHandler(e *gin.RouterGroup, service category.CategoryService) (*HttpCategoryHandler){
-	handler := &HttpCategoryHandler{
-		categoryService: service,
+func NewOrderStatusHttpHandler(e *gin.RouterGroup, service orderStatus.OrderStatusService) (*HttpOrderStatusHandler){
+	handler := &HttpOrderStatusHandler{
+		orderStatusService: service,
 	}
 	handler.UnauthorizedRoutes(e)
 	return handler
 }
 
-func (s *HttpCategoryHandler) UnauthorizedRoutes(e *gin.RouterGroup){
-	e.GET("/", s.GetAllCategory)
-	e.GET("/:id", s.GetCategoryById)
-	e.POST("/", s.CreateCategory)
-	e.PUT("/:id",s.UpdateCategory)
-	e.DELETE("/:id", s.DeleteCategory)
+func (s *HttpOrderStatusHandler) UnauthorizedRoutes(e *gin.RouterGroup){
+	e.GET("/", s.GetAllOrderStatus)
+	e.GET("/:id", s.GetOrderStatusById)
+	e.POST("/", s.CreateOrderStatus)
+	e.PUT("/:id", s.UpdateOrderStatus)
+	e.DELETE("/:id", s.DeleteOrderStatus)
 }
 
-func (s *HttpCategoryHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
-
-
+func (s *HttpOrderStatusHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
 	/*e.POST("/", s.CreateCategory)
 	e.GET("/:id", s.GetCategoryById)
 	e.PUT("/:id",s.UpdateCategory)
 	e.DELETE("/:id", s.DeleteCategory)*/
 }
 
-func (s *HttpCategoryHandler) GetAllCategory(c *gin.Context) {
+func (s *HttpOrderStatusHandler) GetAllOrderStatus(c *gin.Context) {
 
 	page, _ := strconv.Atoi(c.DefaultQuery(common.Page, common.PageDefault))
 	limit, _ := strconv.Atoi(c.DefaultQuery(common.Limit, common.LimitDefault))
-	listCategory, err := s.categoryService.GetCategory(limit,page)
+	listOrderStatus, err := s.orderStatusService.GetOrderStatus(limit,page)
 
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
-	c.JSON(http.StatusOK,listCategory)
+	c.JSON(http.StatusOK,listOrderStatus)
 }
 
-func  (s *HttpCategoryHandler) GetCategoryById(c *gin.Context){
+func  (s *HttpOrderStatusHandler) GetOrderStatusById(c *gin.Context){
 	id := c.Param("id")
 	if id == ""{
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
@@ -66,72 +65,66 @@ func  (s *HttpCategoryHandler) GetCategoryById(c *gin.Context){
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
 		return
 	}
-	category,err := s.categoryService.GetCategoryById(int(idNum))
+	orderStatus,err := s.orderStatusService.GetOrderStatusById(int(idNum))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
-	c.JSON(http.StatusOK,category)
+	c.JSON(http.StatusOK,orderStatus)
 }
 
-func  (s *HttpCategoryHandler) CreateCategory(c *gin.Context){
-	var category category.Category
-	err:= common.Bind(c,&category)
+func  (s *HttpOrderStatusHandler) CreateOrderStatus(c *gin.Context){
+	var orderStatus orderStatus.OrderStatus
+	err:= common.Bind(c,&orderStatus)
+	orderStatus.StatusChangedTime = time.Now()
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
 		return
 	}
-	if category.Name == "" || strings.TrimSpace(category.Name) == ""{
-		c.JSON(http.StatusNotAcceptable, common.NewError("Empty name",errors.New("Name is empty")))
-		return
-	}
-	if category.Description == "" || strings.TrimSpace(category.Description) == ""{
+	if orderStatus.Description == "" || strings.TrimSpace(orderStatus.Description) == ""{
 		c.JSON(http.StatusNotAcceptable, common.NewError("Empty description",errors.New("Description is empty")))
 		return
 	}
-	_,err = s.categoryService.CreateNewCategory(&category)
+	_,err = s.orderStatusService.CreateNewOrderStatus(&orderStatus)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
-	c.JSON(http.StatusOK,category)
+	c.JSON(http.StatusOK,orderStatus)
 }
 
-func  (s *HttpCategoryHandler) UpdateCategory(c *gin.Context){
+func  (s *HttpOrderStatusHandler) UpdateOrderStatus(c *gin.Context){
 	id := c.Param("id")
 	if id == ""{
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
 		return
 	}
-	var category category.Category
+	var orderStatus orderStatus.OrderStatus
 	idNum,err := strconv.ParseUint(id,10,32)
 	if err != nil {
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
 		return
 	}
-	category.ID = uint(idNum)
-	err = common.Bind(c,&category)
+	orderStatus.ID = uint(idNum)
+	err = common.Bind(c,&orderStatus)
+	orderStatus.StatusChangedTime = time.Now()
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
 		return
 	}
-	if category.Name == "" || strings.TrimSpace(category.Name) == ""{
-		c.JSON(http.StatusNotAcceptable, common.NewError("Empty name",errors.New("Name is empty")))
-		return
-	}
-	if category.Description == "" || strings.TrimSpace(category.Description) == ""{
+	if orderStatus.Description == "" || strings.TrimSpace(orderStatus.Description) == ""{
 		c.JSON(http.StatusNotAcceptable, common.NewError("Empty description",errors.New("Description is empty")))
 		return
 	}
-	_,err = s.categoryService.UpdateCategory(&category)
+	_,err = s.orderStatusService.UpdateOrderStatus(&orderStatus)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Database", err))
 		return
 	}
-	c.JSON(http.StatusOK,&category)
+	c.JSON(http.StatusOK,&orderStatus)
 }
 
-func (s *HttpCategoryHandler) DeleteCategory(c *gin.Context){
+func (s *HttpOrderStatusHandler) DeleteOrderStatus(c *gin.Context){
 	id := c.Param("id")
 	if id == ""{
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
@@ -142,7 +135,7 @@ func (s *HttpCategoryHandler) DeleteCategory(c *gin.Context){
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
 		return
 	}
-	bool,err := s.categoryService.DeleteCategory(int(idNum))
+	bool,err := s.orderStatusService.DeleteOrderStatus(int(idNum))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Database", err))
 		return
