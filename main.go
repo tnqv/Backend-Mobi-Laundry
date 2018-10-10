@@ -1,23 +1,26 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"github.com/gin-gonic/gin"
-	cfg "d2d-backend/config"
-	"net/url"
-	"d2d-backend/common"
 	"d2d-backend/accounts"
+	categoryHandler "d2d-backend/category/handler"
+	categoryRepository "d2d-backend/category/repository"
+	categoryService "d2d-backend/category/service"
+	"d2d-backend/common"
+	cfg "d2d-backend/config"
 	"d2d-backend/orders"
-	storeHandler "d2d-backend/store/handler"
 	reviewHandler "d2d-backend/review/handler"
 	reviewRepository "d2d-backend/review/repository"
 	reviewService "d2d-backend/review/service"
+	serviceHandler "d2d-backend/service/handler"
+	serviceRepository "d2d-backend/service/repository"
+	serviceService "d2d-backend/service/service"
+	storeHandler "d2d-backend/store/handler"
 	storeRepository "d2d-backend/store/repository"
 	storeService "d2d-backend/store/service"
-	serviceHandler "d2d-backend/service/handler"
-	serviceService "d2d-backend/service/service"
-	serviceRepository "d2d-backend/service/repository"
+	"fmt"
+	"github.com/gin-gonic/gin"
+	"log"
+	"net/url"
 )
 
 var config cfg.Config
@@ -36,11 +39,11 @@ func init(){
 }
 //
 //func insertTestExampleValue(db *gorm.DB){
-//	category1 := orders.Category{Name:"Combo Giặt + Sấy + Xả Quần áo",Description:"Combo Giặt + Sấy + Xả Quần áo"}
-//	category2 := orders.Category{Name:"Combo Chăn Màn",Description:"Combo Chăn Màn"}
-//	category3 := orders.Category{Name:"Combo Thú bông",Description:"Combo Thú bông"}
-//	category4 := orders.Category{Name:"Dịch vụ giặt hấp (không bao gồm ủi)",Description:"Dịch vụ giặt hấp (không bao gồm ủi)"}
-//	category5 := orders.Category{Name:"Combo Rèm Cửa",Description:"Combo Rèm Cửa"}
+//	category1 := orders.category{Name:"Combo Giặt + Sấy + Xả Quần áo",Description:"Combo Giặt + Sấy + Xả Quần áo"}
+//	category2 := orders.category{Name:"Combo Chăn Màn",Description:"Combo Chăn Màn"}
+//	category3 := orders.category{Name:"Combo Thú bông",Description:"Combo Thú bông"}
+//	category4 := orders.category{Name:"Dịch vụ giặt hấp (không bao gồm ủi)",Description:"Dịch vụ giặt hấp (không bao gồm ủi)"}
+//	category5 := orders.category{Name:"Combo Rèm Cửa",Description:"Combo Rèm Cửa"}
 //
 //	db.Create(&category1)
 //	db.Create(&category2)
@@ -108,11 +111,17 @@ func main() {
 	serviceService := serviceService.NewServiceService(serviceRepository)
 	serviceHttpHandler := serviceHandler.NewServiceHttpHandler(v1.Group("/service"), serviceService)
 
+	//Category
+	categoryRepository := categoryRepository.NewMysqlCategoryRepository()
+	categoryService := categoryService.NewCategoryService(categoryRepository)
+	categoryHttpHandler := categoryHandler.NewStoreHttpHandler(v1.Group("/category"),categoryService)
+
 
 	v1.Use(accounts.AuthMiddleware(true))
 	storeHttpHandler.AuthorizedRequiredRoutes(v1.Group("/store"))
 	reviewHttpHandler.AuthorizedRequiredRoutes(v1.Group("/review"))
 	serviceHttpHandler.AuthorizedRequiredRoutes(v1.Group("/service"))
+	categoryHttpHandler.AuthorizedRequiredRoutes(v1.Group("/category"))
 	// users.UserRegister(v1.Group("/user"))
 	// users.ProfileRegister(v1.Group("/profiles"))
 
