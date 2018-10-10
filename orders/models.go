@@ -14,7 +14,7 @@ type Service struct {
 	Description string		`json:"description"`
 	CategoryID  uint		`json:"-"`
 	ImageUrl	string		`json:"url"`
-	//Categories  Category `gorm:"PRELOAD:false"`
+	//Categories  category `gorm:"PRELOAD:false"`
 }
 
 type Category struct {
@@ -155,7 +155,7 @@ func createOrderService(orderservice *ServiceOrder){
 	db.Create(&orderservice)
 }
 
-//Category
+//category
 func createCategory(category *Category){
 	db := common.GetDB()
 	db.Create(&category)
