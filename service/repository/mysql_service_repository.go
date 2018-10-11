@@ -3,10 +3,8 @@ package repository
 import (
 	"d2d-backend/common"
 	"d2d-backend/service"
-	"errors"
 	"github.com/biezhi/gorm-paginator/pagination"
 	"github.com/jinzhu/gorm"
-	"strconv"
 )
 
 type repo struct {
@@ -17,17 +15,12 @@ func NewMysqlServiceRepository() service.ServiceRepository {
 	return &repo{common.GetDB()}
 }
 
-func (r *repo) Find(id string) (*service.Service, error) {
-	if id == "" {
-		return nil, errors.New("Invalid ID")
-	}
+func (r *repo) Find(id int) (*service.Service, error) {
 	var service service.Service
-	idNum, err := strconv.Atoi(id)
+	err := r.Conn.First(&service, id).Error
 	if err != nil {
 		return nil, err
 	}
-	r.Conn.First(&service, idNum)
-
 	return &service, nil
 }
 

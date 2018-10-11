@@ -1,35 +1,38 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"github.com/gin-gonic/gin"
-	cfg "d2d-backend/config"
-	"net/url"
+	accountHandler "d2d-backend/account/handler"
+	accountRepository "d2d-backend/account/repository"
+	accountService "d2d-backend/account/service"
 	"d2d-backend/accounts"
-	"d2d-backend/common"
-	"d2d-backend/orders"
 	categoryHandler "d2d-backend/category/handler"
 	categoryRepository "d2d-backend/category/repository"
 	categoryService "d2d-backend/category/service"
+	"d2d-backend/common"
+	cfg "d2d-backend/config"
+	orderStatusHandler "d2d-backend/orderStatus/handler"
+	orderStatusRepository "d2d-backend/orderStatus/repository"
+	orderStatusService "d2d-backend/orderStatus/service"
+	"d2d-backend/orders"
 	reviewHandler "d2d-backend/review/handler"
 	reviewRepository "d2d-backend/review/repository"
 	reviewService "d2d-backend/review/service"
+	roleHandler "d2d-backend/role/handler"
+	roleRepository "d2d-backend/role/repository"
+	roleService "d2d-backend/role/service"
 	serviceHandler "d2d-backend/service/handler"
 	serviceRepository "d2d-backend/service/repository"
 	serviceService "d2d-backend/service/service"
+	serviceOrderHandler "d2d-backend/serviceOrder/handler"
+	serviceOrderRepository "d2d-backend/serviceOrder/repository"
+	serviceOrderService "d2d-backend/serviceOrder/service"
 	storeHandler "d2d-backend/store/handler"
 	storeRepository "d2d-backend/store/repository"
 	storeService "d2d-backend/store/service"
-	roleHandler "d2d-backend/role/handler"
-	roleService "d2d-backend/role/service"
-	roleRepository "d2d-backend/role/repository"
-	orderStatusHandler "d2d-backend/orderStatus/handler"
-	orderStatusService "d2d-backend/orderStatus/service"
-	orderStatusRepository "d2d-backend/orderStatus/repository"
-	serviceOrderService "d2d-backend/serviceOrder/service"
-	serviceOrderRepository "d2d-backend/serviceOrder/repository"
-	serviceOrderHandler "d2d-backend/serviceOrder/handler"
+	"fmt"
+	"github.com/gin-gonic/gin"
+	"log"
+	"net/url"
 	userService "d2d-backend/user/service"
 	userRepository "d2d-backend/user/repository"
 	userHandler "d2d-backend/user/handler"
@@ -143,11 +146,13 @@ func main() {
 	serviceOrderService := serviceOrderService.NewServiceOrderService(serviceOrderRepository)
 	serviceOrderHttpHandler := serviceOrderHandler.NewServiceOrderHttpHandler(v1.Group("/serviceorder"), serviceOrderService)
 
-	//User
+	//Account
+	accountRepository := accountRepository.NewMysqlAccounteRepository()
+	accountService := accountService.NewAccountService(accountRepository)
+	accountHttpHandler := accountHandler.NewAccountHttpHandler(v1.Group("/account"), accountService)//User
 	userRepository := userRepository.NewMysqlUserRepository()
 	userService := userService.NewUserService(userRepository)
 	userHttpHandler := userHandler.NewUserHttpHandler(v1.Group("/user"), userService)
-
 	v1.Use(accounts.AuthMiddleware(true))
 	storeHttpHandler.AuthorizedRequiredRoutes(v1.Group("/store"))
 	reviewHttpHandler.AuthorizedRequiredRoutes(v1.Group("/review"))
@@ -156,8 +161,7 @@ func main() {
 	categoryHttpHandler.AuthorizedRequiredRoutes(v1.Group("/category"))
 	orderStatusHttpHandler.AuthorizedRequiredRoutes(v1.Group("/orderstatus"))
 	serviceOrderHttpHandler.AuthorizedRequiredRoutes(v1.Group("/serviceorder"))
-	userHttpHandler.AuthorizedRequiredRoutes(v1.Group("/user"))
-	// users.UserRegister(v1.Group("/user"))
+	accountHttpHandler.AuthorizedRequiredRoutes(v1.Group("/account"))	userHttpHandler.AuthorizedRequiredRoutes(v1.Group("/user"))	// users.UserRegister(v1.Group("/user"))
 	// users.ProfileRegister(v1.Group("/profiles"))
 
 

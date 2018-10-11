@@ -1,8 +1,8 @@
 package handler
 
 import (
+	"d2d-backend/account"
 	"d2d-backend/common"
-	"d2d-backend/service"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -13,42 +13,42 @@ type ResponseError struct {
 	Message string `json:"message"`
 }
 
-type HttpServiceHandler struct {
-	serviceService service.ServiceService
+type HttpAccountHandler struct {
+	accountService account.AccountService
 }
 
-func NewServiceHttpHandler(e *gin.RouterGroup, service service.ServiceService)(*HttpServiceHandler) {
-	handler := &HttpServiceHandler{
-		serviceService: service,
+func NewAccountHttpHandler(e *gin.RouterGroup, service account.AccountService) (*HttpAccountHandler){
+	handler := &HttpAccountHandler{
+		accountService: service,
 	}
 	handler.UnauthorizedRoutes(e)
 	return handler
 }
 
-func (s *HttpServiceHandler) UnauthorizedRoutes(e *gin.RouterGroup){
-	e.GET("/", s.GetAllServices)
-	e.POST("/", s.CreateService)
-	e.GET("/:id", s.GetServiceById)
-	e.PUT("/:id",s.UpdateService)
-	e.DELETE("/:id", s.DeleteService)
+func (s *HttpAccountHandler) UnauthorizedRoutes(e *gin.RouterGroup){
+	e.GET("/", s.GetAllAccounts)
+	e.GET("/:id", s.GetAccountById)
+	e.POST("/", s.CreateAccount)
+	e.PUT("/:id",s.UpdateAccount)
+	e.DELETE("/:id", s.DeleteAccount)
 }
 
-func (s *HttpServiceHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
+func (s *HttpAccountHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
 
 }
 
-func (s *HttpServiceHandler) GetAllServices(c *gin.Context) {
+func (s *HttpAccountHandler) GetAllAccounts(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery(common.Page, common.PageDefault))
 	limit, _ := strconv.Atoi(c.DefaultQuery(common.Limit, common.LimitDefault))
-	listService, err := s.serviceService.GetServices(limit, page)
+	list, err := s.accountService.GetAccounts(limit, page)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
-	c.JSON(http.StatusOK, listService)
+	c.JSON(http.StatusOK, list)
 }
 
-func  (s *HttpServiceHandler) GetServiceById(c *gin.Context){
+func (s *HttpAccountHandler) GetAccountById(c *gin.Context){
 	id := c.Param("id")
 	if id == ""{
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
@@ -59,56 +59,56 @@ func  (s *HttpServiceHandler) GetServiceById(c *gin.Context){
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
 		return
 	}
-	service, err := s.serviceService.GetServiceById(int(idNum))
+	account, err := s.accountService.GetAccountById(int(idNum))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
-	c.JSON(http.StatusOK, service)
+	c.JSON(http.StatusOK, account)
 }
 
-func  (s *HttpServiceHandler) CreateService(c *gin.Context){
-	var service service.Service
-	err := common.Bind(c, &service)
+func (s *HttpAccountHandler) CreateAccount(c *gin.Context){
+	var account account.Account
+	err := common.Bind(c, &account)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
 		return
 	}
-	_, err = s.serviceService.CreateNewService(&service)
+	_, err = s.accountService.CreateNewAccount(&account)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
-	c.JSON(http.StatusOK, service)
+	c.JSON(http.StatusOK, account)
 }
 
-func  (s *HttpServiceHandler) UpdateService(c *gin.Context){
+func  (s *HttpAccountHandler) UpdateAccount (c *gin.Context){
 	id := c.Param("id")
 	if id == "" {
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
 		return
 	}
-	var service service.Service
+	var account account.Account
 	idNum, err := strconv.ParseUint(id,10,32)
 	if err != nil {
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
 		return
 	}
-	service.ID = uint(idNum)
-	err = common.Bind(c, &service)
+	account.ID = uint(idNum)
+	err = common.Bind(c, &account)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
 		return
 	}
-	_, err = s.serviceService.UpdateService(&service)
+	_, err = s.accountService.UpdateAccount(&account)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Database", err))
 		return
 	}
-	c.JSON(http.StatusOK,&service)
+	c.JSON(http.StatusOK,&account)
 }
 
-func (s *HttpServiceHandler) DeleteService(c *gin.Context){
+func (s *HttpAccountHandler) DeleteAccount(c *gin.Context){
 	id := c.Param("id")
 	if id == ""{
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
@@ -119,7 +119,7 @@ func (s *HttpServiceHandler) DeleteService(c *gin.Context){
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
 		return
 	}
-	bool,err := s.serviceService.DeleteService(int(idNum))
+	bool,err := s.accountService.DeleteAccount(int(idNum))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Database", err))
 		return
