@@ -13,7 +13,7 @@ func NewServiceService(serviceRepository service.ServiceRepository) service.Serv
 	return &serviceService{serviceRepository}
 }
 
-func (serviceService *serviceService) GetServiceById(id string) (*service.Service, error) {
+func (serviceService *serviceService) GetServiceById(id int) (*service.Service, error) {
 	service, err := serviceService.serviceRepos.Find(id)
 	if err != nil {
 		return nil, err
