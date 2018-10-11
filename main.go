@@ -36,10 +36,12 @@ import (
 	userService "d2d-backend/user/service"
 	userRepository "d2d-backend/user/repository"
 	userHandler "d2d-backend/user/handler"
+	placedOrderRepository	"d2d-backend/placedOrder/repository"
+	placeOrderService		"d2d-backend/placedOrder/service"
+	placedOrderHandler		"d2d-backend/placedOrder/handler"
 	notificationService "d2d-backend/notification/service"
 	notificationRepository "d2d-backend/notification/repository"
-	notificationHandler "d2d-backend/notification/handler"
-)
+	notificationHandler "d2d-backend/notification/handler")
 
 var config cfg.Config
 var environmentDb string
@@ -153,17 +155,22 @@ func main() {
 	accountRepository := accountRepository.NewMysqlAccounteRepository()
 	accountService := accountService.NewAccountService(accountRepository)
 	accountHttpHandler := accountHandler.NewAccountHttpHandler(v1.Group("/account"), accountService)
-
 	//User
 	userRepository := userRepository.NewMysqlUserRepository()
 	userService := userService.NewUserService(userRepository)
 	userHttpHandler := userHandler.NewUserHttpHandler(v1.Group("/user"), userService)
+
+	//PlacedOrder
+	placedOrderRepository := placedOrderRepository.NewMysqlPlacedOrderRepository()
+	placedOrderService := placeOrderService.NewPlacedOrderService(placedOrderRepository)
+	placedOrderHttpHandler := placedOrderHandler.NewPlacedOrderHttpHandler(v1.Group("/placedorder"), placedOrderService)
 
 	//Notification
 	notificationRepository := notificationRepository.NewMysqlNotificationRepository()
 	notificationService := notificationService.NewNotificationService(notificationRepository)
 	notificationHttpHandler := notificationHandler.NewNotificationHttpHandler(v1.Group("/notification"), notificationService)
 
+	//Authorized
 	v1.Use(accounts.AuthMiddleware(true))
 	storeHttpHandler.AuthorizedRequiredRoutes(v1.Group("/store"))
 	reviewHttpHandler.AuthorizedRequiredRoutes(v1.Group("/review"))
@@ -172,11 +179,12 @@ func main() {
 	categoryHttpHandler.AuthorizedRequiredRoutes(v1.Group("/category"))
 	orderStatusHttpHandler.AuthorizedRequiredRoutes(v1.Group("/orderstatus"))
 	serviceOrderHttpHandler.AuthorizedRequiredRoutes(v1.Group("/serviceorder"))
-	accountHttpHandler.AuthorizedRequiredRoutes(v1.Group("/account"))
-	userHttpHandler.AuthorizedRequiredRoutes(v1.Group("/user"))
+	accountHttpHandler.AuthorizedRequiredRoutes(v1.Group("/account"))	
+	userHttpHandler.AuthorizedRequiredRoutes(v1.Group("/user"))	
+	placedOrderHttpHandler.AuthorizedRequiredRoutes(v1.Group("/placedorder"))
 	notificationHttpHandler.AuthorizedRequiredRoutes(v1.Group("/notification"))
-	// users.UserRegister(v1.Group("/user"))
-	// users.ProfileRegister(v1.Group("/profiles"))
+
+	// users.UserRegister(v1.Group("/user"))	// users.ProfileRegister(v1.Group("/profiles"))
 
 
 	testAuth := r.Group("/api/ping")

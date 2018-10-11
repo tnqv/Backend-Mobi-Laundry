@@ -77,6 +77,7 @@ type OrderStatus struct {
 	gorm.Model						`json:"-"`
 	StatusID uint
 	UserID uint
+	UserModel			uint		`json:"-"`
 	StatusChangedTime time.Time
 	Description string
 }
