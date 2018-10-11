@@ -69,3 +69,16 @@ func (r *repo) Delete(id int) (bool, error) {
 	}
 	return true, nil
 }
+
+func (r *repo) FindByUserId(limit int, page int, id int) (*pagination.Paginator, error) {
+	var notifications []*notification.Notification
+	db := r.Conn
+	db = db.Where("user_id = ?", id)
+	paginator := pagination.Pagging(&pagination.Param{
+		DB: db,
+		Page: page,
+		Limit: limit,
+		ShowSQL: true,
+	}, &notifications)
+	return paginator,nil
+}

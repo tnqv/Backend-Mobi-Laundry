@@ -56,3 +56,11 @@ func (notificationService *notificationService) DeleteNotification(id int) (bool
 	}
 	return bool,nil
 }
+
+func (notificationService *notificationService) GetNotificationByUserId(limit int, page int, id int) (*pagination.Paginator, error) {
+	paginate,err := notificationService.notificationRepos.FindByUserId(limit, page, id)
+	if err != nil {
+		return nil, err
+	}
+	return paginate, nil
+}
