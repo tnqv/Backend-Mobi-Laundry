@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"d2d-backend/category"
 	"d2d-backend/common"
+	"d2d-backend/user"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -13,45 +13,45 @@ import (
 type ResponseError struct {
 	Message string `json:"message"`
 }
-type HttpCategoryHandler struct {
-	categoryService category.CategoryService
+type HttpUserHandler struct {
+	userService user.UserService
 }
 
-func NewCategoryHttpHandler(e *gin.RouterGroup, service category.CategoryService) (*HttpCategoryHandler){
-	handler := &HttpCategoryHandler{
-		categoryService: service,
+func NewUserHttpHandler(e *gin.RouterGroup, service user.UserService) (*HttpUserHandler){
+	handler := &HttpUserHandler{
+		userService: service,
 	}
 	handler.UnauthorizedRoutes(e)
 	return handler
 }
 
-func (s *HttpCategoryHandler) UnauthorizedRoutes(e *gin.RouterGroup){
-	e.GET("/", s.GetAllCategory)
-	e.GET("/:id", s.GetCategoryById)
-	e.POST("/", s.CreateCategory)
-	e.PUT("/:id", s.UpdateCategory)
-	e.DELETE("/:id", s.DeleteCategory)
+func (s *HttpUserHandler) UnauthorizedRoutes(e *gin.RouterGroup){
+	e.GET("/", s.GetAllUser)
+	e.GET("/:id", s.GetUserById)
+	e.POST("/", s.CreateUser)
+	e.PUT("/:id", s.UpdateUser)
+	e.DELETE("/:id", s.DeleteUser)
 }
 
-func (s *HttpCategoryHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
+func (s *HttpUserHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
 
 
 }
 
-func (s *HttpCategoryHandler) GetAllCategory(c *gin.Context) {
+func (s *HttpUserHandler) GetAllUser(c *gin.Context) {
 
 	page, _ := strconv.Atoi(c.DefaultQuery(common.Page, common.PageDefault))
 	limit, _ := strconv.Atoi(c.DefaultQuery(common.Limit, common.LimitDefault))
-	listCategory, err := s.categoryService.GetCategory(limit,page)
+	listUser, err := s.userService.GetUser(limit,page)
 
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
-	c.JSON(http.StatusOK,listCategory)
+	c.JSON(http.StatusOK,listUser)
 }
 
-func  (s *HttpCategoryHandler) GetCategoryById(c *gin.Context){
+func  (s *HttpUserHandler) GetUserById(c *gin.Context){
 	id := c.Param("id")
 	if id == ""{
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
@@ -62,72 +62,72 @@ func  (s *HttpCategoryHandler) GetCategoryById(c *gin.Context){
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
 		return
 	}
-	category,err := s.categoryService.GetCategoryById(int(idNum))
+	user,err := s.userService.GetUserById(int(idNum))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
-	c.JSON(http.StatusOK,category)
+	c.JSON(http.StatusOK,user)
 }
 
-func  (s *HttpCategoryHandler) CreateCategory(c *gin.Context){
-	var category category.Category
-	err:= common.Bind(c,&category)
+func  (s *HttpUserHandler) CreateUser(c *gin.Context){
+	var user user.User
+	err:= common.Bind(c,&user)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
 		return
 	}
-	if category.Name == "" || strings.TrimSpace(category.Name) == ""{
+	if user.Name == "" || strings.TrimSpace(user.Name) == ""{
 		c.JSON(http.StatusNotAcceptable, common.NewError("Empty name",errors.New("Name is empty")))
 		return
 	}
-	if category.Description == "" || strings.TrimSpace(category.Description) == ""{
-		c.JSON(http.StatusNotAcceptable, common.NewError("Empty description",errors.New("Description is empty")))
+	if user.PhoneNumber == "" || strings.TrimSpace(user.PhoneNumber) == ""{
+		c.JSON(http.StatusNotAcceptable, common.NewError("Empty description",errors.New("Phone number is empty")))
 		return
 	}
-	_,err = s.categoryService.CreateNewCategory(&category)
+	_,err = s.userService.CreateNewUser(&user)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
-	c.JSON(http.StatusOK,category)
+	c.JSON(http.StatusOK,user)
 }
 
-func  (s *HttpCategoryHandler) UpdateCategory(c *gin.Context){
+func  (s *HttpUserHandler) UpdateUser(c *gin.Context){
 	id := c.Param("id")
 	if id == ""{
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
 		return
 	}
-	var category category.Category
+	var user user.User
 	idNum,err := strconv.ParseUint(id,10,32)
 	if err != nil {
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
 		return
 	}
-	category.ID = uint(idNum)
-	err = common.Bind(c,&category)
+	user.ID = uint(idNum)
+	err = common.Bind(c,&user)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
 		return
 	}
-	if category.Name == "" || strings.TrimSpace(category.Name) == ""{
+	if user.Name == "" || strings.TrimSpace(user.Name) == ""{
 		c.JSON(http.StatusNotAcceptable, common.NewError("Empty name",errors.New("Name is empty")))
 		return
 	}
-	if category.Description == "" || strings.TrimSpace(category.Description) == ""{
+	if user.PhoneNumber == "" || strings.TrimSpace(user.PhoneNumber) == ""{
 		c.JSON(http.StatusNotAcceptable, common.NewError("Empty description",errors.New("Description is empty")))
 		return
 	}
-	_,err = s.categoryService.UpdateCategory(&category)
+	_,err = s.userService.UpdateUser(&user)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Database", err))
 		return
 	}
-	c.JSON(http.StatusOK,&category)
+	c.JSON(http.StatusOK,&user)
 }
 
-func (s *HttpCategoryHandler) DeleteCategory(c *gin.Context){
+func (s *HttpUserHandler) DeleteUser(c *gin.Context){
 	id := c.Param("id")
 	if id == ""{
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
@@ -138,7 +138,7 @@ func (s *HttpCategoryHandler) DeleteCategory(c *gin.Context){
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
 		return
 	}
-	bool,err := s.categoryService.DeleteCategory(int(idNum))
+	bool,err := s.userService.DeleteUser(int(idNum))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Database", err))
 		return

@@ -30,6 +30,9 @@ import (
 	serviceOrderService "d2d-backend/serviceOrder/service"
 	serviceOrderRepository "d2d-backend/serviceOrder/repository"
 	serviceOrderHandler "d2d-backend/serviceOrder/handler"
+	userService "d2d-backend/user/service"
+	userRepository "d2d-backend/user/repository"
+	userHandler "d2d-backend/user/handler"
 )
 
 var config cfg.Config
@@ -140,6 +143,10 @@ func main() {
 	serviceOrderService := serviceOrderService.NewServiceOrderService(serviceOrderRepository)
 	serviceOrderHttpHandler := serviceOrderHandler.NewServiceOrderHttpHandler(v1.Group("/serviceorder"), serviceOrderService)
 
+	//User
+	userRepository := userRepository.NewMysqlUserRepository()
+	userService := userService.NewUserService(userRepository)
+	userHttpHandler := userHandler.NewUserHttpHandler(v1.Group("/user"), userService)
 
 	v1.Use(accounts.AuthMiddleware(true))
 	storeHttpHandler.AuthorizedRequiredRoutes(v1.Group("/store"))
@@ -149,6 +156,7 @@ func main() {
 	categoryHttpHandler.AuthorizedRequiredRoutes(v1.Group("/category"))
 	orderStatusHttpHandler.AuthorizedRequiredRoutes(v1.Group("/orderstatus"))
 	serviceOrderHttpHandler.AuthorizedRequiredRoutes(v1.Group("/serviceorder"))
+	userHttpHandler.AuthorizedRequiredRoutes(v1.Group("/user"))
 	// users.UserRegister(v1.Group("/user"))
 	// users.ProfileRegister(v1.Group("/profiles"))
 
