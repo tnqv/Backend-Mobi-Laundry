@@ -12,7 +12,6 @@ type repo struct {
 }
 
 func NewMysqlCategoryRepository() category.CategoryRepository {
-
 	return &repo{common.GetDB()}
 }
 

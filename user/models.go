@@ -3,7 +3,7 @@ package user
 import "github.com/jinzhu/gorm"
 
 type User struct {
-	gorm.Model
+	gorm.Model						`json:"-"`
 	Name 				string		`form:"name" json:"name" binding:"exists"`
 	PhoneNumber			string		`form:"phone_number" json:"phone_number" binding:"exists"`
 	//ShippingAddress		string 		`form:"shippingaddress" json:"shipping_address"`

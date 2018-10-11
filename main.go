@@ -36,6 +36,9 @@ import (
 	userService "d2d-backend/user/service"
 	userRepository "d2d-backend/user/repository"
 	userHandler "d2d-backend/user/handler"
+	notificationService "d2d-backend/notification/service"
+	notificationRepository "d2d-backend/notification/repository"
+	notificationHandler "d2d-backend/notification/handler"
 )
 
 var config cfg.Config
@@ -149,10 +152,18 @@ func main() {
 	//Account
 	accountRepository := accountRepository.NewMysqlAccounteRepository()
 	accountService := accountService.NewAccountService(accountRepository)
-	accountHttpHandler := accountHandler.NewAccountHttpHandler(v1.Group("/account"), accountService)//User
+	accountHttpHandler := accountHandler.NewAccountHttpHandler(v1.Group("/account"), accountService)
+
+	//User
 	userRepository := userRepository.NewMysqlUserRepository()
 	userService := userService.NewUserService(userRepository)
 	userHttpHandler := userHandler.NewUserHttpHandler(v1.Group("/user"), userService)
+
+	//Notification
+	notificationRepository := notificationRepository.NewMysqlNotificationRepository()
+	notificationService := notificationService.NewNotificationService(notificationRepository)
+	notificationHttpHandler := notificationHandler.NewNotificationHttpHandler(v1.Group("/notification"), notificationService)
+
 	v1.Use(accounts.AuthMiddleware(true))
 	storeHttpHandler.AuthorizedRequiredRoutes(v1.Group("/store"))
 	reviewHttpHandler.AuthorizedRequiredRoutes(v1.Group("/review"))
@@ -161,7 +172,10 @@ func main() {
 	categoryHttpHandler.AuthorizedRequiredRoutes(v1.Group("/category"))
 	orderStatusHttpHandler.AuthorizedRequiredRoutes(v1.Group("/orderstatus"))
 	serviceOrderHttpHandler.AuthorizedRequiredRoutes(v1.Group("/serviceorder"))
-	accountHttpHandler.AuthorizedRequiredRoutes(v1.Group("/account"))	userHttpHandler.AuthorizedRequiredRoutes(v1.Group("/user"))	// users.UserRegister(v1.Group("/user"))
+	accountHttpHandler.AuthorizedRequiredRoutes(v1.Group("/account"))
+	userHttpHandler.AuthorizedRequiredRoutes(v1.Group("/user"))
+	notificationHttpHandler.AuthorizedRequiredRoutes(v1.Group("/notification"))
+	// users.UserRegister(v1.Group("/user"))
 	// users.ProfileRegister(v1.Group("/profiles"))
 
 

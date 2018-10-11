@@ -89,6 +89,16 @@ type Review struct {
 	UserModel accounts.User
 }
 
+type Notification struct {
+	gorm.Model         						`json:"-"`
+	NotificationTypeID 		uint   			`json:"notification_type_id"`
+	Read               		bool   			`json:"read"`
+	Content            		string 			`json:"content"`
+	//Customer
+	UserID    				uint          	`json:"user_id"`
+	UserModel 				accounts.User 	`json:"-"`
+}
+
 // Migrate the schema of database if needed
 func AutoMigrate() {
 	db := common.GetDB()
@@ -99,6 +109,7 @@ func AutoMigrate() {
 	db.AutoMigrate(&Review{})
 	db.AutoMigrate(&PlacedOrder{})
 	db.AutoMigrate(&ServiceOrder{})
+	db.AutoMigrate(&Notification{})
 }
 
 func getAllServicesBasedOnCategory()([]Category,error){

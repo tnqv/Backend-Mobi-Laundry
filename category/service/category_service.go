@@ -19,7 +19,6 @@ func (categoryService *categoryService) GetCategoryDetailByName(name string) (*c
 
 func (categoryService *categoryService) CreateNewCategory(newCategory *category.Category) (*category.Category, error) {
 	_,err := categoryService.categoryRepos.Create(newCategory)
-
 	if err != nil {
 		return nil,err
 	}
