@@ -83,7 +83,7 @@ func main() {
 	)
 
 
-	listenAddr = config.GetString(`server.address`)
+	listenAddr = config.GetString(environmentDb + `.serverAddress`)
 	dbHost := config.GetString(environmentDb + `.DatabaseConfig.DBHost`)
 	dbUser := config.GetString(environmentDb + `.DatabaseConfig.DBUser`)
 	dbName := config.GetString(environmentDb + `.DatabaseConfig.DBName`)

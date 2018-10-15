@@ -1,9 +1,7 @@
 {
-  "debug": false,
-  "server": {
-      "address":":8080"
-  },
+  "debug": true,
   "development" : {
+      "serverAddress": "127.0.0.1:8080",
       "DatabaseConfig" : {
           "DBHost" : "127.0.0.1",
           "DBUser" : "root",
@@ -13,6 +11,7 @@
       }
   },
   "production" : {
+      "serverAddress": ":8080",
       "DatabaseConfig" : {
           "DBHost" : "ldds.chfcg4wvpnay.ap-southeast-1.rds.amazonaws.com",
           "DBUser" : "ldds_user_db",
