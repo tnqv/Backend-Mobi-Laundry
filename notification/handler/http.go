@@ -30,7 +30,6 @@ func NewNotificationHttpHandler(e *gin.RouterGroup, service notification.Notific
 func (s *HttpNotificationHandler) UnauthorizedRoutes(e *gin.RouterGroup) {
 	e.GET("/", s.GetAllNotifications)
 	e.GET("/:id", s.GetNotificationById)
-	//e.GET("/user/:id", s.GetNotificationsByUserId)
 	e.POST("/", s.CreateNotification)
 	e.PUT("/:id", s.UpdateNotification)
 	e.DELETE("/:id", s.DeleteNotification)
@@ -138,23 +137,3 @@ func (s *HttpNotificationHandler) DeleteNotification(c *gin.Context) {
 	c.JSON(http.StatusOK, ResponseError{Message: strconv.FormatBool(bool)})
 }
 
-func (s *HttpNotificationHandler) GetNotificationsByUserId(c *gin.Context)  {
-	page, _ := strconv.Atoi(c.DefaultQuery(common.Page, common.PageDefault))
-	limit, _ := strconv.Atoi(c.DefaultQuery(common.Limit, common.LimitDefault))
-	id := c.Param("id")
-	if id == ""{
-		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
-		return
-	}
-	idNum, err := strconv.ParseUint(id,10,32)
-	if err != nil {
-		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
-		return
-	}
-	list, err := s.notificationService.GetNotificationByUserId(limit, page, int(idNum))
-	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
-		return
-	}
-	c.JSON(http.StatusOK, list)
-}

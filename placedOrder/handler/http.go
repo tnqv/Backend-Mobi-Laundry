@@ -36,7 +36,6 @@ func NewPlacedOrderHttpHandler(e *gin.RouterGroup, service placedOrder.PlacedOrd
 func (s *HttpPlacedOrderHandler) UnauthorizedRoutes(e *gin.RouterGroup){
 	e.GET("/", s.GetAllPlacedOrders)
 	e.GET("/:id", s.GetPlacedOrderById)
-	//e.GET("/user/:id", s.GetPlacedOrdersByUserId)
 	e.POST("/", s.CreatePlacedOrder)
 	e.PUT("/:id",s.UpdatePlacedOrder)
 	e.DELETE("/:id", s.DeletePlacedOrder)
@@ -150,23 +149,3 @@ func (s *HttpPlacedOrderHandler) DeletePlacedOrder(c *gin.Context){
 	c.JSON(http.StatusOK,ResponseError{Message: strconv.FormatBool(bool)})
 }
 
-func (s *HttpPlacedOrderHandler) GetPlacedOrdersByUserId(c *gin.Context)  {
-	page, _ := strconv.Atoi(c.DefaultQuery(common.Page, common.PageDefault))
-	limit, _ := strconv.Atoi(c.DefaultQuery(common.Limit, common.LimitDefault))
-	id := c.Param("id")
-	if id == ""{
-		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
-		return
-	}
-	idNum, err := strconv.ParseUint(id,10,32)
-	if err != nil {
-		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
-		return
-	}
-	list, err := s.placedOrderService.GetListOrdersByUserId(limit, page, int(idNum))
-	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
-		return
-	}
-	c.JSON(http.StatusOK, list)
-}

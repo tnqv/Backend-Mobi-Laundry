@@ -1,5 +1,5 @@
 {
-  "debug": true,
+  "debug": false,
   "server": {
       "address":"127.0.0.1:8080"
   },
@@ -14,9 +14,9 @@
   },
   "production" : {
       "DatabaseConfig" : {
-          "DBHost" : "ldds.cbdg6hqefjgu.us-east-1.rds.amazonaws.com",
-          "DBUser" : "ldds_user",
-          "DBName" : "lddsDB",
+          "DBHost" : "ldds.chfcg4wvpnay.ap-southeast-1.rds.amazonaws.com",
+          "DBUser" : "ldds_user_db",
+          "DBName" : "ldds_db",
           "DBPort" : 3306,
           "DBPassword" : "ldds21122018"
       }

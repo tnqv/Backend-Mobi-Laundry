@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"d2d-backend/notification"
+	"d2d-backend/placedOrder"
 )
 
 type ResponseError struct {
@@ -15,11 +17,18 @@ type ResponseError struct {
 }
 type HttpUserHandler struct {
 	userService user.UserService
+	notificationService notification.NotificationService
+	placedOrderService placedOrder.PlacedOrderService
 }
 
-func NewUserHttpHandler(e *gin.RouterGroup, service user.UserService) (*HttpUserHandler){
+func NewUserHttpHandler(e *gin.RouterGroup,
+						service user.UserService,
+						notifService notification.NotificationService,
+						orderService placedOrder.PlacedOrderService	) (*HttpUserHandler){
 	handler := &HttpUserHandler{
 		userService: service,
+		notificationService: notifService,
+		placedOrderService: orderService,
 	}
 	handler.UnauthorizedRoutes(e)
 	return handler
@@ -28,6 +37,8 @@ func NewUserHttpHandler(e *gin.RouterGroup, service user.UserService) (*HttpUser
 func (s *HttpUserHandler) UnauthorizedRoutes(e *gin.RouterGroup){
 	e.GET("/", s.GetAllUser)
 	e.GET("/:id", s.GetUserById)
+	e.GET("/:id/notifications", s.GetNotificationsByUserId)
+	e.GET("/:id/placedorders", s.GetPlacedOrdersByUserId)
 	e.POST("/", s.CreateUser)
 	e.PUT("/:id", s.UpdateUser)
 	e.DELETE("/:id", s.DeleteUser)
@@ -144,4 +155,48 @@ func (s *HttpUserHandler) DeleteUser(c *gin.Context){
 		return
 	}
 	c.JSON(http.StatusOK,ResponseError{Message: strconv.FormatBool(bool)})
+}
+
+
+func (s *HttpUserHandler) GetNotificationsByUserId(c *gin.Context)  {
+	page, _ := strconv.Atoi(c.DefaultQuery(common.Page, common.PageDefault))
+	limit, _ := strconv.Atoi(c.DefaultQuery(common.Limit, common.LimitDefault))
+	id := c.Param("id")
+	if id == ""{
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
+		return
+	}
+	idNum, err := strconv.ParseUint(id,10,32)
+	if err != nil {
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
+		return
+	}
+	list, err := s.notificationService.GetNotificationByUserId(limit, page, int(idNum))
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+	c.JSON(http.StatusOK, list)
+}
+
+
+func (s *HttpUserHandler) GetPlacedOrdersByUserId(c *gin.Context)  {
+	page, _ := strconv.Atoi(c.DefaultQuery(common.Page, common.PageDefault))
+	limit, _ := strconv.Atoi(c.DefaultQuery(common.Limit, common.LimitDefault))
+	id := c.Param("id")
+	if id == ""{
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
+		return
+	}
+	idNum, err := strconv.ParseUint(id,10,32)
+	if err != nil {
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
+		return
+	}
+	list, err := s.placedOrderService.GetListOrdersByUserId(limit, page, int(idNum))
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+	c.JSON(http.StatusOK, list)
 }

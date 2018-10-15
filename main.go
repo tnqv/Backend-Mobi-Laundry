@@ -155,10 +155,6 @@ func main() {
 	accountRepository := accountRepository.NewMysqlAccounteRepository()
 	accountService := accountService.NewAccountService(accountRepository)
 	accountHttpHandler := accountHandler.NewAccountHttpHandler(v1.Group("/account"), accountService)
-	//User
-	userRepository := userRepository.NewMysqlUserRepository()
-	userService := userService.NewUserService(userRepository)
-	userHttpHandler := userHandler.NewUserHttpHandler(v1.Group("/user"), userService)
 
 	//PlacedOrder
 	placedOrderRepository := placedOrderRepository.NewMysqlPlacedOrderRepository()
@@ -169,6 +165,11 @@ func main() {
 	notificationRepository := notificationRepository.NewMysqlNotificationRepository()
 	notificationService := notificationService.NewNotificationService(notificationRepository)
 	notificationHttpHandler := notificationHandler.NewNotificationHttpHandler(v1.Group("/notification"), notificationService)
+
+	//User
+	userRepository := userRepository.NewMysqlUserRepository()
+	userService := userService.NewUserService(userRepository)
+	userHttpHandler := userHandler.NewUserHttpHandler(v1.Group("/user"), userService,notificationService,placedOrderService)
 
 	//Authorized
 	v1.Use(accounts.AuthMiddleware(true))
@@ -195,26 +196,6 @@ func main() {
 		})
 	})
 
-	// test 1 to 1
-	//tx1 := db.Begin()
-	//userA := users.UserModel{
-	//	Username: "AAAAAAAAAAAAAAAA",
-	//	Email:    "aaaa@g.cn",
-	//	Bio:      "hehddeda",
-	//	Image:    nil,
-	//}
-	//tx1.Save(&userA)
-	//tx1.Commit()
-	//fmt.Println(userA)
-
-	//db.Save(&ArticleUserModel{
-	//    UserModelID:userA.ID,
-	//})
-	//var userAA ArticleUserModel
-	//db.Where(&ArticleUserModel{
-	//    UserModelID:userA.ID,
-	//}).First(&userAA)
-	//fmt.Println(userAA)
 
 	r.Run(listenAddr)
 }
