@@ -7,6 +7,6 @@ type Service struct {
 	Name 			string		`form:"name" json:"name"`
 	Price 			int64		`form:"price" json:"price"`
 	Description 	string		`form:"description" json:"description"`
-	ImageUrl		string		`json:"-"`
-	CategoryId 		uint		`json:"-"`
+	ImageUrl		string		`form:"image_url" json:"-"`
+	CategoryId 		uint		`form:"category_id" json:"-"`
 }

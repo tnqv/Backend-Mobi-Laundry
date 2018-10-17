@@ -37,7 +37,7 @@ func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error) {
 }
 
 func (r *repo) Create(category *category.Category) (*category.Category, error) {
-	err := r.Conn.Create(category).Error
+	err := r.Conn.Create(&category).Error
 	if err != nil {
 		return nil,err
 	}
