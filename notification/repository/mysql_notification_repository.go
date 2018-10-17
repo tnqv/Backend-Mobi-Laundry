@@ -11,6 +11,7 @@ type repo struct {
 	Conn *gorm.DB
 }
 
+
 func NewMysqlNotificationRepository() notification.NotificationRepository {
 	return &repo{common.GetDB()}
 }
@@ -81,4 +82,13 @@ func (r *repo) FindByUserId(limit int, page int, id int) (*pagination.Paginator,
 		ShowSQL: true,
 	}, &notifications)
 	return paginator,nil
+}
+
+func (r *repo) GetUnreadNotificationCount(userId int)(int,error){
+	var count int
+	err := r.Conn.Model(&notification.Notification{}).Where("user_id = ?", userId).Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+	return count,nil
 }

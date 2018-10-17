@@ -27,11 +27,7 @@ func NewOrderStatusHttpHandler(e *gin.RouterGroup, service orderStatus.OrderStat
 }
 
 func (s *HttpOrderStatusHandler) UnauthorizedRoutes(e *gin.RouterGroup){
-	e.GET("/", s.GetAllOrderStatus)
-	e.GET("/:id", s.GetOrderStatusById)
-	e.POST("/", s.CreateOrderStatus)
-	e.PUT("/:id", s.UpdateOrderStatus)
-	e.DELETE("/:id", s.DeleteOrderStatus)
+
 }
 
 func (s *HttpOrderStatusHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
@@ -39,6 +35,11 @@ func (s *HttpOrderStatusHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
 	e.GET("/:id", s.GetCategoryById)
 	e.PUT("/:id",s.UpdateCategory)
 	e.DELETE("/:id", s.DeleteCategory)*/
+	e.GET("/", s.GetAllOrderStatus)
+	e.GET("/:id", s.GetOrderStatusById)
+	e.POST("/", s.CreateOrderStatus)
+	e.PUT("/:id", s.UpdateOrderStatus)
+	e.DELETE("/:id", s.DeleteOrderStatus)
 }
 
 func (s *HttpOrderStatusHandler) GetAllOrderStatus(c *gin.Context) {

@@ -10,4 +10,5 @@ type NotificationService interface {
 	UpdateNotification(updateNotification *Notification) (*Notification, error)
 	DeleteNotification(id int) (bool, error)
 	GetNotificationByUserId(limit int, page int, id int) (*pagination.Paginator, error)
+	GetTotalUnreadNotification(userId int)(int,error)
 }

@@ -28,12 +28,13 @@ func NewCategoryHttpHandler(e *gin.RouterGroup, service category.CategoryService
 func (s *HttpCategoryHandler) UnauthorizedRoutes(e *gin.RouterGroup){
 	e.GET("/", s.GetAllCategory)
 	e.GET("/:id", s.GetCategoryById)
-	e.POST("/", s.CreateCategory)
-	e.PUT("/:id", s.UpdateCategory)
-	e.DELETE("/:id", s.DeleteCategory)
 }
 
 func (s *HttpCategoryHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
+
+	e.POST("/", s.CreateCategory)
+	e.PUT("/:id", s.UpdateCategory)
+	e.DELETE("/:id", s.DeleteCategory)
 
 
 }

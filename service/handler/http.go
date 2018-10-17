@@ -27,14 +27,13 @@ func NewServiceHttpHandler(e *gin.RouterGroup, service service.ServiceService)(*
 
 func (s *HttpServiceHandler) UnauthorizedRoutes(e *gin.RouterGroup){
 	e.GET("/", s.GetAllServices)
-	e.POST("/", s.CreateService)
 	e.GET("/:id", s.GetServiceById)
-	e.PUT("/:id",s.UpdateService)
-	e.DELETE("/:id", s.DeleteService)
 }
 
 func (s *HttpServiceHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
-
+	e.POST("/", s.CreateService)
+	e.PUT("/:id",s.UpdateService)
+	e.DELETE("/:id", s.DeleteService)
 }
 
 func (s *HttpServiceHandler) GetAllServices(c *gin.Context) {

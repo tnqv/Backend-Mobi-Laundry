@@ -34,15 +34,15 @@ func NewPlacedOrderHttpHandler(e *gin.RouterGroup, service placedOrder.PlacedOrd
 }
 
 func (s *HttpPlacedOrderHandler) UnauthorizedRoutes(e *gin.RouterGroup){
+
+}
+
+func (s *HttpPlacedOrderHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
 	e.GET("/", s.GetAllPlacedOrders)
 	e.GET("/:id", s.GetPlacedOrderById)
 	e.POST("/", s.CreatePlacedOrder)
 	e.PUT("/:id",s.UpdatePlacedOrder)
 	e.DELETE("/:id", s.DeletePlacedOrder)
-}
-
-func (s *HttpPlacedOrderHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
-
 }
 
 func (s *HttpPlacedOrderHandler) GetAllPlacedOrders(c *gin.Context) {

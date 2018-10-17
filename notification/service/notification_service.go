@@ -64,3 +64,12 @@ func (notificationService *notificationService) GetNotificationByUserId(limit in
 	}
 	return paginate, nil
 }
+
+
+func (notificationService *notificationService) GetTotalUnreadNotification(userId int)(int,error){
+	count,err := notificationService.notificationRepos.GetUnreadNotificationCount(userId)
+	if err != nil {
+		return 0,err
+	}
+	return count,nil
+}

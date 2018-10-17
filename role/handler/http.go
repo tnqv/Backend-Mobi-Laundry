@@ -26,15 +26,15 @@ func NewRoleHttpHandler(e *gin.RouterGroup, service role.RoleService) (*HttpRole
 }
 
 func (s *HttpRoleHandler) UnauthorizedRoutes(e *gin.RouterGroup){
+
+}
+
+func (s *HttpRoleHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
 	e.GET("/", s.GetAllRoles)
 	e.GET("/:id", s.GetRoleById)
 	e.POST("/", s.CreateRole)
 	e.PUT("/:id",s.UpdateRole)
 	e.DELETE("/:id", s.DeleteRole)
-}
-
-func (s *HttpRoleHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
-
 }
 
 func (s *HttpRoleHandler) GetAllRoles(c *gin.Context) {

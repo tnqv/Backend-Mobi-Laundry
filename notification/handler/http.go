@@ -28,15 +28,16 @@ func NewNotificationHttpHandler(e *gin.RouterGroup, service notification.Notific
 }
 
 func (s *HttpNotificationHandler) UnauthorizedRoutes(e *gin.RouterGroup) {
+
+}
+
+func (s *HttpNotificationHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup) {
+
 	e.GET("/", s.GetAllNotifications)
 	e.GET("/:id", s.GetNotificationById)
 	e.POST("/", s.CreateNotification)
 	e.PUT("/:id", s.UpdateNotification)
 	e.DELETE("/:id", s.DeleteNotification)
-}
-
-func (s *HttpNotificationHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup) {
-
 }
 
 func (s *HttpNotificationHandler) GetAllNotifications(c *gin.Context) {

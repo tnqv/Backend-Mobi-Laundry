@@ -26,15 +26,15 @@ func NewServiceOrderHttpHandler(e *gin.RouterGroup, service serviceOrder.Service
 }
 
 func (s *HttpServiceOrderHandler) UnauthorizedRoutes(e *gin.RouterGroup){
+
+}
+
+func (s *HttpServiceOrderHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
 	e.GET("/", s.GetAllServiceOrders)
 	e.GET("/:id", s.GetServiceOrderById)
 	e.POST("/", s.CreateServiceOrder)
 	e.PUT("/:id",s.UpdateServiceOrder)
 	e.DELETE("/:id", s.DeleteServiceOrder)
-}
-
-func (s *HttpServiceOrderHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
-
 }
 
 func (s *HttpServiceOrderHandler) GetAllServiceOrders(c *gin.Context) {

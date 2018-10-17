@@ -26,8 +26,9 @@ func (r *repo) Find(id int) (*category.Category, error) {
 
 func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error) {
 	var category []category.Category
+
 	paginator := pagination.Pagging(&pagination.Param{
-		DB: r.Conn,
+		DB: r.Conn.Preload("Services"),
 		Page: page,
 		Limit: limit,
 		ShowSQL: true,

@@ -35,17 +35,18 @@ func NewUserHttpHandler(e *gin.RouterGroup,
 }
 
 func (s *HttpUserHandler) UnauthorizedRoutes(e *gin.RouterGroup){
+
+}
+
+func (s *HttpUserHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
 	e.GET("/", s.GetAllUser)
 	e.GET("/:id", s.GetUserById)
 	e.GET("/:id/notifications", s.GetNotificationsByUserId)
+	e.GET("/:id/notifications/unread", s.GetTotalUnreadMessage)
 	e.GET("/:id/placedorders", s.GetPlacedOrdersByUserId)
 	e.POST("/", s.CreateUser)
 	e.PUT("/:id", s.UpdateUser)
 	e.DELETE("/:id", s.DeleteUser)
-}
-
-func (s *HttpUserHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
-
 
 }
 
@@ -177,6 +178,28 @@ func (s *HttpUserHandler) GetNotificationsByUserId(c *gin.Context)  {
 		return
 	}
 	c.JSON(http.StatusOK, list)
+}
+
+func (s *HttpUserHandler) GetTotalUnreadMessage(c *gin.Context)  {
+	id := c.Param("id")
+	if id == ""{
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
+		return
+	}
+	idNum, err := strconv.ParseUint(id,10,32)
+	if err != nil {
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
+		return
+	}
+	count, err := s.notificationService.GetTotalUnreadNotification(int(idNum))
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "success",
+		"count": count,
+	})
 }
 
 

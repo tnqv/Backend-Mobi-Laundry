@@ -9,4 +9,5 @@ type NotificationRepository interface {
 	Create(notification *Notification) (*Notification, error)
 	Update(notification *Notification) (*Notification, error)
 	Delete(id int) (bool, error)
+	GetUnreadNotificationCount(userId int)(int,error)
 }

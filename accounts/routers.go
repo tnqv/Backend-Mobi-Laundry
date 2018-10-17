@@ -165,7 +165,15 @@ func AccountsRegistration(c *gin.Context) {
 	}
 	var user User
 	user.Name = c.PostForm("name")
+	if user.Name == ""{
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("validation", errors.New("Chưa khai báo tên")))
+		return
+	}
 	user.PhoneNumber = c.PostForm("phone_number")
+	if user.PhoneNumber == ""{
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("validation", errors.New("Số điện thoại không hợp lệ")))
+		return
+	}
 	user.AccountID = accountModelValidator.accountModel.ID
 	if err := CreateNewUser(&user); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
