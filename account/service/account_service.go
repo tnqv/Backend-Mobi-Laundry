@@ -4,14 +4,13 @@ import (
 	"d2d-backend/account"
 	"github.com/biezhi/gorm-paginator/pagination"
 	"d2d-backend/models"
-	"d2d-backend/user"
 )
 
 type accountService struct {
 	accountRepos account.AccountRepository
 }
 
-func NewAccountService(accountRepository account.AccountRepository,userRepo user.UserRepository) account.AccountService {
+func NewAccountService(accountRepository account.AccountRepository) account.AccountService {
 	return &accountService{accountRepository}
 }
 
