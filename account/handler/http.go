@@ -140,6 +140,7 @@ func (s *HttpAccountHandler) CreateAccount(c *gin.Context){
 	}
 
 	user.AccountId = accountModel.ID
+	user.RoleId = 1
 
 	_,err = s.userService.CreateNewUser(&user)
 	if err != nil {

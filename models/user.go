@@ -12,7 +12,8 @@ type User struct {
 	Longitude			uint		`form:"longitude" json:"longitude"`
 	Latitude			uint		`form:"latitude" json:"latitude"`
 	RoleId				uint		`form:"role_id" json:"role_id"`
-	AccountId			uint 		`gorm:"not null;unique" form:"account_id" json:"account_id"`
+	Role				Role		`gorm:"auto_preload" json:"role"`
+	AccountId			uint 		`gorm:"not null;unique" form:"account_id" json:"-"`
 	StoreId				uint		`form:"storeid" json:"store_id"`
 	Address 			string		`form:"address" json:"address"`
 	IdentifyNummber		uint		`form:"identify_number" json:"identify_nummber"`

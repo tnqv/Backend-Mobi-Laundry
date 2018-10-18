@@ -19,7 +19,7 @@ func NewMysqlUserRepository() user.UserRepository {
 
 func (r *repo) Find(id int) (*models.User, error) {
 	var userModel models.User
-	err := r.Conn.First(&userModel,id).Error
+	err := r.Conn.Preload("Role").First(&userModel,id).Error
 	if err != nil {
 		return nil,err
 	}
@@ -49,10 +49,11 @@ func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error) {
 
 func (r *repo) Create(userModel *models.User) (*models.User, error) {
 
-	err := r.Conn.Create(userModel).Error
+	err := r.Conn.Create(userModel).Preload("Role").First(userModel).Error
 	if err != nil {
 		return nil,err
 	}
+
 	return userModel,nil
 }
 
