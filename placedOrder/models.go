@@ -7,6 +7,7 @@ import (
 	"d2d-backend/user"
 	"github.com/jinzhu/gorm"
 	"time"
+	"d2d-backend/common"
 )
 
 type PlacedOrder struct {
@@ -32,4 +33,9 @@ type PlacedOrder struct {
 	//Review
 	ReviewID 			uint					`form:"" json:"review_id""`
 	ReviewModel 		review.Review			`json:"-"`
+}
+
+func AutoMigrate() {
+	db := common.GetDB()
+	db.AutoMigrate(&PlacedOrder{})
 }

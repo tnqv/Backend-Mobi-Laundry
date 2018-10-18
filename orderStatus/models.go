@@ -3,6 +3,7 @@ package orderStatus
 import (
 	"github.com/jinzhu/gorm"
 	"time"
+	"d2d-backend/common"
 )
 
 type OrderStatus struct {
@@ -14,5 +15,7 @@ type OrderStatus struct {
 	Description 		string 		`form:"description" json:"description"`
 }
 
-
-
+func AutoMigrate() {
+	db := common.GetDB()
+	db.AutoMigrate(&OrderStatus{})
+}

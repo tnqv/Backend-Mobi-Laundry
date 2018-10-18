@@ -1,6 +1,9 @@
 package service
 
-import "github.com/jinzhu/gorm"
+import (
+	"github.com/jinzhu/gorm"
+	"d2d-backend/common"
+)
 
 type Service struct {
 	gorm.Model					`json:"-"`
@@ -9,4 +12,9 @@ type Service struct {
 	Description 	string		`form:"description" json:"description"`
 	ImageUrl		string		`form:"image_url" json:"image_url,omitempty"`
 	CategoryId 		uint		`form:"category_id" json:"-"`
+}
+
+func AutoMigrate() {
+	db := common.GetDB()
+	db.AutoMigrate(&Service{})
 }

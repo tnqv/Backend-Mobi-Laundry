@@ -8,4 +8,5 @@ type AccountRepository interface{
 	Create(account *Account) (*Account,error)
 	Update(account *Account) (*Account, error)
 	Delete(id int) (bool,error)
+	FindOneAccount(condition interface{})(Account,error)
 }

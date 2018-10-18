@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"strconv"
 )
-
 const (
 	FacebookProvider = "FACEBOOK"
 	NormalProvider = "NORMAL"

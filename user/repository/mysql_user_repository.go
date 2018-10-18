@@ -5,6 +5,7 @@ import (
 	"d2d-backend/user"
 	"github.com/biezhi/gorm-paginator/pagination"
 	"github.com/jinzhu/gorm"
+	"errors"
 )
 
 type repo struct {
@@ -36,12 +37,18 @@ func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error) {
 	return paginator,nil
 }
 
-func (r *repo) Create(user *user.User) (*user.User, error) {
-	err := r.Conn.Create(user).Error
+func (r *repo) Create(userModel *user.User) (*user.User, error) {
+	var userTemp user.User
+
+	if err := r.Conn.Where("phone_number = ?",userModel.PhoneNumber).First(&userTemp).Error; err == nil {
+		return nil, errors.New("Số điện thoại bị trùng")
+	}
+
+	err := r.Conn.Create(userModel).Error
 	if err != nil {
 		return nil,err
 	}
-	return user,nil
+	return userModel,nil
 }
 
 func (r *repo) Update(updateUser *user.User) (*user.User, error) {

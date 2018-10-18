@@ -15,6 +15,8 @@ import (
 
 const (
 	TEMPLATE_DB_CONSTRING = `%s:%s@tcp(%s:%s)/%s`
+	FacebookProvider = "FACEBOOK"
+	NormalProvider = "NORMAL"
 )
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 

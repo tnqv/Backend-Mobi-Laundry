@@ -54,4 +54,26 @@ func (accountService *accountService) UpdateAccount(updateAccount *account.Accou
 }
 
 
+func (accountService *accountService) FindOneAccount(condition interface{})(*account.Account,error){
+	account,err := accountService.accountRepos.FindOneAccount(condition)
+	if err != nil {
+		return nil,err
+	}
+	return &account,nil
+}
+
+func (accountService *accountService) UpdateAccountFcmToken(accountID int,fcmToken string) error {
+	account,err := accountService.accountRepos.Find(accountID)
+	if err != nil {
+		return err
+	}
+	account.FcmToken = fcmToken
+	_,err = accountService.accountRepos.Update(account)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}
 

@@ -4,7 +4,6 @@ import (
 	accountHandler "d2d-backend/account/handler"
 	accountRepository "d2d-backend/account/repository"
 	accountService "d2d-backend/account/service"
-	"d2d-backend/accounts"
 	categoryHandler "d2d-backend/category/handler"
 	categoryRepository "d2d-backend/category/repository"
 	categoryService "d2d-backend/category/service"
@@ -41,7 +40,9 @@ import (
 	placedOrderHandler		"d2d-backend/placedOrder/handler"
 	notificationService "d2d-backend/notification/service"
 	notificationRepository "d2d-backend/notification/repository"
-	notificationHandler "d2d-backend/notification/handler")
+	notificationHandler "d2d-backend/notification/handler"
+	"d2d-backend/accounts"
+)
 
 var config cfg.Config
 var environmentDb string
@@ -106,15 +107,15 @@ func main() {
 	//Init repository
 
 	v1 := r.Group("/api/v1")
-	accounts.AccountsRouterRegister(v1.Group("/accounts"))
-	accounts.RolesRouterRegister(v1.Group("/roles"))
-	accounts.UsersRouterRegister(v1.Group("/users"))
+	//accounts.AccountsRouterRegister(v1.Group("/accounts"))
+	//accounts.RolesRouterRegister(v1.Group("/roles"))
+	//accounts.UsersRouterRegister(v1.Group("/users"))
 	v1.Use(accounts.AuthMiddleware(false))
 	//orders.ServicesRouterRegister(v1.Group("/service"))
-	orders.OrdersRouterRegister(v1.Group("/orders"))
-	orders.ServiceOrdersRouterRegister(v1.Group("/services/orders"))
-	//orders.OrderStatusesRouterRegister(v1.Group("/orders/statuses"))
-	orders.OrderStatusesRouterRegister(v1.Group("/notifications"))
+	//orders.OrdersRouterRegister(v1.Group("/orders"))
+	//orders.ServiceOrdersRouterRegister(v1.Group("/services/orders"))
+	////orders.OrderStatusesRouterRegister(v1.Group("/orders/statuses"))
+	//orders.OrderStatusesRouterRegister(v1.Group("/notifications"))
 
 
 	//Review
@@ -152,10 +153,6 @@ func main() {
 	serviceOrderService := serviceOrderService.NewServiceOrderService(serviceOrderRepository)
 	serviceOrderHttpHandler := serviceOrderHandler.NewServiceOrderHttpHandler(v1.Group("/serviceorder"), serviceOrderService)
 
-	//Account
-	accountRepository := accountRepository.NewMysqlAccounteRepository()
-	accountService := accountService.NewAccountService(accountRepository)
-	accountHttpHandler := accountHandler.NewAccountHttpHandler(v1.Group("/account"), accountService)
 
 	//PlacedOrder
 	placedOrderRepository := placedOrderRepository.NewMysqlPlacedOrderRepository()
@@ -171,6 +168,12 @@ func main() {
 	userRepository := userRepository.NewMysqlUserRepository()
 	userService := userService.NewUserService(userRepository)
 	userHttpHandler := userHandler.NewUserHttpHandler(v1.Group("/user"), userService,notificationService,placedOrderService)
+
+
+	//Account
+	accountRepository := accountRepository.NewMysqlAccounteRepository()
+	accountService := accountService.NewAccountService(accountRepository)
+	accountHttpHandler := accountHandler.NewAccountHttpHandler(v1.Group("/account"), accountService,userService)
 
 	//Authorized
 	v1.Use(accounts.AuthMiddleware(true))

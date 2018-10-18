@@ -5,6 +5,7 @@ import (
 	"d2d-backend/common"
 	"github.com/biezhi/gorm-paginator/pagination"
 	"github.com/jinzhu/gorm"
+	"errors"
 )
 
 type repo struct {
@@ -35,12 +36,19 @@ func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error) {
 	return paginator,nil
 }
 
-func (r *repo) Create(account *account.Account) (*account.Account, error) {
-	err := r.Conn.Create(account).Error
-	if err != nil {
+func (r *repo) Create(accountModel *account.Account) (*account.Account, error) {
+
+	var temp account.Account
+
+	if err := r.Conn.Where("email = ?",accountModel.Email).First(&temp).Error; err == nil {
+		return nil, errors.New("Email đã có người đăng ký")
+	}
+
+	if err := r.Conn.Create(accountModel).Error; err != nil{
 		return nil,err
 	}
-	return account,nil
+
+	return accountModel,nil
 }
 
 func (r *repo) Update(updateAccount *account.Account) (*account.Account, error) {
@@ -67,5 +75,11 @@ func (r *repo) Delete(id int) (bool, error) {
 		return false, err
 	}
 	return true, nil
+}
+
+func (r *repo) FindOneAccount(condition interface{})(account.Account,error){
+	var model account.Account
+	err := r.Conn.Where(condition).First(&model).Error
+	return model, err
 }
 

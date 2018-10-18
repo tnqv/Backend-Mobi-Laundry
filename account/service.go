@@ -8,4 +8,6 @@ type AccountService interface {
 	GetAccountById(id int)(*Account, error)
 	UpdateAccount(updateAccount *Account)(*Account, error)
 	DeleteAccount(id int)(bool, error)
+	FindOneAccount(condition interface{})(*Account,error)
+	UpdateAccountFcmToken(accountID int,fcmToken string) error
 }
