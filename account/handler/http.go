@@ -101,23 +101,14 @@ func (s *HttpAccountHandler) CreateAccount(c *gin.Context){
 		return
 	}
 
-	userTemp,err := s.userService.GetUserByPhoneNumber(user.PhoneNumber)
-	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
-		return
-	}
+	userTemp,_ := s.userService.GetUserByPhoneNumber(user.PhoneNumber)
 
 	if userTemp.PhoneNumber != ""{
 		c.JSON(http.StatusForbidden, common.NewError("database", errors.New("Số điện thoại đã bị trùng")))
 		return
 	}
 
-
-	accountTemp,err := s.accountService.GetAccountByEmail(accountModel.Email)
-	if err != nil {
-		c.JSON(http.StatusForbidden, common.NewError("database", err))
-		return
-	}
+	accountTemp,_ := s.accountService.GetAccountByEmail(accountModel.Email)
 
 	if accountTemp.Email != ""{
 		c.JSON(http.StatusForbidden,common.NewError("database",errors.New("Email đã bị trùng")))
