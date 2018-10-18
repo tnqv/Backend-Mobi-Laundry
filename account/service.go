@@ -13,4 +13,5 @@ type AccountService interface {
 	DeleteAccount(id int)(bool, error)
 	FindOneAccount(condition interface{})(*models.Account,error)
 	UpdateAccountFcmToken(accountID int,fcmToken string) error
+	GetAccountByEmail(email string)(*models.Account,error)
 }

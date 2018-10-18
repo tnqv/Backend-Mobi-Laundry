@@ -4,14 +4,23 @@ import (
 	"d2d-backend/account"
 	"github.com/biezhi/gorm-paginator/pagination"
 	"d2d-backend/models"
+	"d2d-backend/user"
 )
 
 type accountService struct {
 	accountRepos account.AccountRepository
 }
 
-func NewAccountService(accountRepository account.AccountRepository) account.AccountService {
+func NewAccountService(accountRepository account.AccountRepository,userRepo user.UserRepository) account.AccountService {
 	return &accountService{accountRepository}
+}
+
+func (accountService *accountService) GetAccountByEmail(email string)(*models.Account,error){
+	accountModel, err := accountService.accountRepos.FindAccountByEmail(email)
+	if err != nil {
+		return nil, err
+	}
+	return accountModel, nil
 }
 
 func (accountService *accountService) CreateNewAccount(newAccount *models.Account) (*models.Account, error) {
@@ -31,11 +40,11 @@ func (accountService *accountService) DeleteAccount(id int) (bool, error) {
 }
 
 func (accountService *accountService) GetAccountById(id int) (*models.Account, error) {
-	role, err := accountService.accountRepos.Find(id)
+	accountModel, err := accountService.accountRepos.Find(id)
 	if err != nil {
 		return nil, err
 	}
-	return role, nil
+	return accountModel, nil
 }
 
 func (accountService *accountService) GetAccounts(limit int, page int) (*pagination.Paginator, error) {

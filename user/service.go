@@ -12,5 +12,6 @@ type UserService interface {
 	GetUserById(id int)(*models.User,error)
 	UpdateUser(updateUser *models.User)(*models.User,error)
 	DeleteUser(id int)(bool,error)
+	GetUserByPhoneNumber(phoneNumber string) (*models.User, error)
 }
 

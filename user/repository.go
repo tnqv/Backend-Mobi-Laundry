@@ -11,4 +11,5 @@ type UserRepository interface{
 	Create(category *models.User) (*models.User,error)
 	Update(category *models.User) (*models.User, error)
 	Delete(id int) (bool,error)
+	FindUserByPhoneNumber(phoneNumber string)(*models.User,error)
 }

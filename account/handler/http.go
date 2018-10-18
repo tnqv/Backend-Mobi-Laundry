@@ -100,14 +100,39 @@ func (s *HttpAccountHandler) CreateAccount(c *gin.Context){
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("validation", errors.New("Số điện thoại không hợp lệ")))
 		return
 	}
-	user.AccountId = accountModel.ID
-	_,err = s.userService.CreateNewUser(&user)
+
+	userTemp,err := s.userService.GetUserByPhoneNumber(user.PhoneNumber)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
 
+	if userTemp.PhoneNumber != ""{
+		c.JSON(http.StatusForbidden, common.NewError("database", errors.New("Số điện thoại đã bị trùng")))
+		return
+	}
+
+
+	accountTemp,err := s.accountService.GetAccountByEmail(accountModel.Email)
+	if err != nil {
+		c.JSON(http.StatusForbidden, common.NewError("database", err))
+		return
+	}
+
+	if accountTemp.Email != ""{
+		c.JSON(http.StatusForbidden,common.NewError("database",errors.New("Email đã bị trùng")))
+		return
+	}
+
 	_, err = s.accountService.CreateNewAccount(&accountModel)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+
+	user.AccountId = accountModel.ID
+
+	_,err = s.userService.CreateNewUser(&user)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return

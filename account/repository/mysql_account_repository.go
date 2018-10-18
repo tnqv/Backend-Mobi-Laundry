@@ -5,7 +5,6 @@ import (
 	"d2d-backend/common"
 	"github.com/biezhi/gorm-paginator/pagination"
 	"github.com/jinzhu/gorm"
-	"errors"
 	"d2d-backend/models"
 )
 
@@ -37,13 +36,18 @@ func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error) {
 	return paginator,nil
 }
 
-func (r *repo) Create(accountModel *models.Account) (*models.Account, error) {
+func (r *repo) FindAccountByEmail(email string)(*models.Account,error){
 
 	var temp models.Account
 
-	if err := r.Conn.Where("email = ?",accountModel.Email).First(&temp).Error; err == nil {
-		return nil, errors.New("Email đã có người đăng ký")
+	if err := r.Conn.Where("email = ?",email).First(&temp).Error; err == nil {
+		return nil, err
 	}
+	return &temp,nil
+}
+
+
+func (r *repo) Create(accountModel *models.Account) (*models.Account, error) {
 
 	if err := r.Conn.Save(accountModel).Error; err != nil{
 		return nil,err

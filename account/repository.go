@@ -12,4 +12,5 @@ type AccountRepository interface{
 	Update(account *models.Account) (*models.Account, error)
 	Delete(id int) (bool,error)
 	FindOneAccount(condition interface{})(models.Account,error)
+	FindAccountByEmail(email string)(*models.Account,error)
 }

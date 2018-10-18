@@ -5,7 +5,6 @@ import (
 	"d2d-backend/user"
 	"github.com/biezhi/gorm-paginator/pagination"
 	"github.com/jinzhu/gorm"
-	"errors"
 	"d2d-backend/models"
 )
 
@@ -27,6 +26,16 @@ func (r *repo) Find(id int) (*models.User, error) {
 	return &userModel, nil
 }
 
+func (r *repo) FindUserByPhoneNumber(phoneNumber string)(*models.User,error){
+	var userTemp models.User
+
+	if err := r.Conn.Where("phone_number = ?",phoneNumber).First(&userTemp).Error; err != nil {
+		return nil, err
+	}
+
+	return &userTemp,nil
+}
+
 func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error) {
 	var userModels []models.User
 	paginator := pagination.Pagging(&pagination.Param{
@@ -39,11 +48,6 @@ func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error) {
 }
 
 func (r *repo) Create(userModel *models.User) (*models.User, error) {
-	var userTemp models.User
-
-	if err := r.Conn.Where("phone_number = ?",userModel.PhoneNumber).First(&userTemp).Error; err == nil {
-		return nil, errors.New("Số điện thoại bị trùng")
-	}
 
 	err := r.Conn.Create(userModel).Error
 	if err != nil {

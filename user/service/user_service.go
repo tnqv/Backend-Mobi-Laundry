@@ -43,6 +43,15 @@ func (userService *userService) GetUserById(id int) (*models.User, error) {
 	return userModel,nil
 }
 
+func (userService *userService) GetUserByPhoneNumber(phoneNumber string) (*models.User, error) {
+	userModel,err := userService.userRepos.FindUserByPhoneNumber(phoneNumber)
+	if err != nil {
+		return nil,err
+	}
+
+	return userModel,nil
+}
+
 func (userService *userService) UpdateUser(updateUser *models.User) (*models.User, error) {
 	updateUser,err := userService.userRepos.Update(updateUser)
 	if err != nil {
