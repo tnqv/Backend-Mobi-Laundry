@@ -1,26 +1,22 @@
-package placedOrder
+package models
 
 import (
-	"d2d-backend/orderStatus"
-	"d2d-backend/review"
-	"d2d-backend/store"
-	"d2d-backend/user"
+
 	"github.com/jinzhu/gorm"
 	"time"
-	"d2d-backend/common"
 )
 
 type PlacedOrder struct {
 	gorm.Model									`json:"-"`
 	StoreID 			uint					`form:"store_id" json:"store_id"`
-	StoreModel 			store.Store				`json:"-"`
+	StoreModel 			Store				`json:"-"`
 	TimePlaced 			time.Time				`form:"time_placed" json:"time_placed"`
 	Detail 				string					`form:"detail" json:"detail"`
-	OrderStatusID 		uint					`form:"order_status_id" json:"order_status_id"`
-	OrderStatusModel 	orderStatus.OrderStatus	`json:"-"`
+	//OrderStatusID 		uint					`form:"order_status_id" json:"order_status_id"`
+	ListOrderStatusModel 	[]OrderStatus	`json:"order_status"`
 	//Customer
 	UserID 				uint					`form:"user_id" json:"user_id"`
-	UserModel 			user.User				`json:"-"`
+	UserModel 			User				`json:"-"`
 	//OrderInformation
 	Capacity 			float32					`form:"capacity" json:"capacity"`
 	EstimatedCapacity 	float32					`form:"estimated_capacity" json:"estimated_capacity"`
@@ -31,11 +27,6 @@ type PlacedOrder struct {
 	Priority 			int						`form:"priority" json:"priority"`
 	OrderCode 			string					`form:"order_code" json:"order_code"`
 	//Review
-	ReviewID 			uint					`form:"" json:"review_id""`
-	ReviewModel 		review.Review			`json:"-"`
-}
-
-func AutoMigrate() {
-	db := common.GetDB()
-	db.AutoMigrate(&PlacedOrder{})
+	ReviewID 			uint					`form:"" json:"review_id"`
+	ReviewModel 		Review			`json:"-"`
 }

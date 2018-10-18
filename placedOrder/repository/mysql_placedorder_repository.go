@@ -3,9 +3,9 @@ package repository
 import (
 	"d2d-backend/common"
 	"d2d-backend/placedOrder"
-	"d2d-backend/role"
 	"github.com/biezhi/gorm-paginator/pagination"
 	"github.com/jinzhu/gorm"
+	"d2d-backend/models"
 )
 
 type repo struct {
@@ -16,17 +16,17 @@ func NewMysqlPlacedOrderRepository() placedOrder.PlacedOrderRepository{
 	return &repo{common.GetDB()}
 }
 
-func (r *repo) Find(id int) (*placedOrder.PlacedOrder, error) {
-	var placedOrder placedOrder.PlacedOrder
-	err := r.Conn.First(&placedOrder, id).Error
+func (r *repo) Find(id int) (*models.PlacedOrder, error) {
+	var placedOrderModel models.PlacedOrder
+	err := r.Conn.First(&placedOrderModel, id).Error
 	if err != nil {
 		return nil, err
 	}
-	return &placedOrder, nil
+	return &placedOrderModel, nil
 }
 
 func (r *repo) FindByUserId(limit int, page int, id int) (*pagination.Paginator, error) {
-	var placedOrders []*placedOrder.PlacedOrder
+	var placedOrders []*models.PlacedOrder
 	db := r.Conn
 	db = db.Where("user_id = ?", id)
 	paginator := pagination.Pagging(&pagination.Param{
@@ -39,7 +39,7 @@ func (r *repo) FindByUserId(limit int, page int, id int) (*pagination.Paginator,
 }
 
 func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error) {
-	var placedOrders []*placedOrder.PlacedOrder
+	var placedOrders []*models.PlacedOrder
 	paginator := pagination.Pagging(&pagination.Param{
 		DB: r.Conn,
 		Page: page,
@@ -50,7 +50,7 @@ func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error) {
 	return paginator,nil
 }
 
-func (r *repo) Create(placedOrder *placedOrder.PlacedOrder) (*placedOrder.PlacedOrder, error) {
+func (r *repo) Create(placedOrder *models.PlacedOrder) (*models.PlacedOrder, error) {
 	err := r.Conn.Create(placedOrder).Error
 	if err != nil {
 		return nil,err
@@ -58,8 +58,8 @@ func (r *repo) Create(placedOrder *placedOrder.PlacedOrder) (*placedOrder.Placed
 	return placedOrder,nil
 }
 
-func (r *repo) Update(updatePlacedOrder *placedOrder.PlacedOrder) (*placedOrder.PlacedOrder, error) {
-	var tempPlacedOrder role.Role
+func (r *repo) Update(updatePlacedOrder *models.PlacedOrder) (*models.PlacedOrder, error) {
+	var tempPlacedOrder models.Role
 	err := r.Conn.First(&tempPlacedOrder,updatePlacedOrder.ID).Error
 	if err != nil{
 		return nil, err
@@ -72,7 +72,7 @@ func (r *repo) Update(updatePlacedOrder *placedOrder.PlacedOrder) (*placedOrder.
 }
 
 func (r *repo) Delete(id int) (bool, error) {
-	var tempPlacedOrder placedOrder.PlacedOrder
+	var tempPlacedOrder models.PlacedOrder
 	err := r.Conn.First(&tempPlacedOrder, id).Error
 	if err != nil {
 		return false, err

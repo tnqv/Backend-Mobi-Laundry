@@ -3,6 +3,7 @@ package service
 import (
 	"d2d-backend/serviceOrder"
 	"github.com/biezhi/gorm-paginator/pagination"
+	"d2d-backend/models"
 )
 
 type serviceOrderService struct {
@@ -13,7 +14,7 @@ func NewServiceOrderService(serviceOrderRepository serviceOrder.ServiceOrderRepo
 	return &serviceOrderService{serviceOrderRepository}
 }
 
-func (serviceOrderService *serviceOrderService) CreateNewServiceOrder(newServiceOrder *serviceOrder.ServiceOrder) (*serviceOrder.ServiceOrder, error) {
+func (serviceOrderService *serviceOrderService) CreateNewServiceOrder(newServiceOrder *models.ServiceOrder) (*models.ServiceOrder, error) {
 	_, err := serviceOrderService.serviceOrderRepos.Create(newServiceOrder)
 	if err != nil {
 		return nil, err
@@ -29,15 +30,15 @@ func (serviceOrderService *serviceOrderService) GetServiceOrders(limit int, page
 	return paginate, nil
 }
 
-func (serviceOrderService *serviceOrderService) GetServiceOrderById(id int) (*serviceOrder.ServiceOrder, error) {
-	serviceOrder, err := serviceOrderService.serviceOrderRepos.Find(id)
+func (serviceOrderService *serviceOrderService) GetServiceOrderById(id int) (*models.ServiceOrder, error) {
+	serviceOrderModel, err := serviceOrderService.serviceOrderRepos.Find(id)
 	if err != nil {
 		return nil, err
 	}
-	return serviceOrder, nil
+	return serviceOrderModel, nil
 }
 
-func (serviceOrderService *serviceOrderService) UpdateServiceOrder(updateServiceOrder *serviceOrder.ServiceOrder) (*serviceOrder.ServiceOrder, error) {
+func (serviceOrderService *serviceOrderService) UpdateServiceOrder(updateServiceOrder *models.ServiceOrder) (*models.ServiceOrder, error) {
 	updateServiceOrder, err := serviceOrderService.serviceOrderRepos.Update(updateServiceOrder)
 	if err != nil {
 		return nil, err
@@ -46,9 +47,9 @@ func (serviceOrderService *serviceOrderService) UpdateServiceOrder(updateService
 }
 
 func (serviceOrderService *serviceOrderService) DeleteServiceOrder(id int) (bool, error) {
-	bool, err := serviceOrderService.serviceOrderRepos.Delete(id)
+	isDeletedSuccess, err := serviceOrderService.serviceOrderRepos.Delete(id)
 	if err != nil {
-		return bool, err
+		return isDeletedSuccess, err
 	}
-	return bool, nil
+	return isDeletedSuccess, nil
 }

@@ -1,8 +1,7 @@
-package account
+package models
 
 import (
 	"github.com/jinzhu/gorm"
-	"d2d-backend/common"
 	"golang.org/x/crypto/bcrypt"
 	"errors"
 )
@@ -16,11 +15,6 @@ type Account struct {
 	AccessToken string	`form:"access_token" json:"access_token"`
 	FcmToken 	string	`form:"fcm_token" json:"fcm_token"`
 	ApnToken 	string	`form:"apn_token" json:"apn_token"`
-}
-
-func AutoMigrate() {
-	db := common.GetDB()
-	db.AutoMigrate(&Account{})
 }
 
 

@@ -3,6 +3,7 @@ package service
 import (
 	"d2d-backend/store"
 	"github.com/biezhi/gorm-paginator/pagination"
+	"d2d-backend/models"
 )
 
 type storeService struct {
@@ -13,14 +14,14 @@ func NewStoreService(storeRepository store.StoreRepository) store.StoreService {
 	return &storeService{storeRepository}
 }
 
-func (storeService *storeService) GetStoreById(store *store.Store)(*store.Store,error) {
-		store,err := storeService.storeRepos.Find(store)
+func (storeService *storeService) GetStoreById(store *models.Store)(*models.Store,error) {
+		storeModel,err := storeService.storeRepos.Find(store)
 
 		if err != nil {
 			return nil,err
 		}
 
-		return store,nil
+		return storeModel,nil
 }
 
 func (storeService *storeService) GetStores(limit int, page int)(*pagination.Paginator,error){
@@ -31,11 +32,11 @@ func (storeService *storeService) GetStores(limit int, page int)(*pagination.Pag
 	return paginate,nil
 }
 
-func (storeService *storeService) GetStoreDetailByName(name string) (*store.Store,error) {
+func (storeService *storeService) GetStoreDetailByName(name string) (*models.Store,error) {
 	return nil,nil
 }
 
-func (storeService *storeService)  CreateNewStore(newStore *store.Store)(*store.Store,error){
+func (storeService *storeService)  CreateNewStore(newStore *models.Store)(*models.Store,error){
 	_,err := storeService.storeRepos.Create(newStore)
 
 	if err != nil {
@@ -44,7 +45,7 @@ func (storeService *storeService)  CreateNewStore(newStore *store.Store)(*store.
 	return newStore,nil
 }
 
-func (storeService *storeService) UpdateStore(updateStore *store.Store)(*store.Store,error){
+func (storeService *storeService) UpdateStore(updateStore *models.Store)(*models.Store,error){
 	updateStore,err := storeService.storeRepos.Update(updateStore)
 
 	if err != nil {
@@ -55,13 +56,13 @@ func (storeService *storeService) UpdateStore(updateStore *store.Store)(*store.S
 }
 
 func (storeService *storeService) DeleteStore(id int)(bool,error) {
-	bool,err := storeService.storeRepos.Delete(id)
+	isDeletedSuccess,err := storeService.storeRepos.Delete(id)
 
 	if err != nil {
-		return bool,err
+		return isDeletedSuccess,err
 	}
 
-	return bool,nil
+	return isDeletedSuccess,nil
 
 
 }

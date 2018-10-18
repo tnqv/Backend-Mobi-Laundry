@@ -5,6 +5,7 @@ import (
 	"d2d-backend/serviceOrder"
 	"github.com/biezhi/gorm-paginator/pagination"
 	"github.com/jinzhu/gorm"
+	"d2d-backend/models"
 )
 
 type repo struct {
@@ -15,17 +16,17 @@ func NewMysqlServiceOrderRepository() serviceOrder.ServiceOrderRepository {
 	return &repo{common.GetDB()}
 }
 
-func (r *repo) Find(id int) (*serviceOrder.ServiceOrder, error) {
-	var serviceOrder serviceOrder.ServiceOrder
-	err := r.Conn.First(&serviceOrder, id).Error
+func (r *repo) Find(id int) (*models.ServiceOrder, error) {
+	var serviceOrderModel models.ServiceOrder
+	err := r.Conn.First(&serviceOrderModel, id).Error
 	if err != nil {
 		return nil, err
 	}
-	return &serviceOrder, nil
+	return &serviceOrderModel, nil
 }
 
 func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error) {
-	var serviceOrders []*serviceOrder.ServiceOrder
+	var serviceOrders []*models.ServiceOrder
 	paginator := pagination.Pagging(&pagination.Param{
 		DB: r.Conn,
 		Page: page,
@@ -35,7 +36,7 @@ func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error) {
 	return paginator, nil
 }
 
-func (r *repo) Create(serviceOrder *serviceOrder.ServiceOrder) (*serviceOrder.ServiceOrder, error) {
+func (r *repo) Create(serviceOrder *models.ServiceOrder) (*models.ServiceOrder, error) {
 	err := r.Conn.Create(serviceOrder).Error
 	if err != nil {
 		return nil, err
@@ -43,8 +44,8 @@ func (r *repo) Create(serviceOrder *serviceOrder.ServiceOrder) (*serviceOrder.Se
 	return serviceOrder, nil
 }
 
-func (r *repo) Update(updateServiceOrder *serviceOrder.ServiceOrder) (*serviceOrder.ServiceOrder, error) {
-	var tempServiceOrder serviceOrder.ServiceOrder
+func (r *repo) Update(updateServiceOrder *models.ServiceOrder) (*models.ServiceOrder, error) {
+	var tempServiceOrder models.ServiceOrder
 	err := r.Conn.First(&tempServiceOrder,updateServiceOrder.ID).Error
 	if err != nil{
 		return nil, err
@@ -57,7 +58,7 @@ func (r *repo) Update(updateServiceOrder *serviceOrder.ServiceOrder) (*serviceOr
 }
 
 func (r *repo) Delete(id int) (bool, error) {
-	var tempServiceOrder serviceOrder.ServiceOrder
+	var tempServiceOrder models.ServiceOrder
 	err := r.Conn.First(&tempServiceOrder, id).Error
 	if err != nil {
 		return false, err

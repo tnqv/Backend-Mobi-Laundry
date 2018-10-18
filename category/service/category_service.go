@@ -3,6 +3,7 @@ package service
 import (
 	"d2d-backend/category"
 	"github.com/biezhi/gorm-paginator/pagination"
+	"d2d-backend/models"
 )
 
 type categoryService struct {
@@ -13,11 +14,11 @@ func NewCategoryService(categoryRepository category.CategoryRepository) category
 	return &categoryService{categoryRepository}
 }
 
-func (categoryService *categoryService) GetCategoryDetailByName(name string) (*category.Category, error) {
+func (categoryService *categoryService) GetCategoryDetailByName(name string) (*models.Category, error) {
 	panic("implement me")
 }
 
-func (categoryService *categoryService) CreateNewCategory(newCategory *category.Category) (*category.Category, error) {
+func (categoryService *categoryService) CreateNewCategory(newCategory *models.Category) (*models.Category, error) {
 	_,err := categoryService.categoryRepos.Create(newCategory)
 	if err != nil {
 		return nil,err
@@ -33,15 +34,15 @@ func (categoryService *categoryService) GetCategory(limit int, page int) (*pagin
 	return paginate,nil
 }
 
-func (categoryService *categoryService) GetCategoryById(id int) (*category.Category, error) {
-	category,err := categoryService.categoryRepos.Find(id)
+func (categoryService *categoryService) GetCategoryById(id int) (*models.Category, error) {
+	categoryModel,err := categoryService.categoryRepos.Find(id)
 	if err != nil {
 		return nil,err
 	}
-	return category,nil
+	return categoryModel,nil
 }
 
-func (categoryService *categoryService) UpdateCategory(updateCategory *category.Category) (*category.Category, error) {
+func (categoryService *categoryService) UpdateCategory(updateCategory *models.Category) (*models.Category, error) {
 	updateCategory,err := categoryService.categoryRepos.Update(updateCategory)
 	if err != nil {
 		return nil,err
@@ -50,10 +51,10 @@ func (categoryService *categoryService) UpdateCategory(updateCategory *category.
 }
 
 func (categoryService *categoryService) DeleteCategory(id int) (bool, error) {
-	bool,err := categoryService.categoryRepos.Delete(id)
+	isDeletedSuccess,err := categoryService.categoryRepos.Delete(id)
 	if err != nil {
-		return bool,err
+		return isDeletedSuccess,err
 	}
-	return bool,nil
+	return isDeletedSuccess,nil
 }
 

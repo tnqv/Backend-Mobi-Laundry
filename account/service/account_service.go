@@ -3,6 +3,7 @@ package service
 import (
 	"d2d-backend/account"
 	"github.com/biezhi/gorm-paginator/pagination"
+	"d2d-backend/models"
 )
 
 type accountService struct {
@@ -13,7 +14,7 @@ func NewAccountService(accountRepository account.AccountRepository) account.Acco
 	return &accountService{accountRepository}
 }
 
-func (accountService *accountService) CreateNewAccount(newAccount *account.Account) (*account.Account, error) {
+func (accountService *accountService) CreateNewAccount(newAccount *models.Account) (*models.Account, error) {
 	_, err := accountService.accountRepos.Create(newAccount)
 	if err != nil {
 		return nil, err
@@ -22,14 +23,14 @@ func (accountService *accountService) CreateNewAccount(newAccount *account.Accou
 }
 
 func (accountService *accountService) DeleteAccount(id int) (bool, error) {
-	bool, err := accountService.accountRepos.Delete(id)
+	isDeletedSuccess, err := accountService.accountRepos.Delete(id)
 	if err != nil {
-		return bool, err
+		return isDeletedSuccess, err
 	}
-	return bool, nil
+	return isDeletedSuccess, nil
 }
 
-func (accountService *accountService) GetAccountById(id int) (*account.Account, error) {
+func (accountService *accountService) GetAccountById(id int) (*models.Account, error) {
 	role, err := accountService.accountRepos.Find(id)
 	if err != nil {
 		return nil, err
@@ -45,7 +46,7 @@ func (accountService *accountService) GetAccounts(limit int, page int) (*paginat
 	return paginate, nil
 }
 
-func (accountService *accountService) UpdateAccount(updateAccount *account.Account) (*account.Account, error) {
+func (accountService *accountService) UpdateAccount(updateAccount *models.Account) (*models.Account, error) {
 	updateAccount, err := accountService.accountRepos.Update(updateAccount)
 	if err != nil {
 		return nil, err
@@ -54,21 +55,21 @@ func (accountService *accountService) UpdateAccount(updateAccount *account.Accou
 }
 
 
-func (accountService *accountService) FindOneAccount(condition interface{})(*account.Account,error){
-	account,err := accountService.accountRepos.FindOneAccount(condition)
+func (accountService *accountService) FindOneAccount(condition interface{})(*models.Account,error){
+	accountModel,err := accountService.accountRepos.FindOneAccount(condition)
 	if err != nil {
 		return nil,err
 	}
-	return &account,nil
+	return &accountModel,nil
 }
 
 func (accountService *accountService) UpdateAccountFcmToken(accountID int,fcmToken string) error {
-	account,err := accountService.accountRepos.Find(accountID)
+	accountModel,err := accountService.accountRepos.Find(accountID)
 	if err != nil {
 		return err
 	}
-	account.FcmToken = fcmToken
-	_,err = accountService.accountRepos.Update(account)
+	accountModel.FcmToken = fcmToken
+	_,err = accountService.accountRepos.Update(accountModel)
 	if err != nil {
 		return err
 	}

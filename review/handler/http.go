@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strings"
 	"errors"
+	"d2d-backend/models"
 )
 
 type ResponseError struct {
@@ -87,7 +88,7 @@ func  (s *HttpReviewHandler) CreateReview(c *gin.Context){
 		return
 	}
 
-	var newReview review.Review
+	var newReview models.Review
 
 	newReview.UserID = userId
 	newReview.Content = content

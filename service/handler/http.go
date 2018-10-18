@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"d2d-backend/models"
 )
 
 type ResponseError struct {
@@ -58,27 +59,27 @@ func  (s *HttpServiceHandler) GetServiceById(c *gin.Context){
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
 		return
 	}
-	service, err := s.serviceService.GetServiceById(int(idNum))
+	serviceModel, err := s.serviceService.GetServiceById(int(idNum))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
-	c.JSON(http.StatusOK, service)
+	c.JSON(http.StatusOK, serviceModel)
 }
 
 func  (s *HttpServiceHandler) CreateService(c *gin.Context){
-	var service service.Service
-	err := common.Bind(c, &service)
+	var serviceModel models.Service
+	err := common.Bind(c, &serviceModel)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
 		return
 	}
-	_, err = s.serviceService.CreateNewService(&service)
+	_, err = s.serviceService.CreateNewService(&serviceModel)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
-	c.JSON(http.StatusOK, service)
+	c.JSON(http.StatusOK, serviceModel)
 }
 
 func  (s *HttpServiceHandler) UpdateService(c *gin.Context){
@@ -87,24 +88,24 @@ func  (s *HttpServiceHandler) UpdateService(c *gin.Context){
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
 		return
 	}
-	var service service.Service
+	var serviceModel models.Service
 	idNum, err := strconv.ParseUint(id,10,32)
 	if err != nil {
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
 		return
 	}
-	service.ID = uint(idNum)
-	err = common.Bind(c, &service)
+	serviceModel.ID = uint(idNum)
+	err = common.Bind(c, &serviceModel)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
 		return
 	}
-	_, err = s.serviceService.UpdateService(&service)
+	_, err = s.serviceService.UpdateService(&serviceModel)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Database", err))
 		return
 	}
-	c.JSON(http.StatusOK,&service)
+	c.JSON(http.StatusOK,&serviceModel)
 }
 
 func (s *HttpServiceHandler) DeleteService(c *gin.Context){

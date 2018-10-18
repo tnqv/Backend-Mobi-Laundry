@@ -3,6 +3,7 @@ package service
 import (
 	"d2d-backend/notification"
 	"github.com/biezhi/gorm-paginator/pagination"
+	"d2d-backend/models"
 )
 
 type notificationService struct {
@@ -13,11 +14,11 @@ func NewNotificationService(notificationRepository notification.NotificationRepo
 	return &notificationService{notificationRepository}
 }
 
-func (notificationService *notificationService) GetNotification(name string) (*notification.Notification, error) {
+func (notificationService *notificationService) GetNotification(name string) (*models.Notification, error) {
 	panic("implement me")
 }
 
-func (notificationService *notificationService) CreateNewNotification(newNotification *notification.Notification) (*notification.Notification, error) {
+func (notificationService *notificationService) CreateNewNotification(newNotification *models.Notification) (*models.Notification, error) {
 	_,err := notificationService.notificationRepos.Create(newNotification)
 	if err != nil {
 		return nil,err
@@ -33,15 +34,15 @@ func (notificationService *notificationService) GetNotifications(limit int, page
 	return paginate,nil
 }
 
-func (notificationService *notificationService) GetNotificationById(id int) (*notification.Notification, error) {
-	notification,err := notificationService.notificationRepos.Find(id)
+func (notificationService *notificationService) GetNotificationById(id int) (*models.Notification, error) {
+	notificationModel,err := notificationService.notificationRepos.Find(id)
 	if err != nil {
 		return nil,err
 	}
-	return notification,nil
+	return notificationModel,nil
 }
 
-func (notificationService *notificationService) UpdateNotification(updateNotification *notification.Notification) (*notification.Notification, error) {
+func (notificationService *notificationService) UpdateNotification(updateNotification *models.Notification) (*models.Notification, error) {
 	updateNotification,err := notificationService.notificationRepos.Update(updateNotification)
 	if err != nil {
 		return nil,err
@@ -50,11 +51,11 @@ func (notificationService *notificationService) UpdateNotification(updateNotific
 }
 
 func (notificationService *notificationService) DeleteNotification(id int) (bool, error) {
-	bool,err := notificationService.notificationRepos.Delete(id)
+	isDeletedSuccess,err := notificationService.notificationRepos.Delete(id)
 	if err != nil {
-		return bool,err
+		return isDeletedSuccess,err
 	}
-	return bool,nil
+	return isDeletedSuccess,nil
 }
 
 func (notificationService *notificationService) GetNotificationByUserId(limit int, page int, id int) (*pagination.Paginator, error) {

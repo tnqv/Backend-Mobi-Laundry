@@ -1,9 +1,8 @@
-package review
+package models
 
 import (
 	"github.com/jinzhu/gorm"
 	"d2d-backend/accounts"
-	"d2d-backend/common"
 )
 
 type Review struct {
@@ -12,9 +11,4 @@ type Review struct {
 	Rate           int		   		`json:"rate"`
 	UserRate       accounts.User  	`json:"user"`
 	UserID		   int				`json:"-"`
-}
-
-func AutoMigrate() {
-	db := common.GetDB()
-	db.AutoMigrate(&Review{})
 }

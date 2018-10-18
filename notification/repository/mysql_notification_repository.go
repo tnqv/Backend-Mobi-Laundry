@@ -5,6 +5,7 @@ import (
 	"d2d-backend/notification"
 	"github.com/biezhi/gorm-paginator/pagination"
 	"github.com/jinzhu/gorm"
+	"d2d-backend/models"
 )
 
 type repo struct {
@@ -16,17 +17,17 @@ func NewMysqlNotificationRepository() notification.NotificationRepository {
 	return &repo{common.GetDB()}
 }
 
-func (r *repo) Find(id int) (*notification.Notification, error) {
-	var notification notification.Notification
-	err := r.Conn.First(&notification, id).Error
+func (r *repo) Find(id int) (*models.Notification, error) {
+	var notificationModel models.Notification
+	err := r.Conn.First(&notificationModel, id).Error
 	if err != nil {
 		return nil, err
 	}
-	return &notification, nil
+	return &notificationModel, nil
 }
 
 func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error) {
-	var notifications []*notification.Notification
+	var notifications []*models.Notification
 	paginator := pagination.Pagging(&pagination.Param{
 		DB:      r.Conn,
 		Page:    page,
@@ -37,7 +38,7 @@ func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error) {
 	return paginator, nil
 }
 
-func (r *repo) Create(notification *notification.Notification) (*notification.Notification, error) {
+func (r *repo) Create(notification *models.Notification) (*models.Notification, error) {
 	err := r.Conn.Create(notification).Error
 	if err != nil {
 		return nil, err
@@ -45,8 +46,8 @@ func (r *repo) Create(notification *notification.Notification) (*notification.No
 	return notification, nil
 }
 
-func (r *repo) Update(updateNotification *notification.Notification) (*notification.Notification, error) {
-	var tempNotification notification.Notification
+func (r *repo) Update(updateNotification *models.Notification) (*models.Notification, error) {
+	var tempNotification models.Notification
 	err := r.Conn.First(&tempNotification, updateNotification.ID).Error
 	if err != nil {
 		return nil, err
@@ -59,7 +60,7 @@ func (r *repo) Update(updateNotification *notification.Notification) (*notificat
 }
 
 func (r *repo) Delete(id int) (bool, error) {
-	var tempNotification notification.Notification
+	var tempNotification models.Notification
 	err := r.Conn.First(&tempNotification, id).Error
 	if err != nil {
 		return false, err
@@ -72,7 +73,7 @@ func (r *repo) Delete(id int) (bool, error) {
 }
 
 func (r *repo) FindByUserId(limit int, page int, id int) (*pagination.Paginator, error) {
-	var notifications []*notification.Notification
+	var notifications []*models.Notification
 	db := r.Conn
 	db = db.Where("user_id = ?", id)
 	paginator := pagination.Pagging(&pagination.Param{
@@ -86,7 +87,7 @@ func (r *repo) FindByUserId(limit int, page int, id int) (*pagination.Paginator,
 
 func (r *repo) GetUnreadNotificationCount(userId int)(int,error){
 	var count int
-	err := r.Conn.Model(&notification.Notification{}).Where("user_id = ?", userId).Count(&count).Error
+	err := r.Conn.Model(&models.Notification{}).Where("user_id = ?", userId).Count(&count).Error
 	if err != nil {
 		return 0, err
 	}

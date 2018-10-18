@@ -12,7 +12,6 @@ import (
 	orderStatusHandler "d2d-backend/orderStatus/handler"
 	orderStatusRepository "d2d-backend/orderStatus/repository"
 	orderStatusService "d2d-backend/orderStatus/service"
-	"d2d-backend/orders"
 	reviewHandler "d2d-backend/review/handler"
 	reviewRepository "d2d-backend/review/repository"
 	reviewService "d2d-backend/review/service"
@@ -41,7 +40,9 @@ import (
 	notificationService "d2d-backend/notification/service"
 	notificationRepository "d2d-backend/notification/repository"
 	notificationHandler "d2d-backend/notification/handler"
-	"d2d-backend/accounts"
+	middlewares "d2d-backend/middlewares"
+
+	"d2d-backend/models"
 )
 
 var config cfg.Config
@@ -58,24 +59,9 @@ func init(){
 	}
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 }
-//
-//func insertTestExampleValue(db *gorm.DB){
-//	category1 := orders.Category{Name:"Combo Giặt + Sấy + Xả Quần áo",Description:"Combo Giặt + Sấy + Xả Quần áo"}
-//	category2 := orders.Category{Name:"Combo Chăn Màn",Description:"Combo Chăn Màn"}
-//	category3 := orders.Category{Name:"Combo Thú bông",Description:"Combo Thú bông"}
-//	category4 := orders.Category{Name:"Dịch vụ giặt hấp (không bao gồm ủi)",Description:"Dịch vụ giặt hấp (không bao gồm ủi)"}
-//	category5 := orders.Category{Name:"Combo Rèm Cửa",Description:"Combo Rèm Cửa"}
-//
-//	db.Create(&category1)
-//	db.Create(&category2)
-//	db.Create(&category3)
-//	db.Create(&category4)
-//	db.Create(&category5)
-//}
 
 func Migrate() {
-	accounts.AutoMigrate()
-	orders.AutoMigrate()
+	models.AutoMigrate()
 }
 
 func main() {
@@ -110,7 +96,7 @@ func main() {
 	//accounts.AccountsRouterRegister(v1.Group("/accounts"))
 	//accounts.RolesRouterRegister(v1.Group("/roles"))
 	//accounts.UsersRouterRegister(v1.Group("/users"))
-	v1.Use(accounts.AuthMiddleware(false))
+	v1.Use(middlewares.AuthMiddleware(false))
 	//orders.ServicesRouterRegister(v1.Group("/service"))
 	//orders.OrdersRouterRegister(v1.Group("/orders"))
 	//orders.ServiceOrdersRouterRegister(v1.Group("/services/orders"))
@@ -119,64 +105,64 @@ func main() {
 
 
 	//Review
-	reviewRepository := reviewRepository.NewMysqlReviewRepository()
-	reviewService := reviewService.NewReviewService(reviewRepository)
-	reviewHttpHandler := reviewHandler.NewReviewHttpHandler(v1.Group("/review"),reviewService)
+	reviewRepo := reviewRepository.NewMysqlReviewRepository()
+	reviewServ := reviewService.NewReviewService(reviewRepo)
+	reviewHttpHandler := reviewHandler.NewReviewHttpHandler(v1.Group("/review"), reviewServ)
 
 	//Store
-	storeRepository := storeRepository.NewMysqlStoreRepository()
-	storeService := storeService.NewStoreService(storeRepository)
-	storeHttpHandler := storeHandler.NewStoreHttpHandler(v1.Group("/store"),storeService)
+	storeRepo := storeRepository.NewMysqlStoreRepository()
+	storeServ := storeService.NewStoreService(storeRepo)
+	storeHttpHandler := storeHandler.NewStoreHttpHandler(v1.Group("/store"), storeServ)
 
 	//Service
-	serviceRepository := serviceRepository.NewMysqlServiceRepository()
-	serviceService := serviceService.NewServiceService(serviceRepository)
-	serviceHttpHandler := serviceHandler.NewServiceHttpHandler(v1.Group("/service"), serviceService)
+	serviceRepo := serviceRepository.NewMysqlServiceRepository()
+	serviceServ := serviceService.NewServiceService(serviceRepo)
+	serviceHttpHandler := serviceHandler.NewServiceHttpHandler(v1.Group("/service"), serviceServ)
 
 	//Role
-	roleRepository := roleRepository.NewMysqlRoleRepository()
-	roleService := roleService.NewRoleService(roleRepository)
-	roleHttpHandler := roleHandler.NewRoleHttpHandler(v1.Group("/role"), roleService)
+	roleRepo := roleRepository.NewMysqlRoleRepository()
+	roleServ := roleService.NewRoleService(roleRepo)
+	roleHttpHandler := roleHandler.NewRoleHttpHandler(v1.Group("/role"), roleServ)
 
 	//Category
-	categoryRepository := categoryRepository.NewMysqlCategoryRepository()
-	categoryService := categoryService.NewCategoryService(categoryRepository)
-	categoryHttpHandler := categoryHandler.NewCategoryHttpHandler(v1.Group("/category"),categoryService)
+	categoryRepo := categoryRepository.NewMysqlCategoryRepository()
+	categoryServ := categoryService.NewCategoryService(categoryRepo)
+	categoryHttpHandler := categoryHandler.NewCategoryHttpHandler(v1.Group("/category"), categoryServ)
 
 	//OrderStatus
-	orderStatusRepository := orderStatusRepository.NewMysqlOrderStatusRepository()
-	orderStatusService := orderStatusService.NewOrderStatusService(orderStatusRepository)
-	orderStatusHttpHandler := orderStatusHandler.NewOrderStatusHttpHandler(v1.Group("/orderstatus"),orderStatusService)
+	orderStatusRepo := orderStatusRepository.NewMysqlOrderStatusRepository()
+	orderStatusServ := orderStatusService.NewOrderStatusService(orderStatusRepo)
+	orderStatusHttpHandler := orderStatusHandler.NewOrderStatusHttpHandler(v1.Group("/orderstatus"), orderStatusServ)
 
 	//ServiceOrder
-	serviceOrderRepository := serviceOrderRepository.NewMysqlServiceOrderRepository()
-	serviceOrderService := serviceOrderService.NewServiceOrderService(serviceOrderRepository)
-	serviceOrderHttpHandler := serviceOrderHandler.NewServiceOrderHttpHandler(v1.Group("/serviceorder"), serviceOrderService)
+	serviceOrderRepo := serviceOrderRepository.NewMysqlServiceOrderRepository()
+	serviceOrderServ := serviceOrderService.NewServiceOrderService(serviceOrderRepo)
+	serviceOrderHttpHandler := serviceOrderHandler.NewServiceOrderHttpHandler(v1.Group("/serviceorder"), serviceOrderServ)
 
 
 	//PlacedOrder
-	placedOrderRepository := placedOrderRepository.NewMysqlPlacedOrderRepository()
-	placedOrderService := placeOrderService.NewPlacedOrderService(placedOrderRepository)
-	placedOrderHttpHandler := placedOrderHandler.NewPlacedOrderHttpHandler(v1.Group("/placedorder"), placedOrderService,orderStatusService)
+	placedOrderRepo := placedOrderRepository.NewMysqlPlacedOrderRepository()
+	placedOrderService := placeOrderService.NewPlacedOrderService(placedOrderRepo)
+	placedOrderHttpHandler := placedOrderHandler.NewPlacedOrderHttpHandler(v1.Group("/placedorder"), placedOrderService, orderStatusServ)
 
 	//Notification
-	notificationRepository := notificationRepository.NewMysqlNotificationRepository()
-	notificationService := notificationService.NewNotificationService(notificationRepository)
-	notificationHttpHandler := notificationHandler.NewNotificationHttpHandler(v1.Group("/notification"), notificationService)
+	notificationRepo := notificationRepository.NewMysqlNotificationRepository()
+	notificationServ := notificationService.NewNotificationService(notificationRepo)
+	notificationHttpHandler := notificationHandler.NewNotificationHttpHandler(v1.Group("/notification"), notificationServ)
 
 	//User
-	userRepository := userRepository.NewMysqlUserRepository()
-	userService := userService.NewUserService(userRepository)
-	userHttpHandler := userHandler.NewUserHttpHandler(v1.Group("/user"), userService,notificationService,placedOrderService)
+	userRepo := userRepository.NewMysqlUserRepository()
+	userServ := userService.NewUserService(userRepo)
+	userHttpHandler := userHandler.NewUserHttpHandler(v1.Group("/user"), userServ, notificationServ,placedOrderService)
 
 
 	//Account
-	accountRepository := accountRepository.NewMysqlAccounteRepository()
-	accountService := accountService.NewAccountService(accountRepository)
-	accountHttpHandler := accountHandler.NewAccountHttpHandler(v1.Group("/account"), accountService,userService)
+	accountRepo := accountRepository.NewMysqlAccounteRepository()
+	accountServ := accountService.NewAccountService(accountRepo)
+	accountHttpHandler := accountHandler.NewAccountHttpHandler(v1.Group("/account"), accountServ, userServ)
 
 	//Authorized
-	v1.Use(accounts.AuthMiddleware(true))
+	v1.Use(middlewares.AuthMiddleware(true))
 	storeHttpHandler.AuthorizedRequiredRoutes(v1.Group("/store"))
 	reviewHttpHandler.AuthorizedRequiredRoutes(v1.Group("/review"))
 	serviceHttpHandler.AuthorizedRequiredRoutes(v1.Group("/service"))

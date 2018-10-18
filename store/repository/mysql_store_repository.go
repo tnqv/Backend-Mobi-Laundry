@@ -6,6 +6,7 @@ import (
 	"d2d-backend/common"
 	"errors"
 	"github.com/biezhi/gorm-paginator/pagination"
+	"d2d-backend/models"
 )
 
 type repo struct {
@@ -17,7 +18,7 @@ func NewMysqlStoreRepository() store.StoreRepository {
 	return &repo{common.GetDB()}
 }
 
-func (r *repo) Find(store *store.Store) (*store.Store, error) {
+func (r *repo) Find(store *models.Store) (*models.Store, error) {
 
 	err := r.Conn.First(&store,store.ID).Error
 
@@ -28,26 +29,26 @@ func (r *repo) Find(store *store.Store) (*store.Store, error) {
 	return store, nil
 }
 
-func (r *repo) FindByStoreName(name string) (*store.Store, error){
+func (r *repo) FindByStoreName(name string) (*models.Store, error){
 	if name == ""{
 		return nil, errors.New("Invalid name")
 	}
 
-	var store store.Store
+	var storeModel models.Store
 
-	err := r.Conn.First(&store,"name = ?",name).Error
+	err := r.Conn.First(&storeModel,"name = ?",name).Error
 
 	if err != nil {
 		return nil,err
 	}
 
-	return &store,nil
+	return &storeModel,nil
 }
 
 
 func (r *repo) FindAll(limit int,page int) (*pagination.Paginator, error){
 
-	var stores []*store.Store
+	var stores []*models.Store
 
 	paginator := pagination.Pagging(&pagination.Param{
 		DB: r.Conn,
@@ -59,7 +60,7 @@ func (r *repo) FindAll(limit int,page int) (*pagination.Paginator, error){
 	return paginator,nil
 }
 
-func (r *repo) Create(store *store.Store) (*store.Store,error){
+func (r *repo) Create(store *models.Store) (*models.Store,error){
 	err := r.Conn.Create(store).Error
 	if err != nil {
 		return nil,err
@@ -68,9 +69,9 @@ func (r *repo) Create(store *store.Store) (*store.Store,error){
 	return store,nil
 }
 
-func (r *repo) Update(storeUpdate *store.Store) (*store.Store, error){
+func (r *repo) Update(storeUpdate *models.Store) (*models.Store, error){
 
-	var storeTemp store.Store
+	var storeTemp models.Store
 
 	err := r.Conn.First(&storeTemp,storeUpdate.ID).Error
 
@@ -102,7 +103,7 @@ func (r *repo) Update(storeUpdate *store.Store) (*store.Store, error){
 		storeTemp.Longitude = storeUpdate.Longitude
 	}
 
-	err = r.Conn.Model(&store.Store{}).Save(&storeTemp).Error
+	err = r.Conn.Model(&models.Store{}).Save(&storeTemp).Error
 
 	if err != nil {
 		return nil,err
@@ -111,7 +112,7 @@ func (r *repo) Update(storeUpdate *store.Store) (*store.Store, error){
 	return &storeTemp,nil
 }
 func (r *repo) Delete(id int) (bool,error){
-	var storeTemp store.Store
+	var storeTemp models.Store
 
 	err := r.Conn.First(&storeTemp,id).Error
 

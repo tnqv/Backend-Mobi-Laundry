@@ -6,6 +6,7 @@ import (
 	"github.com/biezhi/gorm-paginator/pagination"
 	"github.com/jinzhu/gorm"
 	"errors"
+	"d2d-backend/models"
 )
 
 type repo struct {
@@ -17,28 +18,28 @@ func NewMysqlUserRepository() user.UserRepository {
 	return &repo{common.GetDB()}
 }
 
-func (r *repo) Find(id int) (*user.User, error) {
-	var user user.User
-	err := r.Conn.First(&user,id).Error
+func (r *repo) Find(id int) (*models.User, error) {
+	var userModel models.User
+	err := r.Conn.First(&userModel,id).Error
 	if err != nil {
 		return nil,err
 	}
-	return &user, nil
+	return &userModel, nil
 }
 
 func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error) {
-	var user []user.User
+	var userModels []models.User
 	paginator := pagination.Pagging(&pagination.Param{
 		DB: r.Conn,
 		Page: page,
 		Limit: limit,
 		ShowSQL: true,
-	}, &user)
+	}, &userModels)
 	return paginator,nil
 }
 
-func (r *repo) Create(userModel *user.User) (*user.User, error) {
-	var userTemp user.User
+func (r *repo) Create(userModel *models.User) (*models.User, error) {
+	var userTemp models.User
 
 	if err := r.Conn.Where("phone_number = ?",userModel.PhoneNumber).First(&userTemp).Error; err == nil {
 		return nil, errors.New("Số điện thoại bị trùng")
@@ -51,8 +52,8 @@ func (r *repo) Create(userModel *user.User) (*user.User, error) {
 	return userModel,nil
 }
 
-func (r *repo) Update(updateUser *user.User) (*user.User, error) {
-	var tempUser user.User
+func (r *repo) Update(updateUser *models.User) (*models.User, error) {
+	var tempUser models.User
 	err := r.Conn.First(&tempUser,updateUser.ID).Error
 	if err != nil{
 		return nil, err
@@ -65,7 +66,7 @@ func (r *repo) Update(updateUser *user.User) (*user.User, error) {
 }
 
 func (r *repo) Delete(id int) (bool, error) {
-	var tempUser user.User
+	var tempUser models.User
 	err := r.Conn.First(&tempUser,id).Error
 	if err != nil {
 		return false,err

@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"d2d-backend/models"
 )
 
 type ResponseError struct {
@@ -75,7 +76,7 @@ func  (s *HttpOrderStatusHandler) GetOrderStatusById(c *gin.Context){
 }
 
 func  (s *HttpOrderStatusHandler) CreateOrderStatus(c *gin.Context){
-	var orderStatus orderStatus.OrderStatus
+	var orderStatus models.OrderStatus
 	err:= common.Bind(c,&orderStatus)
 	orderStatus.StatusChangedTime = time.Now()
 	if err != nil {
@@ -100,7 +101,7 @@ func  (s *HttpOrderStatusHandler) UpdateOrderStatus(c *gin.Context){
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
 		return
 	}
-	var orderStatus orderStatus.OrderStatus
+	var orderStatus models.OrderStatus
 	idNum,err := strconv.ParseUint(id,10,32)
 	if err != nil {
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))

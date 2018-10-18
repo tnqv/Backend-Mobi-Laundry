@@ -6,6 +6,7 @@ import (
 	"github.com/biezhi/gorm-paginator/pagination"
 	"github.com/jinzhu/gorm"
 	"errors"
+	"d2d-backend/models"
 )
 
 type repo struct {
@@ -16,29 +17,29 @@ func NewMysqlAccounteRepository() account.AccountRepository {
 	return &repo{common.GetDB()}
 }
 
-func (r *repo) Find(id int) (*account.Account, error) {
-	var account account.Account
-	err := r.Conn.First(&account, id).Error
+func (r *repo) Find(id int) (*models.Account, error) {
+	var accountModel models.Account
+	err := r.Conn.First(&accountModel, id).Error
 	if err != nil {
 		return nil, err
 	}
-	return &account, nil
+	return &accountModel, nil
 }
 
 func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error) {
-	var account []*account.Account
+	var accounts []*models.Account
 	paginator := pagination.Pagging(&pagination.Param{
 		DB: r.Conn,
 		Page: page,
 		Limit: limit,
 		ShowSQL: true,
-	}, &account)
+	}, &accounts)
 	return paginator,nil
 }
 
-func (r *repo) Create(accountModel *account.Account) (*account.Account, error) {
+func (r *repo) Create(accountModel *models.Account) (*models.Account, error) {
 
-	var temp account.Account
+	var temp models.Account
 
 	if err := r.Conn.Where("email = ?",accountModel.Email).First(&temp).Error; err == nil {
 		return nil, errors.New("Email đã có người đăng ký")
@@ -51,8 +52,8 @@ func (r *repo) Create(accountModel *account.Account) (*account.Account, error) {
 	return accountModel,nil
 }
 
-func (r *repo) Update(updateAccount *account.Account) (*account.Account, error) {
-	var tempAccount account.Account
+func (r *repo) Update(updateAccount *models.Account) (*models.Account, error) {
+	var tempAccount models.Account
 	err := r.Conn.First(&tempAccount,updateAccount.ID).Error
 	if err != nil{
 		return nil, err
@@ -65,7 +66,7 @@ func (r *repo) Update(updateAccount *account.Account) (*account.Account, error) 
 }
 
 func (r *repo) Delete(id int) (bool, error) {
-	var tempAccount account.Account
+	var tempAccount models.Account
 	err := r.Conn.First(&tempAccount, id).Error
 	if err != nil {
 		return false, err
@@ -77,8 +78,8 @@ func (r *repo) Delete(id int) (bool, error) {
 	return true, nil
 }
 
-func (r *repo) FindOneAccount(condition interface{})(account.Account,error){
-	var model account.Account
+func (r *repo) FindOneAccount(condition interface{})(models.Account,error){
+	var model models.Account
 	err := r.Conn.Where(condition).First(&model).Error
 	return model, err
 }

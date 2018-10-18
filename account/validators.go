@@ -3,6 +3,7 @@ package account
 import (
 "d2d-backend/common"
 "github.com/gin-gonic/gin"
+	"d2d-backend/models"
 )
 
 // *ModelValidator containing two parts:
@@ -14,7 +15,7 @@ type AccountModelValidator struct {
 		Email    string `form:"email" json:"email" binding:"exists,email"`
 		Password string `form:"password" json:"password" binding:"exists,min=8,max=255"`
 	} `json:"account"`
-	accountModel Account `json:"-"`
+	accountModel models.Account `json:"-"`
 }
 
 // There are some difference when you create or update a model, you need to fill the DataModel before
@@ -40,7 +41,7 @@ func NewAccountModelValidator() AccountModelValidator {
 	return userModelValidator
 }
 
-func NewUserModelValidatorFillWith(userModel Account) AccountModelValidator {
+func NewUserModelValidatorFillWith(userModel models.Account) AccountModelValidator {
 	userModelValidator := NewAccountModelValidator()
 	userModelValidator.Account.Email = userModel.Email
 	userModelValidator.Account.Password = common.NBRandomPassword
@@ -53,7 +54,7 @@ type LoginValidator struct {
 		Email    string `form:"email" json:"email" binding:"exists,email"`
 		Password string `form:"password" json:"password" binding:"exists,min=8,max=255"`
 	} `json:"account"`
-	AccountModel Account `json:"-"`
+	AccountModel models.Account `json:"-"`
 }
 
 
@@ -73,7 +74,7 @@ type FBLoginValidator struct {
 		Provider string	`form:"provider" json:"provider" binding:"exists"`
 		AccessToken string `form:"fb_access_token" json:"fb_access_token"`
 	} `json:"account"`
-	AccountModel Account `json:"-"`
+	AccountModel models.Account `json:"-"`
 }
 
 func (self *FBLoginValidator) Bind(c *gin.Context) error {
@@ -90,7 +91,7 @@ type FcmTokenValidator struct {
 	Account struct {
 		FcmToken string `form:"fcm_token" json:"fcm_token" binding:"exists"`
 	} `json:"account"`
-	AccountModel Account `json:"-"`
+	AccountModel models.Account `json:"-"`
 }
 
 func (self *FcmTokenValidator) Bind(c *gin.Context) error {

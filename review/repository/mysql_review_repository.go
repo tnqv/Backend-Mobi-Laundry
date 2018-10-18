@@ -8,6 +8,7 @@ import (
 	"errors"
 	"github.com/biezhi/gorm-paginator/pagination"
 	"strconv"
+	"d2d-backend/models"
 )
 
 type repo struct {
@@ -19,28 +20,28 @@ func NewMysqlReviewRepository() review.ReviewRepository {
 	return &repo{common.GetDB()}
 }
 
-func (r *repo) Find(id string) (*review.Review, error) {
+func (r *repo) Find(id string) (*models.Review, error) {
 	if id == ""{
 		return nil, errors.New("Invalid id")
 	}
 
-	var review review.Review
+	var reviewModel models.Review
 	idNum,err := strconv.Atoi(id)
 	if err != nil {
 		return nil,err
 	}
-	r.Conn.First(&review,idNum)
+	r.Conn.First(&reviewModel,idNum)
 
-	return &review, nil
+	return &reviewModel, nil
 }
 
-func (r *repo) FindReviewByRate(rate int) (*review.Review, error){
+func (r *repo) FindReviewByRate(rate int) (*models.Review, error){
 	return nil,nil
 }
 
 
 func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error){
-	var reviews []review.Review
+	var reviews []models.Review
 
 	paginator := pagination.Pagging(&pagination.Param{
 		DB: r.Conn,
@@ -52,7 +53,7 @@ func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error){
 	return paginator,nil
 }
 
-func (r *repo)Create(review *review.Review) (*review.Review,error){
+func (r *repo)Create(review *models.Review) (*models.Review,error){
 	err := r.Conn.Create(review).Error
 	if err != nil {
 		return nil,err
@@ -61,9 +62,9 @@ func (r *repo)Create(review *review.Review) (*review.Review,error){
 	return review,nil
 }
 
-func (r *repo)Update(updatedReview *review.Review) error {
+func (r *repo)Update(updatedReview *models.Review) error {
 
-	var reviewTemp review.Review
+	var reviewTemp models.Review
 
 	err := r.Conn.First(&reviewTemp,updatedReview.ID).Error
 
@@ -81,7 +82,7 @@ func (r *repo)Update(updatedReview *review.Review) error {
 
 func (r *repo) Delete(id int) (bool,error){
 
-	var reviewTemp review.Review
+	var reviewTemp models.Review
 
 	err := r.Conn.First(&reviewTemp,id).Error
 

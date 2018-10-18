@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"d2d-backend/models"
 )
 
 type ResponseError struct {
@@ -68,7 +69,7 @@ func (s *HttpServiceOrderHandler) GetServiceOrderById(c *gin.Context){
 }
 
 func (s *HttpServiceOrderHandler) CreateServiceOrder(c *gin.Context){
-	var serviceOrder serviceOrder.ServiceOrder
+	var serviceOrder models.ServiceOrder
 	err := common.Bind(c, &serviceOrder)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
@@ -88,7 +89,7 @@ func  (s *HttpServiceOrderHandler) UpdateServiceOrder(c *gin.Context){
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
 		return
 	}
-	var serviceOrder serviceOrder.ServiceOrder
+	var serviceOrder models.ServiceOrder
 	idNum, err := strconv.ParseUint(id,10,32)
 	if err != nil {
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))

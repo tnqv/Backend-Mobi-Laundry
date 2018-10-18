@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strings"
 	"d2d-backend/common"
-	"d2d-backend/account"
+	"d2d-backend/models"
 )
 
 // Strips 'TOKEN ' prefix from token string
@@ -36,7 +36,7 @@ var MyAuth2Extractor = &request.MultiExtractor{
 
 // A helper to write user_id and user_model to the context
 func UpdateContextUserModel(c *gin.Context, my_user_id uint) {
-	var account account.Account
+	var account models.Account
 	if my_user_id != 0 {
 		db := common.GetDB()
 		db.First(&account, my_user_id)

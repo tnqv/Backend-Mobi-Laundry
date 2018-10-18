@@ -7,6 +7,7 @@ import (
 	"d2d-backend/common"
 	"net/http"
 	"errors"
+	"d2d-backend/models"
 )
 
 type ResponseError struct {
@@ -60,7 +61,7 @@ func (s *HttpStoreHandler) GetStoreById(c *gin.Context){
 		return
 	}
 
-	var store store.Store
+	var storeModel models.Store
 
 	idNum,err := strconv.ParseUint(id,10,32)
 	if err != nil {
@@ -69,37 +70,37 @@ func (s *HttpStoreHandler) GetStoreById(c *gin.Context){
 	}
 
 
-	store.ID = uint(idNum)
+	storeModel.ID = uint(idNum)
 
-	_,err = s.storeService.GetStoreById(&store)
+	_,err = s.storeService.GetStoreById(&storeModel)
 
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
 
-	c.JSON(http.StatusOK,store)
+	c.JSON(http.StatusOK,storeModel)
 
 
 }
 
 func  (s *HttpStoreHandler) CreateStore(c *gin.Context){
 
-	var store store.Store
+	var storeModel models.Store
 
-	err:= common.Bind(c,&store)
+	err:= common.Bind(c,&storeModel)
 
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
 		return
 	}
-	_,err = s.storeService.CreateNewStore(&store)
+	_,err = s.storeService.CreateNewStore(&storeModel)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
 
-	c.JSON(http.StatusOK,store)
+	c.JSON(http.StatusOK,storeModel)
 }
 
 func  (s *HttpStoreHandler) UpdateStore(c *gin.Context){
@@ -110,7 +111,7 @@ func  (s *HttpStoreHandler) UpdateStore(c *gin.Context){
 		return
 	}
 
-	var store store.Store
+	var storeModel models.Store
 
 	idNum,err := strconv.ParseUint(id,10,32)
 	if err != nil {
@@ -119,9 +120,9 @@ func  (s *HttpStoreHandler) UpdateStore(c *gin.Context){
 	}
 
 
-	store.ID = uint(idNum)
+	storeModel.ID = uint(idNum)
 
-	err = common.Bind(c,&store)
+	err = common.Bind(c,&storeModel)
 
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
@@ -129,14 +130,14 @@ func  (s *HttpStoreHandler) UpdateStore(c *gin.Context){
 	}
 
 
-	_,err = s.storeService.UpdateStore(&store)
+	_,err = s.storeService.UpdateStore(&storeModel)
 
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Database", err))
 		return
 	}
 
-	c.JSON(http.StatusOK,&store)
+	c.JSON(http.StatusOK,&storeModel)
 
 }
 
@@ -154,13 +155,13 @@ func (s *HttpStoreHandler) DeleteStore(c *gin.Context){
 		return
 	}
 
-	bool,err := s.storeService.DeleteStore(int(idNum))
+	isDeleted,err := s.storeService.DeleteStore(int(idNum))
 
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Database", err))
 		return
 	}
 
-	c.JSON(http.StatusOK,ResponseError{Message: strconv.FormatBool(bool)})
+	c.JSON(http.StatusOK,ResponseError{Message: strconv.FormatBool(isDeleted)})
 
 }

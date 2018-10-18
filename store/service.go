@@ -1,12 +1,15 @@
 package store
 
-import "github.com/biezhi/gorm-paginator/pagination"
+import (
+	"github.com/biezhi/gorm-paginator/pagination"
+	"d2d-backend/models"
+)
 
 type StoreService interface {
-	GetStoreDetailByName(name string) (*Store,error)
-	CreateNewStore(newStore *Store)(*Store,error)
+	GetStoreDetailByName(name string) (*models.Store,error)
+	CreateNewStore(newStore *models.Store)(*models.Store,error)
 	GetStores(limit int, page int)(*pagination.Paginator,error)
-	GetStoreById(store *Store)(*Store,error)
-	UpdateStore(updateStore *Store)(*Store,error)
+	GetStoreById(store *models.Store)(*models.Store,error)
+	UpdateStore(updateStore *models.Store)(*models.Store,error)
 	DeleteStore(id int)(bool,error)
 }

@@ -1,8 +1,7 @@
-package store
+package models
 
 import (
 	"github.com/jinzhu/gorm"
-	"d2d-backend/common"
 )
 
 type Store struct {
@@ -13,9 +12,4 @@ type Store struct {
 	Latitude 	   float32		`form:"latitude" json:"latitude" binding:"exists"`
 	Address        string   	`form:"address" json:"address" binding:"exists"`
 	PhoneNumber    string  		`form:"phone_number" json:"phone_number" binding:"exists"`
-}
-
-func AutoMigrate() {
-	db := common.GetDB()
-	db.AutoMigrate(&Store{})
 }

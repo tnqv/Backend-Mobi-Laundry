@@ -3,6 +3,7 @@ package service
 import (
 	"d2d-backend/placedOrder"
 	"github.com/biezhi/gorm-paginator/pagination"
+	"d2d-backend/models"
 )
 
 type placedOrderService struct {
@@ -13,7 +14,7 @@ func NewPlacedOrderService(placedOrderRepository placedOrder.PlacedOrderReposito
 	return &placedOrderService{placedOrderRepository}
 }
 
-func (placedOrderService *placedOrderService) CreateNewPlacedOrder(newPlacedOrder *placedOrder.PlacedOrder) (*placedOrder.PlacedOrder, error) {
+func (placedOrderService *placedOrderService) CreateNewPlacedOrder(newPlacedOrder *models.PlacedOrder) (*models.PlacedOrder, error) {
 	_, err := placedOrderService.placedOrderRepos.Create(newPlacedOrder)
 	if err != nil {
 		return nil, err
@@ -29,7 +30,7 @@ func (placedOrderService *placedOrderService) GetPlacedOrders(limit int, page in
 	return paginate, nil
 }
 
-func (placedOrderService *placedOrderService) GetPlacedOrderById(id int) (*placedOrder.PlacedOrder, error) {
+func (placedOrderService *placedOrderService) GetPlacedOrderById(id int) (*models.PlacedOrder, error) {
 	role, err := placedOrderService.placedOrderRepos.Find(id)
 	if err != nil {
 		return nil, err
@@ -37,7 +38,7 @@ func (placedOrderService *placedOrderService) GetPlacedOrderById(id int) (*place
 	return role, nil
 }
 
-func (placedOrderService *placedOrderService) UpdatePlacedOrder(updatePlacedOrder *placedOrder.PlacedOrder) (*placedOrder.PlacedOrder, error) {
+func (placedOrderService *placedOrderService) UpdatePlacedOrder(updatePlacedOrder *models.PlacedOrder) (*models.PlacedOrder, error) {
 	updateRole, err := placedOrderService.placedOrderRepos.Update(updatePlacedOrder)
 	if err != nil {
 		return nil, err
@@ -46,11 +47,11 @@ func (placedOrderService *placedOrderService) UpdatePlacedOrder(updatePlacedOrde
 }
 
 func (placedOrderService *placedOrderService) DeletePlacedOrder(id int) (bool, error) {
-	bool, err := placedOrderService.placedOrderRepos.Delete(id)
+	isDeleted, err := placedOrderService.placedOrderRepos.Delete(id)
 	if err != nil {
-		return bool, err
+		return isDeleted, err
 	}
-	return bool, nil
+	return isDeleted, nil
 }
 
 func (placedOrderService *placedOrderService) GetListOrdersByUserId(limit int, page int, id int) (*pagination.Paginator, error) {

@@ -5,6 +5,7 @@ import (
 	"d2d-backend/role"
 	"github.com/biezhi/gorm-paginator/pagination"
 	"github.com/jinzhu/gorm"
+	"d2d-backend/models"
 )
 
 type repo struct {
@@ -15,17 +16,17 @@ func NewMysqlRoleRepository() role.RoleRepository {
 	return &repo{common.GetDB()}
 }
 
-func (r *repo) Find(id int) (*role.Role, error) {
-	var role role.Role
-	err := r.Conn.First(&role, id).Error
+func (r *repo) Find(id int) (*models.Role, error) {
+	var roleModel models.Role
+	err := r.Conn.First(&roleModel, id).Error
 	if err != nil {
 		return nil, err
 	}
-	return &role, nil
+	return &roleModel, nil
 }
 
 func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error) {
-	var roles []*role.Role
+	var roles []*models.Role
 	paginator := pagination.Pagging(&pagination.Param{
 		DB: r.Conn,
 		Page: page,
@@ -36,7 +37,7 @@ func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error) {
 	return paginator,nil
 }
 
-func (r *repo) Create(role *role.Role) (*role.Role, error) {
+func (r *repo) Create(role *models.Role) (*models.Role, error) {
 	err := r.Conn.Create(role).Error
 	if err != nil {
 		return nil,err
@@ -44,8 +45,8 @@ func (r *repo) Create(role *role.Role) (*role.Role, error) {
 	return role,nil
 }
 
-func (r *repo) Update(updateRole *role.Role) (*role.Role, error) {
-	var tempRole role.Role
+func (r *repo) Update(updateRole *models.Role) (*models.Role, error) {
+	var tempRole models.Role
 	err := r.Conn.First(&tempRole,updateRole.ID).Error
 	if err != nil{
 		return nil, err
@@ -58,7 +59,7 @@ func (r *repo) Update(updateRole *role.Role) (*role.Role, error) {
 }
 
 func (r *repo) Delete(id int) (bool, error) {
-	var tempRole role.Role
+	var tempRole models.Role
 	err := r.Conn.First(&tempRole, id).Error
 	if err != nil {
 		return false, err

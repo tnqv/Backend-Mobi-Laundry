@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"d2d-backend/models"
 )
 type ResponseError struct {
 	Message string `json:"message"`
@@ -59,35 +60,35 @@ func (s *HttpRoleHandler) GetRoleById(c *gin.Context){
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
 		return
 	}
-	role, err := s.roleService.GetRoleById(int(idNum))
+	roleModel, err := s.roleService.GetRoleById(int(idNum))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
-	c.JSON(http.StatusOK, role)
+	c.JSON(http.StatusOK, roleModel)
 }
 
 func (s *HttpRoleHandler) CreateRole(c *gin.Context){
-	var role role.Role
-	err := common.Bind(c, &role)
+	var roleModel models.Role
+	err := common.Bind(c, &roleModel)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
 		return
 	}
-	if role.Name == "" || strings.TrimSpace(role.Name) == "" {
+	if roleModel.Name == "" || strings.TrimSpace(roleModel.Name) == "" {
 		c.JSON(http.StatusNotAcceptable, common.NewError("Empty name",errors.New("Name is empty")))
 		return
 	}
-	if role.Description == "" || strings.TrimSpace(role.Description) == "" {
+	if roleModel.Description == "" || strings.TrimSpace(roleModel.Description) == "" {
 		c.JSON(http.StatusNotAcceptable, common.NewError("Empty description",errors.New("Description is empty")))
 		return
 	}
-	_, err = s.roleService.CreateNewRole(&role)
+	_, err = s.roleService.CreateNewRole(&roleModel)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
-	c.JSON(http.StatusOK, role)
+	c.JSON(http.StatusOK, roleModel)
 }
 
 func  (s *HttpRoleHandler) UpdateRole(c *gin.Context){
@@ -96,32 +97,32 @@ func  (s *HttpRoleHandler) UpdateRole(c *gin.Context){
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
 		return
 	}
-	var role role.Role
+	var roleModel models.Role
 	idNum, err := strconv.ParseUint(id,10,32)
 	if err != nil {
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
 		return
 	}
-	role.ID = uint(idNum)
-	err = common.Bind(c, &role)
+	roleModel.ID = uint(idNum)
+	err = common.Bind(c, &roleModel)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
 		return
 	}
-	if role.Name == "" || strings.TrimSpace(role.Name) == "" {
+	if roleModel.Name == "" || strings.TrimSpace(roleModel.Name) == "" {
 		c.JSON(http.StatusNotAcceptable, common.NewError("Empty name",errors.New("Name is empty")))
 		return
 	}
-	if role.Description == "" || strings.TrimSpace(role.Description) == "" {
+	if roleModel.Description == "" || strings.TrimSpace(roleModel.Description) == "" {
 		c.JSON(http.StatusNotAcceptable, common.NewError("Empty description",errors.New("Description is empty")))
 		return
 	}
-	_, err = s.roleService.UpdateRole(&role)
+	_, err = s.roleService.UpdateRole(&roleModel)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Database", err))
 		return
 	}
-	c.JSON(http.StatusOK,&role)
+	c.JSON(http.StatusOK,&roleModel)
 }
 
 func (s *HttpRoleHandler) DeleteRole(c *gin.Context){
@@ -135,10 +136,10 @@ func (s *HttpRoleHandler) DeleteRole(c *gin.Context){
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
 		return
 	}
-	bool,err := s.roleService.DeleteRole(int(idNum))
+	isDeleted,err := s.roleService.DeleteRole(int(idNum))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Database", err))
 		return
 	}
-	c.JSON(http.StatusOK,ResponseError{Message: strconv.FormatBool(bool)})
+	c.JSON(http.StatusOK,ResponseError{Message: strconv.FormatBool(isDeleted)})
 }

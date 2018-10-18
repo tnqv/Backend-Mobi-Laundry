@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"d2d-backend/models"
 )
 
 type ResponseError struct {
@@ -63,35 +64,35 @@ func  (s *HttpCategoryHandler) GetCategoryById(c *gin.Context){
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
 		return
 	}
-	category,err := s.categoryService.GetCategoryById(int(idNum))
+	categoryModel,err := s.categoryService.GetCategoryById(int(idNum))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
-	c.JSON(http.StatusOK,category)
+	c.JSON(http.StatusOK,categoryModel)
 }
 
 func  (s *HttpCategoryHandler) CreateCategory(c *gin.Context){
-	var category category.Category
-	err:= common.Bind(c,&category)
+	var categoryModel models.Category
+	err:= common.Bind(c,&categoryModel)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
 		return
 	}
-	if category.Name == "" || strings.TrimSpace(category.Name) == ""{
+	if categoryModel.Name == "" || strings.TrimSpace(categoryModel.Name) == ""{
 		c.JSON(http.StatusNotAcceptable, common.NewError("Empty name",errors.New("Name is empty")))
 		return
 	}
-	if category.Description == "" || strings.TrimSpace(category.Description) == ""{
+	if categoryModel.Description == "" || strings.TrimSpace(categoryModel.Description) == ""{
 		c.JSON(http.StatusNotAcceptable, common.NewError("Empty description",errors.New("Description is empty")))
 		return
 	}
-	_,err = s.categoryService.CreateNewCategory(&category)
+	_,err = s.categoryService.CreateNewCategory(&categoryModel)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
-	c.JSON(http.StatusOK,category)
+	c.JSON(http.StatusOK,categoryModel)
 }
 
 func  (s *HttpCategoryHandler) UpdateCategory(c *gin.Context){
@@ -100,32 +101,32 @@ func  (s *HttpCategoryHandler) UpdateCategory(c *gin.Context){
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
 		return
 	}
-	var category category.Category
+	var categoryModel models.Category
 	idNum,err := strconv.ParseUint(id,10,32)
 	if err != nil {
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
 		return
 	}
-	category.ID = uint(idNum)
-	err = common.Bind(c,&category)
+	categoryModel.ID = uint(idNum)
+	err = common.Bind(c,&categoryModel)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
 		return
 	}
-	if category.Name == "" || strings.TrimSpace(category.Name) == ""{
+	if categoryModel.Name == "" || strings.TrimSpace(categoryModel.Name) == ""{
 		c.JSON(http.StatusNotAcceptable, common.NewError("Empty name",errors.New("Name is empty")))
 		return
 	}
-	if category.Description == "" || strings.TrimSpace(category.Description) == ""{
+	if categoryModel.Description == "" || strings.TrimSpace(categoryModel.Description) == ""{
 		c.JSON(http.StatusNotAcceptable, common.NewError("Empty description",errors.New("Description is empty")))
 		return
 	}
-	_,err = s.categoryService.UpdateCategory(&category)
+	_,err = s.categoryService.UpdateCategory(&categoryModel)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Database", err))
 		return
 	}
-	c.JSON(http.StatusOK,&category)
+	c.JSON(http.StatusOK,&categoryModel)
 }
 
 func (s *HttpCategoryHandler) DeleteCategory(c *gin.Context){
@@ -139,10 +140,10 @@ func (s *HttpCategoryHandler) DeleteCategory(c *gin.Context){
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
 		return
 	}
-	bool,err := s.categoryService.DeleteCategory(int(idNum))
+	isDeleted,err := s.categoryService.DeleteCategory(int(idNum))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Database", err))
 		return
 	}
-	c.JSON(http.StatusOK,ResponseError{Message: strconv.FormatBool(bool)})
+	c.JSON(http.StatusOK,ResponseError{Message: strconv.FormatBool(isDeleted)})
 }

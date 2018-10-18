@@ -1,10 +1,9 @@
-package notification
+package models
 
 import (
 	"d2d-backend/accounts"
 
 	"github.com/jinzhu/gorm"
-	"d2d-backend/common"
 )
 
 type Notification struct {
@@ -15,9 +14,4 @@ type Notification struct {
 	//Customer
 	UserID    				uint          	`form:"user_id" json:"user_id" binding:"exists"`
 	UserModel 				accounts.User 	`json:"-"`
-}
-
-func AutoMigrate() {
-	db := common.GetDB()
-	db.AutoMigrate(&Notification{})
 }

@@ -1,11 +1,14 @@
 package service
 
-import "github.com/biezhi/gorm-paginator/pagination"
+import (
+	"github.com/biezhi/gorm-paginator/pagination"
+	"d2d-backend/models"
+)
 
 type ServiceRepository interface{
-	Find(id int) (*Service, error)
+	Find(id int) (*models.Service, error)
 	FindAll(limit int, page int) (*pagination.Paginator, error)
-	Create(review *Service) (*Service,error)
-	Update(service *Service) (*Service,error)
+	Create(review *models.Service) (*models.Service,error)
+	Update(service *models.Service) (*models.Service,error)
 	Delete(id int) (bool,error)
 }

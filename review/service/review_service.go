@@ -3,6 +3,7 @@ package service
 import (
 	"d2d-backend/review"
 	"github.com/biezhi/gorm-paginator/pagination"
+	"d2d-backend/models"
 )
 
 type reviewService struct {
@@ -23,7 +24,7 @@ func (reviewService *reviewService) GetReviews(page int,limit int) (*pagination.
 	return listReviewsPaginator,nil
 }
 
-func (reviewService *reviewService) CreateNewReview(newReview *review.Review)(*review.Review,error){
+func (reviewService *reviewService) CreateNewReview(newReview *models.Review)(*models.Review,error){
 	_,err := reviewService.reviewRepos.Create(newReview)
 
 	if err != nil {

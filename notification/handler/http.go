@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"d2d-backend/models"
 )
 
 type ResponseError struct {
@@ -71,7 +72,7 @@ func (s *HttpNotificationHandler) GetNotificationById(c *gin.Context) {
 }
 
 func  (s *HttpNotificationHandler) CreateNotification(c *gin.Context){
-	var notification notification.Notification
+	var notification models.Notification
 	err:= common.Bind(c,&notification)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
@@ -95,7 +96,7 @@ func  (s *HttpNotificationHandler) UpdateNotification(c *gin.Context){
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
 		return
 	}
-	var notification notification.Notification
+	var notification models.Notification
 	idNum,err := strconv.ParseUint(id,10,32)
 	if err != nil {
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))

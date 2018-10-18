@@ -1,8 +1,7 @@
-package user
+package models
 
 import (
 	"github.com/jinzhu/gorm"
-	"d2d-backend/common"
 )
 
 type User struct {
@@ -19,9 +18,4 @@ type User struct {
 	IdentifyNummber		uint		`form:"identify_number" json:"identify_nummber"`
 	Capacity			uint		`form:"capacity" json:"capacity"`
 	Imageurl			string		`form:"imageurl" json:"imageurl"`
-}
-
-func AutoMigrate() {
-	db := common.GetDB()
-	db.AutoMigrate(&User{})
 }

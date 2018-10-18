@@ -3,6 +3,7 @@ package service
 import (
 	"d2d-backend/user"
 	"github.com/biezhi/gorm-paginator/pagination"
+	"d2d-backend/models"
 )
 
 type userService struct {
@@ -13,11 +14,11 @@ func NewUserService(UserRepository user.UserRepository) user.UserService {
 	return &userService{UserRepository}
 }
 
-func (userService *userService) GetUserDetailByName(name string) (*user.User, error) {
+func (userService *userService) GetUserDetailByName(name string) (*models.User, error) {
 	panic("implement me")
 }
 
-func (userService *userService) CreateNewUser(newUser *user.User) (*user.User, error) {
+func (userService *userService) CreateNewUser(newUser *models.User) (*models.User, error) {
 	_,err := userService.userRepos.Create(newUser)
 
 	if err != nil {
@@ -34,15 +35,15 @@ func (userService *userService) GetUser(limit int, page int) (*pagination.Pagina
 	return paginate,nil
 }
 
-func (userService *userService) GetUserById(id int) (*user.User, error) {
-	user,err := userService.userRepos.Find(id)
+func (userService *userService) GetUserById(id int) (*models.User, error) {
+	userModel,err := userService.userRepos.Find(id)
 	if err != nil {
 		return nil,err
 	}
-	return user,nil
+	return userModel,nil
 }
 
-func (userService *userService) UpdateUser(updateUser *user.User) (*user.User, error) {
+func (userService *userService) UpdateUser(updateUser *models.User) (*models.User, error) {
 	updateUser,err := userService.userRepos.Update(updateUser)
 	if err != nil {
 		return nil,err
@@ -51,10 +52,10 @@ func (userService *userService) UpdateUser(updateUser *user.User) (*user.User, e
 }
 
 func (userService *userService) DeleteUser(id int) (bool, error) {
-	bool,err := userService.userRepos.Delete(id)
+	isDeletedSuccess,err := userService.userRepos.Delete(id)
 	if err != nil {
-		return bool,err
+		return isDeletedSuccess,err
 	}
-	return bool,nil
+	return isDeletedSuccess,nil
 }
 

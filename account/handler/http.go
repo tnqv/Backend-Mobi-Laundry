@@ -11,6 +11,7 @@ import (
 	"d2d-backend/user"
 	"github.com/huandu/facebook"
 	"fmt"
+	"d2d-backend/models"
 )
 
 type ResponseError struct {
@@ -79,14 +80,14 @@ func (s *HttpAccountHandler) GetAccountById(c *gin.Context){
 }
 
 func (s *HttpAccountHandler) CreateAccount(c *gin.Context){
-	var accountModel account.Account
+	var accountModel models.Account
 	err := common.Bind(c, &accountModel)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
 		return
 	}
 
-	var user user.User
+	var user models.User
 	user.Name = c.PostForm("name")
 	if user.Name == ""{
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("validation", errors.New("Chưa khai báo tên")))
@@ -123,7 +124,7 @@ func  (s *HttpAccountHandler) UpdateAccount (c *gin.Context){
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
 		return
 	}
-	var account account.Account
+	var account models.Account
 	idNum, err := strconv.ParseUint(id,10,32)
 	if err != nil {
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
@@ -200,10 +201,10 @@ func (s *HttpAccountHandler) FacebookAccountsLogin(c *gin.Context){
 		return
 	}
 
-	accountModel,err := s.accountService.FindOneAccount(&account.Account{Email: fbEmail})
+	accountModel,err := s.accountService.FindOneAccount(&models.Account{Email: fbEmail})
 
 	if err != nil {
-		var newAccount account.Account
+		var newAccount models.Account
 		newAccount.Email = fbEmail
 		newAccount.Provider = common.FacebookProvider
 		newAccount.AccessToken = fbLoginValidator.AccountModel.AccessToken
@@ -230,7 +231,7 @@ func (s *HttpAccountHandler) AccountsLogin(c *gin.Context){
 		return
 	}
 
-	accountModel,err := s.accountService.FindOneAccount(&account.Account{Email: loginValidator.AccountModel.Email})
+	accountModel,err := s.accountService.FindOneAccount(&models.Account{Email: loginValidator.AccountModel.Email})
 
 	if err != nil {
 		c.JSON(http.StatusForbidden,common.NewError("login",errors.New("Email hoặc mật khẩu không hợp lệ")))

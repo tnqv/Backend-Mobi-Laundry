@@ -1,12 +1,15 @@
 package placedOrder
 
-import "github.com/biezhi/gorm-paginator/pagination"
+import (
+	"github.com/biezhi/gorm-paginator/pagination"
+	"d2d-backend/models"
+)
 
 type PlacedOrderService interface {
-	CreateNewPlacedOrder(newPlacedOrder *PlacedOrder)(*PlacedOrder, error)
+	CreateNewPlacedOrder(newPlacedOrder *models.PlacedOrder)(*models.PlacedOrder, error)
 	GetPlacedOrders(limit int, page int)(*pagination.Paginator, error)
-	GetPlacedOrderById(id int)(*PlacedOrder, error)
-	UpdatePlacedOrder(updatePlacedOrder *PlacedOrder)(*PlacedOrder, error)
+	GetPlacedOrderById(id int)(*models.PlacedOrder, error)
+	UpdatePlacedOrder(updatePlacedOrder *models.PlacedOrder)(*models.PlacedOrder, error)
 	DeletePlacedOrder(id int)(bool, error)
 	GetListOrdersByUserId(limit int, page int, id int) (*pagination.Paginator, error)
 }

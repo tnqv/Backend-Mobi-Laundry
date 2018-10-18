@@ -1,9 +1,8 @@
-package orderStatus
+package models
 
 import (
 	"github.com/jinzhu/gorm"
 	"time"
-	"d2d-backend/common"
 )
 
 type OrderStatus struct {
@@ -13,9 +12,6 @@ type OrderStatus struct {
 	UserModel			uint		`json:"-"`
 	StatusChangedTime 	time.Time	`form:"status_changed_time" json:"status_changed_time"`
 	Description 		string 		`form:"description" json:"description"`
-}
-
-func AutoMigrate() {
-	db := common.GetDB()
-	db.AutoMigrate(&OrderStatus{})
+	PlacedOrderID		uint 		`form:"place_order_id" json:"-"`
+	PlacedOrder 		PlacedOrder `json:"-"`
 }

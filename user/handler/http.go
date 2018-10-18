@@ -10,6 +10,7 @@ import (
 	"strings"
 	"d2d-backend/notification"
 	"d2d-backend/placedOrder"
+	"d2d-backend/models"
 )
 
 type ResponseError struct {
@@ -83,7 +84,7 @@ func  (s *HttpUserHandler) GetUserById(c *gin.Context){
 }
 
 func  (s *HttpUserHandler) CreateUser(c *gin.Context){
-	var user user.User
+	var user models.User
 	err:= common.Bind(c,&user)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
@@ -111,7 +112,7 @@ func  (s *HttpUserHandler) UpdateUser(c *gin.Context){
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
 		return
 	}
-	var user user.User
+	var user models.User
 	idNum,err := strconv.ParseUint(id,10,32)
 	if err != nil {
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))

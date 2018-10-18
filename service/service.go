@@ -1,12 +1,15 @@
 package service
 
-import "github.com/biezhi/gorm-paginator/pagination"
+import (
+	"github.com/biezhi/gorm-paginator/pagination"
+	"d2d-backend/models"
+)
 
 type ServiceService interface {
-	GetServiceDetailByName(name string) (*Service, error)
-	CreateNewService(newService *Service)(*Service, error)
+	GetServiceDetailByName(name string) (*models.Service, error)
+	CreateNewService(newService *models.Service)(*models.Service, error)
 	GetServices(limit int, page int)(*pagination.Paginator, error)
-	GetServiceById(id int)(*Service, error)
-	UpdateService(updateService *Service)(*Service, error)
+	GetServiceById(id int)(*models.Service, error)
+	UpdateService(updateService *models.Service)(*models.Service, error)
 	DeleteService(id int)(bool, error)
 }

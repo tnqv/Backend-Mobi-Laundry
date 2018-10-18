@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"d2d-backend/models"
 )
 
 type ResponseError struct {
@@ -78,7 +79,7 @@ func (s *HttpPlacedOrderHandler) GetPlacedOrderById(c *gin.Context){
 }
 
 func (s *HttpPlacedOrderHandler) CreatePlacedOrder(c *gin.Context){
-	var placedOrderModel placedOrder.PlacedOrder
+	var placedOrderModel models.PlacedOrder
 	err := common.Bind(c, &placedOrderModel)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
@@ -86,16 +87,16 @@ func (s *HttpPlacedOrderHandler) CreatePlacedOrder(c *gin.Context){
 	}
 	placedOrderModel.TimePlaced = time.Now()
 	placedOrderModel.OrderCode = time.Now().Format("20060102150405")
-	var tempOrderStatus orderStatus.OrderStatus
+	var tempOrderStatus models.OrderStatus
 	tempOrderStatus.StatusID = 1
 	tempOrderStatus.UserID = placedOrderModel.UserID
 	tempOrderStatus.StatusChangedTime = time.Now()
-	newOrderStatus, err := orderStatus.OrderStatusService.CreateNewOrderStatus(s.orderStatusService, &tempOrderStatus)
+	_, err = orderStatus.OrderStatusService.CreateNewOrderStatus(s.orderStatusService, &tempOrderStatus)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
-	placedOrderModel.OrderStatusID = newOrderStatus.ID
+	//placedOrderModel.OrderStatusID = newOrderStatus.ID
 	_, err = s.placedOrderService.CreateNewPlacedOrder(&placedOrderModel)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
@@ -110,7 +111,7 @@ func  (s *HttpPlacedOrderHandler) UpdatePlacedOrder(c *gin.Context){
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
 		return
 	}
-	var placedOrderModel placedOrder.PlacedOrder
+	var placedOrderModel models.PlacedOrder
 	idNum, err := strconv.ParseUint(id,10,32)
 	if err != nil {
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))

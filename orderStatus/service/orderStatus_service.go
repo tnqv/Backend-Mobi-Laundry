@@ -3,6 +3,7 @@ package service
 import (
 	"d2d-backend/orderStatus"
 	"github.com/biezhi/gorm-paginator/pagination"
+	"d2d-backend/models"
 )
 
 type orderStatusService struct {
@@ -13,7 +14,7 @@ func NewOrderStatusService(orderStatusRepository orderStatus.OrderStatusReposito
 	return &orderStatusService{orderStatusRepository}
 }
 
-func (orderStatusService *orderStatusService) CreateNewOrderStatus(newOrderStatus *orderStatus.OrderStatus) (*orderStatus.OrderStatus, error) {
+func (orderStatusService *orderStatusService) CreateNewOrderStatus(newOrderStatus *models.OrderStatus) (*models.OrderStatus, error) {
 	_,err := orderStatusService.orderStatusRepos.Create(newOrderStatus)
 
 	if err != nil {
@@ -30,15 +31,15 @@ func (orderStatusService *orderStatusService) GetOrderStatus(limit int, page int
 	return paginate,nil
 }
 
-func (orderStatusService *orderStatusService) GetOrderStatusById(id int) (*orderStatus.OrderStatus, error) {
-	orderStatus,err := orderStatusService.orderStatusRepos.Find(id)
+func (orderStatusService *orderStatusService) GetOrderStatusById(id int) (*models.OrderStatus, error) {
+	orderStatusModel,err := orderStatusService.orderStatusRepos.Find(id)
 	if err != nil {
 		return nil,err
 	}
-	return orderStatus,nil
+	return orderStatusModel,nil
 }
 
-func (orderStatusService *orderStatusService) UpdateOrderStatus(updateOrderStatus *orderStatus.OrderStatus) (*orderStatus.OrderStatus, error) {
+func (orderStatusService *orderStatusService) UpdateOrderStatus(updateOrderStatus *models.OrderStatus) (*models.OrderStatus, error) {
 	updateOrderStatus,err := orderStatusService.orderStatusRepos.Update(updateOrderStatus)
 	if err != nil {
 		return nil,err
@@ -47,10 +48,10 @@ func (orderStatusService *orderStatusService) UpdateOrderStatus(updateOrderStatu
 }
 
 func (orderStatusService *orderStatusService) DeleteOrderStatus(id int) (bool, error) {
-	bool,err := orderStatusService.orderStatusRepos.Delete(id)
+	isDeletedSuccess,err := orderStatusService.orderStatusRepos.Delete(id)
 	if err != nil {
-		return bool,err
+		return isDeletedSuccess,err
 	}
-	return bool,nil
+	return isDeletedSuccess,nil
 }
 
