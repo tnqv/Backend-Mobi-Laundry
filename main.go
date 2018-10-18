@@ -95,7 +95,7 @@ func main() {
 	val.Add("parseTime", "1")
 	val.Add("loc", "Asia/Saigon")
 	val.Add("charset","utf8")
-	
+
 	dsn := fmt.Sprintf("%s?%s", connection, val.Encode())
 
 	db := common.Init(dsn)
@@ -160,7 +160,7 @@ func main() {
 	//PlacedOrder
 	placedOrderRepository := placedOrderRepository.NewMysqlPlacedOrderRepository()
 	placedOrderService := placeOrderService.NewPlacedOrderService(placedOrderRepository)
-	placedOrderHttpHandler := placedOrderHandler.NewPlacedOrderHttpHandler(v1.Group("/placedorder"), placedOrderService)
+	placedOrderHttpHandler := placedOrderHandler.NewPlacedOrderHttpHandler(v1.Group("/placedorder"), placedOrderService,orderStatusService)
 
 	//Notification
 	notificationRepository := notificationRepository.NewMysqlNotificationRepository()

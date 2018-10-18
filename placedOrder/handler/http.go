@@ -9,8 +9,6 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-	orderStatusRepository "d2d-backend/orderStatus/repository"
-	orderStatusService "d2d-backend/orderStatus/service"
 )
 
 type ResponseError struct {
@@ -19,15 +17,19 @@ type ResponseError struct {
 
 type HttpPlacedOrderHandler struct {
 	placedOrderService placedOrder.PlacedOrderService
+	orderStatusService orderStatus.OrderStatusService
 }
 
 type HttpOrderStatusHandler struct {
 	orderStatusService orderStatus.OrderStatusService
 }
 
-func NewPlacedOrderHttpHandler(e *gin.RouterGroup, service placedOrder.PlacedOrderService) (*HttpPlacedOrderHandler){
+func NewPlacedOrderHttpHandler(e *gin.RouterGroup,
+							   service placedOrder.PlacedOrderService,
+							   	osService orderStatus.OrderStatusService) (*HttpPlacedOrderHandler){
 	handler := &HttpPlacedOrderHandler{
 		placedOrderService: service,
+		orderStatusService: osService,
 	}
 	handler.UnauthorizedRoutes(e)
 	return handler
@@ -88,9 +90,7 @@ func (s *HttpPlacedOrderHandler) CreatePlacedOrder(c *gin.Context){
 	tempOrderStatus.StatusID = 1
 	tempOrderStatus.UserID = placedOrder.UserID
 	tempOrderStatus.StatusChangedTime = time.Now()
-	orderStatusRepository := orderStatusRepository.NewMysqlOrderStatusRepository()
-	orderStatusService := orderStatusService.NewOrderStatusService(orderStatusRepository)
-	newOrderStatus, err := orderStatus.OrderStatusService.CreateNewOrderStatus(orderStatusService, &tempOrderStatus)
+	newOrderStatus, err := orderStatus.OrderStatusService.CreateNewOrderStatus(s.orderStatusService, &tempOrderStatus)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
