@@ -87,6 +87,8 @@ func (s *HttpAccountHandler) CreateAccount(c *gin.Context){
 		return
 	}
 
+	accountModel.DeletedAt = nil
+
 	var user models.User
 	user.Name = c.PostForm("name")
 	if user.Name == ""{

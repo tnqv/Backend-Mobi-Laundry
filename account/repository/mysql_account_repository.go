@@ -45,7 +45,7 @@ func (r *repo) Create(accountModel *models.Account) (*models.Account, error) {
 		return nil, errors.New("Email đã có người đăng ký")
 	}
 
-	if err := r.Conn.Save(&accountModel).Error; err != nil{
+	if err := r.Conn.Save(accountModel).Error; err != nil{
 		return nil,err
 	}
 
