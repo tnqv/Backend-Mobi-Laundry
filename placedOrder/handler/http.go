@@ -69,39 +69,39 @@ func (s *HttpPlacedOrderHandler) GetPlacedOrderById(c *gin.Context){
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
 		return
 	}
-	placedOrder, err := s.placedOrderService.GetPlacedOrderById(int(idNum))
+	placedOrderModel, err := s.placedOrderService.GetPlacedOrderById(int(idNum))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
-	c.JSON(http.StatusOK, placedOrder)
+	c.JSON(http.StatusOK, placedOrderModel)
 }
 
 func (s *HttpPlacedOrderHandler) CreatePlacedOrder(c *gin.Context){
-	var placedOrder placedOrder.PlacedOrder
-	err := common.Bind(c, &placedOrder)
+	var placedOrderModel placedOrder.PlacedOrder
+	err := common.Bind(c, &placedOrderModel)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
 		return
 	}
-	placedOrder.TimePlaced = time.Now()
-	placedOrder.OrderCode = time.Now().Format("20060102150405")
+	placedOrderModel.TimePlaced = time.Now()
+	placedOrderModel.OrderCode = time.Now().Format("20060102150405")
 	var tempOrderStatus orderStatus.OrderStatus
 	tempOrderStatus.StatusID = 1
-	tempOrderStatus.UserID = placedOrder.UserID
+	tempOrderStatus.UserID = placedOrderModel.UserID
 	tempOrderStatus.StatusChangedTime = time.Now()
 	newOrderStatus, err := orderStatus.OrderStatusService.CreateNewOrderStatus(s.orderStatusService, &tempOrderStatus)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
-	placedOrder.OrderStatusID = newOrderStatus.ID
-	_, err = s.placedOrderService.CreateNewPlacedOrder(&placedOrder)
+	placedOrderModel.OrderStatusID = newOrderStatus.ID
+	_, err = s.placedOrderService.CreateNewPlacedOrder(&placedOrderModel)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
-	c.JSON(http.StatusOK, placedOrder)
+	c.JSON(http.StatusOK, placedOrderModel)
 }
 
 func  (s *HttpPlacedOrderHandler) UpdatePlacedOrder(c *gin.Context){
@@ -110,24 +110,24 @@ func  (s *HttpPlacedOrderHandler) UpdatePlacedOrder(c *gin.Context){
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
 		return
 	}
-	var placedOrder placedOrder.PlacedOrder
+	var placedOrderModel placedOrder.PlacedOrder
 	idNum, err := strconv.ParseUint(id,10,32)
 	if err != nil {
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
 		return
 	}
-	placedOrder.ID = uint(idNum)
-	err = common.Bind(c, &placedOrder)
+	placedOrderModel.ID = uint(idNum)
+	err = common.Bind(c, &placedOrderModel)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
 		return
 	}
-	_, err = s.placedOrderService.UpdatePlacedOrder(&placedOrder)
+	_, err = s.placedOrderService.UpdatePlacedOrder(&placedOrderModel)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Database", err))
 		return
 	}
-	c.JSON(http.StatusOK,&placedOrder)
+	c.JSON(http.StatusOK,&placedOrderModel)
 }
 
 func (s *HttpPlacedOrderHandler) DeletePlacedOrder(c *gin.Context){
@@ -141,11 +141,11 @@ func (s *HttpPlacedOrderHandler) DeletePlacedOrder(c *gin.Context){
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
 		return
 	}
-	bool,err := s.placedOrderService.DeletePlacedOrder(int(idNum))
+	isDeleted,err := s.placedOrderService.DeletePlacedOrder(int(idNum))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Database", err))
 		return
 	}
-	c.JSON(http.StatusOK,ResponseError{Message: strconv.FormatBool(bool)})
+	c.JSON(http.StatusOK,ResponseError{Message: strconv.FormatBool(isDeleted)})
 }
 
