@@ -40,7 +40,7 @@ func (r *repo) FindAccountByEmail(email string)(*models.Account,error){
 
 	var temp models.Account
 
-	if err := r.Conn.Where("email = ?",email).First(&temp).Error; err == nil {
+	if err := r.Conn.Where("email = ?",email).First(&temp).Error; err != nil {
 		return nil, err
 	}
 	return &temp,nil

@@ -87,7 +87,22 @@ func (s *HttpAccountHandler) CreateAccount(c *gin.Context){
 		return
 	}
 
+	if accountModel.Email == ""{
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("validation", errors.New("Chưa khai báo Email")))
+		return
+	}
+
+	if accountModel.Password == ""{
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("validation", errors.New("Chưa khai báo password")))
+		return
+	}
+
+	accountModel.Provider = common.NormalProvider
 	accountModel.DeletedAt = nil
+
+	if accountModel.Password != common.NBRandomPassword {
+		accountModel.SetPassword(accountModel.Password)
+	}
 
 	var user models.User
 	user.Name = c.PostForm("name")
@@ -101,16 +116,19 @@ func (s *HttpAccountHandler) CreateAccount(c *gin.Context){
 		return
 	}
 
-	userTemp,_ := s.userService.GetUserByPhoneNumber(user.PhoneNumber)
+	userTemp := &models.User{PhoneNumber:""}
+	accountTemp := &models.Account{Email: ""}
 
-	if userTemp.PhoneNumber != ""{
+	userTemp,_ = s.userService.GetUserByPhoneNumber(user.PhoneNumber)
+
+	if userTemp != nil{
 		c.JSON(http.StatusForbidden, common.NewError("database", errors.New("Số điện thoại đã bị trùng")))
 		return
 	}
 
-	accountTemp,_ := s.accountService.GetAccountByEmail(accountModel.Email)
+	accountTemp,_ = s.accountService.GetAccountByEmail(accountModel.Email)
 
-	if accountTemp.Email != ""{
+	if accountTemp != nil{
 		c.JSON(http.StatusForbidden,common.NewError("database",errors.New("Email đã bị trùng")))
 		return
 	}
@@ -128,10 +146,12 @@ func (s *HttpAccountHandler) CreateAccount(c *gin.Context){
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
+
 	c.Set("user_model", accountModel)
 
+	serializer := account.AccountSerializer{c}
 	c.JSON(http.StatusOK, gin.H{
-		"account": accountModel,
+		"account": serializer.Response(),
 		"user": user,
 	})
 }
