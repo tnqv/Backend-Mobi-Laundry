@@ -17,7 +17,7 @@ type AccountResponse struct {
 }
 
 func (self *AccountSerializer) Response() AccountResponse {
-	accountModel := self.C.MustGet("user_model").(models.Account)
+	accountModel := self.C.MustGet("user_model").(*models.Account)
 	user := AccountResponse{
 		Email:    accountModel.Email,
 		Token:    common.GenToken(accountModel.ID),

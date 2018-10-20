@@ -234,7 +234,7 @@ func (s *HttpAccountHandler) FacebookAccountsLogin(c *gin.Context){
 	var fbName string
 	resp.DecodeField("name",&fbName)
 	err = resp.DecodeField("email",&fbEmail)
-
+	fmt.Println(resp)
 	if err != nil || fbEmail == "" {
 		c.JSON(http.StatusForbidden,common.NewError("fblogin",errors.New("Facebook access token does not required email scope")))
 		return

@@ -16,7 +16,7 @@ type User struct {
 	AccountId			uint 		`gorm:"not null;unique" form:"account_id" json:"-"`
 	StoreId				uint		`form:"storeid" json:"store_id"`
 	Address 			string		`form:"address" json:"address"`
-	IdentifyNummber		uint		`form:"identify_number" json:"identify_nummber"`
+	IdentifyNumber		uint		`form:"identify_number" json:"identify_number"`
 	Capacity			uint		`form:"capacity" json:"capacity"`
 	Imageurl			string		`form:"imageurl" json:"imageurl"`
 }
