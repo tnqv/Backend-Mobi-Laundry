@@ -30,7 +30,9 @@ func (r *repo) FindByUserId(limit int, page int, id int) (*pagination.Paginator,
 	db := r.Conn
 	db = db.Where("user_id = ?", id)
 	paginator := pagination.Pagging(&pagination.Param{
-		DB: db,
+		DB: db.Preload("OrderStatuses", func(db *gorm.DB) *gorm.DB{
+				return db.Order("status_id DESC")
+		}),
 		Page: page,
 		Limit: limit,
 		ShowSQL: true,

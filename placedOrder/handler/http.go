@@ -89,7 +89,7 @@ func (s *HttpPlacedOrderHandler) CreatePlacedOrder(c *gin.Context){
 	placedOrderModel.OrderCode = time.Now().Format("20060102150405")
 	var tempOrderStatus models.OrderStatus
 	tempOrderStatus.StatusID = 1
-	tempOrderStatus.UserID = placedOrderModel.UserID
+	tempOrderStatus.UserId = placedOrderModel.UserID
 	tempOrderStatus.StatusChangedTime = time.Now()
 	_, err = orderStatus.OrderStatusService.CreateNewOrderStatus(s.orderStatusService, &tempOrderStatus)
 	if err != nil {

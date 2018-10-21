@@ -42,7 +42,7 @@ func UpdateContextUserModel(c *gin.Context, my_user_id uint) {
 		db.First(&account, my_user_id)
 	}
 	c.Set("user_id", my_user_id)
-	c.Set("user_model", account)
+	c.Set("user_model", &account)
 }
 
 // You can custom middlewares yourself as the doc: https://github.com/gin-gonic/gin#custom-middleware
