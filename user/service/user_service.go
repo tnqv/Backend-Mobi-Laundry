@@ -68,3 +68,10 @@ func (userService *userService) DeleteUser(id int) (bool, error) {
 	return isDeletedSuccess,nil
 }
 
+func (userService *userService) GetUserByAccountId(accountId uint)(*models.User,error){
+	userModel,err := userService.userRepos.FindUserByAccountId(accountId)
+	if err != nil {
+		return nil,err
+	}
+	return userModel,nil
+}

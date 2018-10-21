@@ -5,7 +5,7 @@ import (
 )
 
 type User struct {
-	gorm.Model						`json:"-"`
+	gorm.Model
 	Name 				string		`form:"name" json:"name" binding:"exists"`
 	PhoneNumber			string		`gorm:"not null;unique" form:"phone_number" json:"phone_number" binding:"exists"`
 	ShippingAddress		string 		`form:"shipping_address" json:"shipping_address"`

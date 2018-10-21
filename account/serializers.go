@@ -21,7 +21,6 @@ func (self *AccountSerializer) Response() AccountResponse {
 	user := AccountResponse{
 		Email:    accountModel.Email,
 		Token:    common.GenToken(accountModel.ID),
-		ID:		  accountModel.ID,
 	}
 	return user
 }

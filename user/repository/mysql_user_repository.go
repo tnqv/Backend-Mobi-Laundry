@@ -83,3 +83,11 @@ func (r *repo) Delete(id int) (bool, error) {
 	return true,nil
 }
 
+
+func (r *repo) FindUserByAccountId(accountId uint)(*models.User,error){
+	var tempUser models.User
+	if err := r.Conn.Where("account_id = ?",accountId).Preload("Role").First(&tempUser).Error; err != nil{
+		return nil,err
+	}
+	return &tempUser,nil
+}

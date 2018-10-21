@@ -232,11 +232,14 @@ func (s *HttpAccountHandler) FacebookAccountsLogin(c *gin.Context){
 
 	var fbEmail string
 	var fbName string
+	imageUrl := make(map[string]interface{})
+	dataImage := make(map[string]interface{})
 	resp.DecodeField("name",&fbName)
+	resp.DecodeField("picture",&imageUrl)
+	dataImage = imageUrl["data"].(map[string]interface{})
 	err = resp.DecodeField("email",&fbEmail)
-	fmt.Println(resp)
 	if err != nil || fbEmail == "" {
-		c.JSON(http.StatusForbidden,common.NewError("fblogin",errors.New("Facebook access token does not required email scope")))
+		c.JSON(http.StatusForbidden,common.NewError("fblogin",errors.New("Facebook access token does not required email scope or facebook account does not have email")))
 		return
 	}
 
@@ -253,13 +256,36 @@ func (s *HttpAccountHandler) FacebookAccountsLogin(c *gin.Context){
 			return
 		}
 
-		c.Set("user_model", newAccount)
+		var user models.User
+
+		user.AccountId = newAccount.ID
+		user.RoleId = 1
+		if dataImage["url"].(string) != ""{
+			user.Imageurl = dataImage["url"].(string)
+		}
+
+
+		_,err = s.userService.CreateNewUser(&user)
+		if err != nil {
+			c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+			return
+		}
+
+
+		c.Set("user_model", &newAccount)
 		serializer := account.AccountSerializer{C: c}
-		c.JSON(http.StatusCreated, gin.H{"account": serializer.Response()})
+		c.JSON(http.StatusCreated, gin.H{"account": serializer.Response(),"user": user})
 	}else{
+
+		userModel,err := s.userService.GetUserByAccountId(accountModel.ID)
+		if err != nil {
+			c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+			return
+		}
+
 		c.Set("user_model", accountModel)
 		serializer := account.AccountSerializer{c}
-		c.JSON(http.StatusOK, gin.H{"account": serializer.Response()})
+		c.JSON(http.StatusOK, gin.H{"account": serializer.Response(),"user": userModel,})
 	}
 }
 
