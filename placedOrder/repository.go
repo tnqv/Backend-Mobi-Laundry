@@ -12,4 +12,5 @@ type PlacedOrderRepository interface{
 	Create(placedOrder *models.PlacedOrder) (*models.PlacedOrder,error)
 	Update(placedOrder *models.PlacedOrder) (*models.PlacedOrder, error)
 	Delete(id int) (bool,error)
+	FindPlacedOrderByOrderCode(orderCode string)(*models.PlacedOrder,error)
 }

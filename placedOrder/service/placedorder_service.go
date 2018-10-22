@@ -22,6 +22,8 @@ func (placedOrderService *placedOrderService) CreateNewPlacedOrder(newPlacedOrde
 	return newPlacedOrder, nil
 }
 
+
+
 func (placedOrderService *placedOrderService) GetPlacedOrders(limit int, page int) (*pagination.Paginator, error) {
 	paginate,err := placedOrderService.placedOrderRepos.FindAll(limit, page)
 	if err != nil {
@@ -30,12 +32,20 @@ func (placedOrderService *placedOrderService) GetPlacedOrders(limit int, page in
 	return paginate, nil
 }
 
+func (placedOrderService *placedOrderService) GetPlacedOrderByOrderCode(orderCode string)(*models.PlacedOrder,error){
+	placedOrderModel,err := placedOrderService.placedOrderRepos.FindPlacedOrderByOrderCode(orderCode)
+	if err != nil {
+		return  nil,err
+	}
+	return placedOrderModel,nil
+}
+
 func (placedOrderService *placedOrderService) GetPlacedOrderById(id int) (*models.PlacedOrder, error) {
-	role, err := placedOrderService.placedOrderRepos.Find(id)
+	placedOrderModel, err := placedOrderService.placedOrderRepos.Find(id)
 	if err != nil {
 		return nil, err
 	}
-	return role, nil
+	return placedOrderModel, nil
 }
 
 func (placedOrderService *placedOrderService) UpdatePlacedOrder(updatePlacedOrder *models.PlacedOrder) (*models.PlacedOrder, error) {

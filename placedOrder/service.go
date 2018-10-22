@@ -12,4 +12,5 @@ type PlacedOrderService interface {
 	UpdatePlacedOrder(updatePlacedOrder *models.PlacedOrder)(*models.PlacedOrder, error)
 	DeletePlacedOrder(id int)(bool, error)
 	GetListOrdersByUserId(limit int, page int, id int) (*pagination.Paginator, error)
+	GetPlacedOrderByOrderCode(orderCode string)(*models.PlacedOrder,error)
 }

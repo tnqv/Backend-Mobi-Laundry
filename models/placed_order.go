@@ -6,7 +6,7 @@ import (
 )
 
 type PlacedOrder struct {
-	gorm.Model										`json:"-"`
+	gorm.Model										
 	StoreID 				uint					`form:"store_id" json:"store_id"`
 	StoreModel 				Store					`json:"-"`
 	TimePlaced 				time.Time				`form:"time_placed" json:"time_placed"`
@@ -15,6 +15,7 @@ type PlacedOrder struct {
 	OrderStatusId			uint					`json:"current_status_id"`
 	//OrderStatus				OrderStatus				`json:"order_status"`
 	OrderStatuses 			[]OrderStatus			`json:"order_status_list"`
+	ServiceOrders 			[]ServiceOrder			`json:"order_service_list"`
 	//Customer
 	UserID 					uint					`form:"user_id" json:"user_id"`
 	UserModel 				User					`json:"-"`

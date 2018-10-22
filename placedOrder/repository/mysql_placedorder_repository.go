@@ -52,6 +52,25 @@ func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error) {
 	return paginator,nil
 }
 
+func (r *repo) FindPlacedOrderByOrderCode(orderCode string)(*models.PlacedOrder,error){
+	var placeOrder models.PlacedOrder
+
+	err := r.Conn.Where("order_code = ?",orderCode).
+	Preload("OrderStatuses",func(db *gorm.DB) *gorm.DB{
+		return db.Order("status_id DESC")
+	}).
+	Preload("ServiceOrders").
+	First(&placeOrder).Error
+
+	if err != nil {
+		return nil,err
+	}
+
+	return &placeOrder,nil
+
+}
+
+
 func (r *repo) Create(placedOrder *models.PlacedOrder) (*models.PlacedOrder, error) {
 	err := r.Conn.Create(placedOrder).Error
 	if err != nil {

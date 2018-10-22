@@ -43,6 +43,7 @@ func (s *HttpPlacedOrderHandler) UnauthorizedRoutes(e *gin.RouterGroup){
 func (s *HttpPlacedOrderHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
 	e.GET("/", s.GetAllPlacedOrders)
 	e.GET("/:id", s.GetPlacedOrderById)
+	//e.GET("/order-code/:orderCode",s.GetPlacedOrderByOrderCode)
 	e.POST("/", s.CreatePlacedOrder)
 	e.PUT("/:id",s.UpdatePlacedOrder)
 	e.DELETE("/:id", s.DeletePlacedOrder)
@@ -57,6 +58,22 @@ func (s *HttpPlacedOrderHandler) GetAllPlacedOrders(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK,listStore)
+}
+
+func (s *HttpPlacedOrderHandler) GetPlacedOrderByOrderCode(c *gin.Context){
+	orderCode := c.Param("orderCode");
+	if orderCode == ""{
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid orderCode")))
+		return
+	}
+
+	placedOrderModel,err := s.placedOrderService.GetPlacedOrderByOrderCode(orderCode)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+
+	c.JSON(http.StatusOK, placedOrderModel)
 }
 
 func (s *HttpPlacedOrderHandler) GetPlacedOrderById(c *gin.Context){
