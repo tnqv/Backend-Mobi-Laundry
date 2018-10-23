@@ -102,18 +102,29 @@ func (s *HttpPlacedOrderHandler) CreatePlacedOrder(c *gin.Context){
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
 		return
 	}
+
+	if placedOrderModel.UserID == 0{
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("Invalid params", errors.New("User không hợp lệ")))
+		return
+	}
+
+	if placedOrderModel.DeliveryAddress == "" || placedOrderModel.DeliveryLongitude == 0 || placedOrderModel.DeliveryLatitude == 0{
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("Invalid params", errors.New("Địa điểm không hợp lệ")))
+		return
+	}
+
 	placedOrderModel.TimePlaced = time.Now()
 	placedOrderModel.OrderCode = time.Now().Format("20060102150405")
 	var tempOrderStatus models.OrderStatus
 	tempOrderStatus.StatusID = 1
 	tempOrderStatus.UserId = placedOrderModel.UserID
 	tempOrderStatus.StatusChangedTime = time.Now()
-	_, err = orderStatus.OrderStatusService.CreateNewOrderStatus(s.orderStatusService, &tempOrderStatus)
+	newOrderStatusModel , err := orderStatus.OrderStatusService.CreateNewOrderStatus(s.orderStatusService, &tempOrderStatus)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
-	//placedOrderModel.OrderStatusID = newOrderStatus.ID
+	placedOrderModel.OrderStatusId = newOrderStatusModel.ID
 	_, err = s.placedOrderService.CreateNewPlacedOrder(&placedOrderModel)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
