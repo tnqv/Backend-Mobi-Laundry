@@ -10,7 +10,6 @@ import (
 	"strconv"
 	"time"
 	"d2d-backend/models"
-	"fmt"
 )
 
 type ResponseError struct {
@@ -98,13 +97,13 @@ func (s *HttpPlacedOrderHandler) GetPlacedOrderById(c *gin.Context){
 
 func (s *HttpPlacedOrderHandler) CreatePlacedOrder(c *gin.Context){
 	var placedOrderModel models.PlacedOrder
-	fmt.Println(c);
 	err := common.Bind(c, &placedOrderModel)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
 		return
 	}
-	fmt.Println(placedOrderModel)
+
+	placedOrderModel.DeletedAt = nil
 
 	if placedOrderModel.UserID == 0{
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Invalid params", errors.New("User không hợp lệ")))
@@ -133,6 +132,15 @@ func (s *HttpPlacedOrderHandler) CreatePlacedOrder(c *gin.Context){
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
+
+	newOrderStatusModel.PlacedOrderID = placedOrderModel.ID
+
+	_,err = s.orderStatusService.UpdateOrderStatus(newOrderStatusModel)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+
 	c.JSON(http.StatusOK, placedOrderModel)
 }
 

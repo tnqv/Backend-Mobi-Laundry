@@ -31,6 +31,6 @@ type OrderStatus struct {
 	User				User		`json:"-"`
 	StatusChangedTime 	time.Time	`form:"status_changed_time" json:"status_changed_time"`
 	Description 		string 		`form:"description" json:"description"`
-	PlacedOrderID		uint 		`form:"place_order_id" json:"-"`
+	PlacedOrderID		uint 		`form:"placed_order_id" json:"-"`
 	PlacedOrder 		PlacedOrder `json:"-"`
 }
