@@ -38,6 +38,8 @@ func (s *HttpAccountHandler) UnauthorizedRoutes(e *gin.RouterGroup){
 	e.POST("/", s.CreateAccount)
 	e.POST("/login",s.AccountsLogin)
 	e.POST("/facebook/auth",s.FacebookAccountsLogin)
+	e.POST("/driver/login",s.DriverLogin)
+	e.POST("/store/login",s.StoreLogin)
 }
 
 func (s *HttpAccountHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
@@ -287,6 +289,77 @@ func (s *HttpAccountHandler) FacebookAccountsLogin(c *gin.Context){
 		serializer := account.AccountSerializer{c}
 		c.JSON(http.StatusOK, gin.H{"account": serializer.Response(),"user": userModel,})
 	}
+}
+
+func (s *HttpAccountHandler) StoreLogin(c *gin.Context){
+	loginValidator := account.NewDriverLoginValidator()
+	if err := loginValidator.Bind(c); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewValidatorError(err))
+		return
+	}
+
+	accountModel,err := s.accountService.FindOneAccount(&models.Account{Username: loginValidator.AccountModel.Username})
+
+	if err != nil {
+		c.JSON(http.StatusForbidden,common.NewError("login",errors.New("Tài khoản hoặc mật khẩu không hợp lệ")))
+		return
+	}
+
+	if accountModel.CheckPassword(loginValidator.Account.Password) != nil {
+		c.JSON(http.StatusForbidden, common.NewError("login", errors.New("Tài khoản chưa đăng ký hoặc sai mật khẩu")))
+		return
+	}
+
+	userModel,err := s.userService.GetUserByAccountId(accountModel.ID)
+	if userModel.RoleId != 3 {
+		c.JSON(http.StatusForbidden, common.NewError("login", errors.New("Invalid credential")))
+		return
+	}
+
+	middlewares.UpdateContextUserModel(c, accountModel.ID)
+	serializer := account.AccountSerializer{c}
+	userRequested,err := s.userService.GetUserById(int(accountModel.ID))
+	c.JSON(http.StatusOK, gin.H{
+		"account": serializer.Response(),
+		"user": userRequested ,
+	})
+
+}
+
+
+func (s *HttpAccountHandler) DriverLogin(c *gin.Context){
+	loginValidator := account.NewDriverLoginValidator()
+	if err := loginValidator.Bind(c); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewValidatorError(err))
+		return
+	}
+
+	accountModel,err := s.accountService.FindOneAccount(&models.Account{Username: loginValidator.AccountModel.Username})
+
+	if err != nil {
+		c.JSON(http.StatusForbidden,common.NewError("login",errors.New("Tài khoản hoặc mật khẩu không hợp lệ")))
+		return
+	}
+
+	if accountModel.CheckPassword(loginValidator.Account.Password) != nil {
+		c.JSON(http.StatusForbidden, common.NewError("login", errors.New("Tài khoản chưa đăng ký hoặc sai mật khẩu")))
+		return
+	}
+
+	userModel,err := s.userService.GetUserByAccountId(accountModel.ID)
+	if userModel.RoleId != 2 {
+		c.JSON(http.StatusForbidden, common.NewError("login", errors.New("Invalid credential")))
+		return
+	}
+
+	middlewares.UpdateContextUserModel(c, accountModel.ID)
+	serializer := account.AccountSerializer{c}
+	userRequested,err := s.userService.GetUserById(int(accountModel.ID))
+	c.JSON(http.StatusOK, gin.H{
+		"account": serializer.Response(),
+		"user": userRequested ,
+	})
+
 }
 
 func (s *HttpAccountHandler) AccountsLogin(c *gin.Context){

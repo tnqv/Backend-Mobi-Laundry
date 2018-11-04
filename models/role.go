@@ -10,7 +10,6 @@ type Role struct {
 	Description string		`form:"description" json:"description" binding:"exists"`
 }
 //1 : customer
-//2 : delivery giao
-//3 : delievery nhận
-//4 : store
-//5 : dieu phoi
+//2 : delivery
+//3 : store
+//4 : dieu phoi/admin

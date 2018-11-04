@@ -9,7 +9,7 @@ type ServiceOrder struct {
 	PlacedOrderID	uint				`form:"placed_order_id" json:"placed_order_id"`
 	PlacedOrder 	PlacedOrder	`json:"-"`
 	ServiceId		uint				`form:"service_id" json:"service_id"`
-	Service 		Service		`json:"-"`
+	Service 		Service				`json:"service"`
 	Description 	string				`form:"description" json:"description"`
 	Quantity 		uint				`form:"quantity" json:"quantity"`
 	Price 			uint				`form:"price" json:"price"`

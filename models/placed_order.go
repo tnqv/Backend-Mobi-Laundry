@@ -18,7 +18,7 @@ type PlacedOrder struct {
 	ServiceOrders 			[]ServiceOrder			`form:"-" json:"order_service_list"`
 	//Customer
 	UserID 					uint					`form:"user_id" json:"user_id"`
-	UserModel 				User					`json:"-"`
+	User					User						`json:"-"`
 	//OrderInformation
 	ReceiverName			string 					`form:"receiver_name" json:"receiver_name"`
 	ReceiverPhone			string					`form:"receiver_phone" json:"receiver_phone"`

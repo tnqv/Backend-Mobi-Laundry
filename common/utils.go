@@ -44,6 +44,7 @@ func GenToken(id uint) string {
 	// Set some claims
 	jwt_token.Claims = jwt.MapClaims{
 		"id":  id,
+		//"role_id": roleId,
 		"exp": time.Now().Add(time.Hour * 24).Unix(),
 	}
 	// Sign and get the complete encoded token as a string

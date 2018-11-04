@@ -47,7 +47,10 @@ func (s *HttpPlacedOrderHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
 	e.POST("/", s.CreatePlacedOrder)
 	e.PUT("/:id",s.UpdatePlacedOrder)
 	e.DELETE("/:id", s.DeletePlacedOrder)
+	e.PUT("/:id/status/:statusId",s.UpdateStatusPlacedOrder)
 }
+
+
 
 func (s *HttpPlacedOrderHandler) GetAllPlacedOrders(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery(common.Page, common.PageDefault))
@@ -189,3 +192,89 @@ func (s *HttpPlacedOrderHandler) DeletePlacedOrder(c *gin.Context){
 	c.JSON(http.StatusOK,ResponseError{Message: strconv.FormatBool(isDeleted)})
 }
 
+func (s *HttpPlacedOrderHandler) UpdateStatusPlacedOrder(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Mã order không hợp lệ")))
+		return
+	}
+
+	statusId := c.Param("statusId")
+	if statusId == "" {
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Mã trạng thái không hợp lệ ")))
+		return
+	}
+
+	var placedOrderModel models.PlacedOrder
+	idNum, err := strconv.ParseUint(id,10,32)
+	if err != nil {
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
+		return
+	}
+
+	idStatusNum,err := strconv.ParseUint(id,10,32)
+
+	if err != nil {
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format status id")))
+		return
+	}
+
+	placedOrderModel.ID = uint(idNum)
+
+	placedOrderUpdate,err := s.placedOrderService.GetPlacedOrderById(int(idNum))
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("param", errors.New("Đơn hàng không tồn tại")))
+		return
+	}
+	userId := c.PostForm("user_id")
+	userIdNum,err := strconv.ParseUint(userId,10,32)
+	if err != nil {
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format status id")))
+		return
+
+	}
+
+
+	var newOrderStatus models.OrderStatus
+
+	switch(idStatusNum){
+		case 2:
+
+				//Store accept order
+				newOrderStatus = models.OrderStatus{StatusID:2,UserId: uint(userIdNum),StatusChangedTime:time.Now(),PlacedOrderID: placedOrderUpdate.ID}
+				placedOrderUpdate.OrderStatusId = 2
+				s.orderStatusService.CreateNewOrderStatus(&newOrderStatus)
+				s.placedOrderService.UpdatePlacedOrder(placedOrderUpdate)
+				//placedOrderModel.TimePlaced = time.Now()
+				//placedOrderModel.OrderCode = time.Now().Format("20060102150405")
+
+		case 3:
+			//Delivery accept order
+			newOrderStatus = models.OrderStatus{StatusID:3,UserId: uint(userIdNum),StatusChangedTime:time.Now(),PlacedOrderID: placedOrderUpdate.ID}
+			placedOrderUpdate.OrderStatusId = 3
+			s.orderStatusService.CreateNewOrderStatus(&newOrderStatus)
+			s.placedOrderService.UpdatePlacedOrder(placedOrderUpdate)
+		case 4:
+			//Delivery confirm order
+			newOrderStatus = models.OrderStatus{StatusID:4,UserId: uint(userIdNum),StatusChangedTime:time.Now(),PlacedOrderID: placedOrderUpdate.ID}
+			placedOrderUpdate.OrderStatusId = 4
+			s.orderStatusService.CreateNewOrderStatus(&newOrderStatus)
+			s.placedOrderService.UpdatePlacedOrder(placedOrderUpdate)
+		case 5:
+			//Delivery has deliveried to Store
+		case 6:
+			//Store change status to laundring
+		case 7:
+			//Store change status to finish
+		case 8:
+			//Delivery change status to deliver
+		case 9:
+			//Customer pay
+		case 10:
+			//Store cancel order
+		default :
+
+	}
+
+	c.JSON(http.StatusOK,placedOrderUpdate)
+}

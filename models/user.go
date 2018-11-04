@@ -15,6 +15,7 @@ type User struct {
 	Role				Role		`gorm:"auto_preload" json:"role"`
 	AccountId			uint 		`gorm:"not null;unique" form:"account_id" json:"-"`
 	StoreId				uint		`form:"storeid" json:"store_id"`
+	Store 				Store		`json:"store,omitempty"`
 	Address 			string		`form:"address" json:"address"`
 	IdentifyNumber		uint		`form:"identify_number" json:"identify_number"`
 	Capacity			uint		`form:"capacity" json:"capacity"`

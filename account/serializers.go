@@ -1,9 +1,9 @@
 package account
 
 import (
-"d2d-backend/common"
 "github.com/gin-gonic/gin"
 	"d2d-backend/models"
+	"d2d-backend/common"
 )
 
 type AccountSerializer struct {
@@ -16,11 +16,17 @@ type AccountResponse struct {
 	ID		 uint	  `json:"-"`
 }
 
-func (self *AccountSerializer) Response() AccountResponse {
+func (self *AccountSerializer) Response() *AccountResponse {
 	accountModel := self.C.MustGet("user_model").(*models.Account)
+	//userModel,err := self.userService.GetUserByAccountId(accountModel.ID)
+
+	//if err != nil {
+	//	return nil
+	//}
+
 	user := AccountResponse{
 		Email:    accountModel.Email,
 		Token:    common.GenToken(accountModel.ID),
 	}
-	return user
+	return &user
 }

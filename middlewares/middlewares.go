@@ -56,6 +56,10 @@ func AuthMiddleware(auto401 bool) gin.HandlerFunc {
 		})
 		if err != nil {
 			if auto401 {
+				c.JSON(http.StatusForbidden, gin.H{
+					"code":    http.StatusForbidden,
+					"message": "Invalid token",
+				})
 				c.AbortWithError(http.StatusUnauthorized, err)
 			}
 			return

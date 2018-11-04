@@ -18,7 +18,7 @@ func NewMysqlPlacedOrderRepository() placedOrder.PlacedOrderRepository{
 
 func (r *repo) Find(id int) (*models.PlacedOrder, error) {
 	var placedOrderModel models.PlacedOrder
-	err := r.Conn.First(&placedOrderModel, id).Error
+	err := r.Conn.Preload("OrderStatuses").Preload("ServiceOrders").Preload("ServiceOrders.Service").First(&placedOrderModel, id).Error
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +30,7 @@ func (r *repo) FindByUserId(limit int, page int, id int) (*pagination.Paginator,
 	db := r.Conn
 	db = db.Where("user_id = ?", id)
 	paginator := pagination.Pagging(&pagination.Param{
-		DB: db.Preload("OrderStatuses", func(db *gorm.DB) *gorm.DB{
+		DB: db.Preload("ServiceOrders").Preload("ServiceOrders.Service").Preload("OrderStatuses", func(db *gorm.DB) *gorm.DB{
 				return db.Order("status_id DESC")
 		}),
 		Page: page,
@@ -60,6 +60,7 @@ func (r *repo) FindPlacedOrderByOrderCode(orderCode string)(*models.PlacedOrder,
 		return db.Order("status_id DESC")
 	}).
 	Preload("ServiceOrders").
+	Preload("ServiceOrders.Service").
 	First(&placeOrder).Error
 
 	if err != nil {

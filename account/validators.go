@@ -57,6 +57,15 @@ type LoginValidator struct {
 	AccountModel models.Account `json:"-"`
 }
 
+type DriverLoginValidator struct {
+	Account struct {
+		Username    string `form:"username" json:"username" binding:"exists,email"`
+		Password string `form:"password" json:"password" binding:"exists,min=8,max=255"`
+	} `json:"account"`
+	AccountModel models.Account `json:"-"`
+
+}
+
 
 func (self *LoginValidator) Bind(c *gin.Context) error {
 	err := common.Bind(c, self)
@@ -67,6 +76,17 @@ func (self *LoginValidator) Bind(c *gin.Context) error {
 	self.AccountModel.Email = self.Account.Email
 	return nil
 }
+
+func (self *DriverLoginValidator) Bind(c *gin.Context) error {
+	err := common.Bind(c, self)
+	if err != nil {
+		return err
+	}
+
+	self.AccountModel.Username = self.Account.Username
+	return nil
+}
+
 
 
 type FBLoginValidator struct {
@@ -113,6 +133,11 @@ func NewFcmTokenValidator() FcmTokenValidator{
 func NewLoginValidator() LoginValidator {
 	loginValidator := LoginValidator{}
 	return loginValidator
+}
+
+func NewDriverLoginValidator() DriverLoginValidator {
+	driverLoginValidator := DriverLoginValidator{}
+	return driverLoginValidator
 }
 
 func FBNewLoginValidator() FBLoginValidator {
