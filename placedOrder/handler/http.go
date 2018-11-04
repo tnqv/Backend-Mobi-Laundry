@@ -234,9 +234,6 @@ func (s *HttpPlacedOrderHandler) UpdateStatusPlacedOrder(c *gin.Context) {
 
 	}
 
-
-	var newOrderStatus models.OrderStatus
-
 	switch(idStatusNum){
 		case 2:
 
