@@ -4,14 +4,17 @@ import (
 	"d2d-backend/placedOrder"
 	"github.com/biezhi/gorm-paginator/pagination"
 	"d2d-backend/models"
+	"time"
+	"d2d-backend/orderStatus"
 )
 
 type placedOrderService struct {
 	placedOrderRepos placedOrder.PlacedOrderRepository
+	orderStatusRepos orderStatus.OrderStatusRepository
 }
 
-func NewPlacedOrderService(placedOrderRepository placedOrder.PlacedOrderRepository) placedOrder.PlacedOrderService{
-	return &placedOrderService{placedOrderRepository}
+func NewPlacedOrderService(placedOrderRepository placedOrder.PlacedOrderRepository,orderStatusRepository orderStatus.OrderStatusRepository) placedOrder.PlacedOrderService{
+	return &placedOrderService{placedOrderRepository,orderStatusRepository}
 }
 
 func (placedOrderService *placedOrderService) CreateNewPlacedOrder(newPlacedOrder *models.PlacedOrder) (*models.PlacedOrder, error) {
@@ -38,6 +41,16 @@ func (placedOrderService *placedOrderService) GetPlacedOrderByOrderCode(orderCod
 		return  nil,err
 	}
 	return placedOrderModel,nil
+}
+
+func (placedOrderService *placedOrderService) UpdatePlacedOrderAndCreateNewOrderStatus(statusId uint,userId uint,order *models.PlacedOrder)(*models.PlacedOrder,error){
+	var newOrderStatus models.OrderStatus
+	newOrderStatus = models.OrderStatus{StatusID:statusId,UserId: userId,StatusChangedTime:time.Now(),PlacedOrderID: order.ID}
+	order.OrderStatusId = 7
+	placedOrderService.orderStatusRepos.Create(&newOrderStatus)
+	placedOrderService.UpdatePlacedOrder(order)
+
+	return order,nil
 }
 
 func (placedOrderService *placedOrderService) GetPlacedOrderById(id int) (*models.PlacedOrder, error) {

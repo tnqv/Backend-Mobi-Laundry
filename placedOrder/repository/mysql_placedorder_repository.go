@@ -82,7 +82,7 @@ func (r *repo) Create(placedOrder *models.PlacedOrder) (*models.PlacedOrder, err
 
 func (r *repo) Update(updatePlacedOrder *models.PlacedOrder) (*models.PlacedOrder, error) {
 	var tempPlacedOrder models.Role
-	err := r.Conn.First(&tempPlacedOrder,updatePlacedOrder.ID).Error
+	err := r.Conn.Preload("OrderStatuses").First(&tempPlacedOrder,updatePlacedOrder.ID).Error
 	if err != nil{
 		return nil, err
 	}

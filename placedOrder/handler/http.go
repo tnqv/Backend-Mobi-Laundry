@@ -241,38 +241,48 @@ func (s *HttpPlacedOrderHandler) UpdateStatusPlacedOrder(c *gin.Context) {
 		case 2:
 
 				//Store accept order
-				newOrderStatus = models.OrderStatus{StatusID:2,UserId: uint(userIdNum),StatusChangedTime:time.Now(),PlacedOrderID: placedOrderUpdate.ID}
-				placedOrderUpdate.OrderStatusId = 2
-				s.orderStatusService.CreateNewOrderStatus(&newOrderStatus)
-				s.placedOrderService.UpdatePlacedOrder(placedOrderUpdate)
-				//placedOrderModel.TimePlaced = time.Now()
-				//placedOrderModel.OrderCode = time.Now().Format("20060102150405")
+				s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(2,uint(userIdNum),placedOrderUpdate)
+				//insert to firebase
+				//Push notification
 
 		case 3:
-			//Delivery accept order
-			newOrderStatus = models.OrderStatus{StatusID:3,UserId: uint(userIdNum),StatusChangedTime:time.Now(),PlacedOrderID: placedOrderUpdate.ID}
-			placedOrderUpdate.OrderStatusId = 3
-			s.orderStatusService.CreateNewOrderStatus(&newOrderStatus)
-			s.placedOrderService.UpdatePlacedOrder(placedOrderUpdate)
+			//Delivery take order
+			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(3,uint(userIdNum),placedOrderUpdate)
+			// delete from firebase
+			// push notification to user
 		case 4:
 			//Delivery confirm order
-			newOrderStatus = models.OrderStatus{StatusID:4,UserId: uint(userIdNum),StatusChangedTime:time.Now(),PlacedOrderID: placedOrderUpdate.ID}
-			placedOrderUpdate.OrderStatusId = 4
-			s.orderStatusService.CreateNewOrderStatus(&newOrderStatus)
-			s.placedOrderService.UpdatePlacedOrder(placedOrderUpdate)
+			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(4,uint(userIdNum),placedOrderUpdate)
+			// push notification to user
+
+
 		case 5:
 			//Delivery has deliveried to Store
+			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(5,uint(userIdNum),placedOrderUpdate)
+			// push notification
+
 		case 6:
 			//Store change status to laundring
+			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(6,uint(userIdNum),placedOrderUpdate)
+			// push notification to user & delivery
 		case 7:
 			//Store change status to finish
+			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(7,uint(userIdNum),placedOrderUpdate)
+			// push notification to user & delivery
+
 		case 8:
 			//Delivery change status to deliver
+			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(8,uint(userIdNum),placedOrderUpdate)
+			// push notification to user
 		case 9:
 			//Customer pay
+			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(9,uint(userIdNum),placedOrderUpdate)
 		case 10:
 			//Store cancel order
+			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(10,uint(userIdNum),placedOrderUpdate)
 		default :
+			c.JSON(http.StatusBadRequest,common.NewError("param",errors.New("Sai thông tin trạng thái")))
+			return
 
 	}
 

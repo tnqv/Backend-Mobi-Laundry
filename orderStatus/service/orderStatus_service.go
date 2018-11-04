@@ -14,6 +14,7 @@ func NewOrderStatusService(orderStatusRepository orderStatus.OrderStatusReposito
 	return &orderStatusService{orderStatusRepository}
 }
 
+
 func (orderStatusService *orderStatusService) CreateNewOrderStatus(newOrderStatus *models.OrderStatus) (*models.OrderStatus, error) {
 	_,err := orderStatusService.orderStatusRepos.Create(newOrderStatus)
 
