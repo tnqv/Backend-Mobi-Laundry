@@ -144,6 +144,9 @@ func (s *HttpPlacedOrderHandler) CreatePlacedOrder(c *gin.Context){
 		return
 	}
 
+	//Insert to firebase store
+	// push notification
+
 	c.JSON(http.StatusOK, placedOrderModel)
 }
 
@@ -239,7 +242,7 @@ func (s *HttpPlacedOrderHandler) UpdateStatusPlacedOrder(c *gin.Context) {
 
 				//Store accept order
 				s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(2,uint(userIdNum),placedOrderUpdate)
-				//insert to firebase
+				//insert to firebase to delivery
 				//Push notification
 
 		case 3:
