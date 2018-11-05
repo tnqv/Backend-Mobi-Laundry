@@ -8,7 +8,8 @@
           "DBName" : "ldds",
           "DBPort" : 3306,
           "DBPassword" : ""
-      }
+      },
+      "notificationAddress": "127.0.0.1:9000"
   },
   "production" : {
       "serverAddress": ":8080",
@@ -18,7 +19,8 @@
           "DBName" : "ldds_db",
           "DBPort" : 3306,
           "DBPassword" : "ldds21122018"
-      }
+      },
+      "notificationAddress": "127.0.0.1:9000"
   },
   "facebook_credentials": {
      "appId" : "2259251500796826",

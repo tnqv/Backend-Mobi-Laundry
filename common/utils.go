@@ -11,12 +11,16 @@ import (
 
 	"github.com/gin-gonic/gin/binding"
 	"github.com/gin-gonic/gin"
+	"github.com/appleboy/gorush/rpc/proto"
+	"context"
 )
 
 const (
 	TEMPLATE_DB_CONSTRING = `%s:%s@tcp(%s:%s)/%s`
 	FacebookProvider = "FACEBOOK"
 	NormalProvider = "NORMAL"
+	ANDROID_PLATFORM_NOTIFICATION = 2
+	IOS_PLATFORM_NOTIFICATION = 1
 )
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 
@@ -50,6 +54,28 @@ func GenToken(id uint) string {
 	// Sign and get the complete encoded token as a string
 	token, _ := jwt_token.SignedString([]byte(NBSecretPassword))
 	return token
+}
+
+func PushAndroidNotification(title string,message string,tokens...string) (*proto.NotificationReply,error){
+	conn := GetNotificationConnection()
+	c := proto.NewGorushClient(conn)
+	r, err := c.Send(context.Background(), &proto.NotificationRequest{
+		Platform: ANDROID_PLATFORM_NOTIFICATION,
+		Tokens:   tokens,
+		//Title: title,
+		//Message:  message,
+		//Badge:    1,
+		Alert: &proto.Alert{
+			Title:    title,
+			Body:     message,
+			//LocKey:   "Test loc key",
+			//LocArgs:  []string{"test", "test"},
+		},
+	})
+	if err != nil {
+		return nil,err
+	}
+	return r,nil
 }
 
 // My own Error type that will help return my customized Error info

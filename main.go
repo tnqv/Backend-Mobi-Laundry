@@ -67,10 +67,11 @@ func Migrate() {
 func main() {
 	var (
 		listenAddr string
+		notificationAddr string
 	)
 
-
 	listenAddr = config.GetString(environmentDb + `.serverAddress`)
+	notificationAddr = config.GetString(environmentDb + `.notificationAddress`)
 	dbHost := config.GetString(environmentDb + `.DatabaseConfig.DBHost`)
 	dbUser := config.GetString(environmentDb + `.DatabaseConfig.DBUser`)
 	dbName := config.GetString(environmentDb + `.DatabaseConfig.DBName`)
@@ -89,6 +90,11 @@ func main() {
 	Migrate()
 
 	defer db.Close()
+
+	common.InitNotificationConnection(notificationAddr)
+
+	//defer notifConn.Close()
+
 	r := gin.Default()
 	//Init repository
 
@@ -142,7 +148,7 @@ func main() {
 
 	//PlacedOrder
 	placedOrderRepo := placedOrderRepository.NewMysqlPlacedOrderRepository()
-	placedOrderService := placeOrderService.NewPlacedOrderService(placedOrderRepo)
+	placedOrderService := placeOrderService.NewPlacedOrderService(placedOrderRepo,orderStatusRepo)
 	placedOrderHttpHandler := placedOrderHandler.NewPlacedOrderHttpHandler(v1.Group("/placedorder"), placedOrderService, orderStatusServ)
 
 	//Notification
