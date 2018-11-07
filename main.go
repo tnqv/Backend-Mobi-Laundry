@@ -67,17 +67,18 @@ func Migrate() {
 func main() {
 	var (
 		listenAddr string
-		notificationAddr string
+		redisAddr string
 	)
 
 	listenAddr = config.GetString(environmentDb + `.serverAddress`)
-	notificationAddr = config.GetString(environmentDb + `.notificationAddress`)
+	redisAddr = config.GetString(environmentDb + `.redisAddress`)
 	dbHost := config.GetString(environmentDb + `.DatabaseConfig.DBHost`)
 	dbUser := config.GetString(environmentDb + `.DatabaseConfig.DBUser`)
 	dbName := config.GetString(environmentDb + `.DatabaseConfig.DBName`)
 	dbPort := config.GetString(environmentDb + `.DatabaseConfig.DBPort`)
 	dbPass := config.GetString(environmentDb + `.DatabaseConfig.DBPassword`)
 
+	//Mysql
 	connection := fmt.Sprintf(common.TEMPLATE_DB_CONSTRING, dbUser, dbPass, dbHost, dbPort, dbName)
 	val := url.Values{}
 	val.Add("parseTime", "1")
@@ -91,9 +92,13 @@ func main() {
 
 	defer db.Close()
 
-	common.InitNotificationConnection(notificationAddr)
+	//Message Queue connection
+	common.InitMessageQueueConnection(redisAddr)
 
-	//defer notifConn.Close()
+	//Notification
+
+	//common.InitNotificationConnection(notificationAddr)
+
 
 	r := gin.Default()
 	//Init repository
@@ -145,21 +150,23 @@ func main() {
 	serviceOrderServ := serviceOrderService.NewServiceOrderService(serviceOrderRepo)
 	serviceOrderHttpHandler := serviceOrderHandler.NewServiceOrderHttpHandler(v1.Group("/serviceorder"), serviceOrderServ)
 
+	//Notification
+	notificationRepo := notificationRepository.NewMysqlNotificationRepository()
+	notificationServ := notificationService.NewNotificationService(notificationRepo)
+	notificationHttpHandler := notificationHandler.NewNotificationHttpHandler(v1.Group("/notification"), notificationServ)
+
 
 	//PlacedOrder
 	placedOrderRepo := placedOrderRepository.NewMysqlPlacedOrderRepository()
 	placedOrderService := placeOrderService.NewPlacedOrderService(placedOrderRepo,orderStatusRepo)
 	placedOrderHttpHandler := placedOrderHandler.NewPlacedOrderHttpHandler(v1.Group("/placedorder"), placedOrderService, orderStatusServ)
 
-	//Notification
-	notificationRepo := notificationRepository.NewMysqlNotificationRepository()
-	notificationServ := notificationService.NewNotificationService(notificationRepo)
-	notificationHttpHandler := notificationHandler.NewNotificationHttpHandler(v1.Group("/notification"), notificationServ)
-
 	//User
 	userRepo := userRepository.NewMysqlUserRepository()
 	userServ := userService.NewUserService(userRepo)
 	userHttpHandler := userHandler.NewUserHttpHandler(v1.Group("/user"), userServ, notificationServ,placedOrderService)
+
+	placedOrderHttpHandler.SetUserService(userServ)
 
 
 	//Account

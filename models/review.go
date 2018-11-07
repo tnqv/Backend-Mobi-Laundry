@@ -11,4 +11,5 @@ type Review struct {
 	Rate           int		   		`json:"rate"`
 	UserRate       accounts.User  	`json:"user"`
 	UserID		   int				`json:"-"`
+	User		   User 			`json:"user" gorm:"save_associations:false"`
 }

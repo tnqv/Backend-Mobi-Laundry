@@ -46,11 +46,23 @@ func (placedOrderService *placedOrderService) GetPlacedOrderByOrderCode(orderCod
 func (placedOrderService *placedOrderService) UpdatePlacedOrderAndCreateNewOrderStatus(statusId uint,userId uint,order *models.PlacedOrder)(*models.PlacedOrder,error){
 	var newOrderStatus models.OrderStatus
 	newOrderStatus = models.OrderStatus{StatusID:statusId,UserId: userId,StatusChangedTime:time.Now(),PlacedOrderID: order.ID}
-	order.OrderStatusId = 7
-	placedOrderService.orderStatusRepos.Create(&newOrderStatus)
-	placedOrderService.UpdatePlacedOrder(order)
+	order.OrderStatusId = statusId
 
+	placedOrderService.orderStatusRepos.Create(&newOrderStatus)
+
+	order,err := placedOrderService.UpdatePlacedOrderStatus(order)
+	if err != nil{
+		return nil,err
+	}
 	return order,nil
+}
+
+func (placedOrderService *placedOrderService) UpdatePlacedOrderStatus(updatePlacedOrder *models.PlacedOrder) (*models.PlacedOrder, error) {
+	updateRole, err := placedOrderService.placedOrderRepos.Update(updatePlacedOrder)
+	if err != nil {
+		return nil, err
+	}
+	return updateRole, nil
 }
 
 func (placedOrderService *placedOrderService) GetPlacedOrderById(id int) (*models.PlacedOrder, error) {

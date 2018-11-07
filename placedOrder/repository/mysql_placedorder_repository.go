@@ -18,7 +18,14 @@ func NewMysqlPlacedOrderRepository() placedOrder.PlacedOrderRepository{
 
 func (r *repo) Find(id int) (*models.PlacedOrder, error) {
 	var placedOrderModel models.PlacedOrder
-	err := r.Conn.Preload("OrderStatuses").Preload("ServiceOrders").Preload("ServiceOrders.Service").First(&placedOrderModel, id).Error
+	//err := r.Conn.Preload("OrderStatuses").
+	//			  Preload("ServiceOrders").
+	//			  Preload("ServiceOrders.Service").
+	//	          Preload("Store").First(&placedOrderModel, id).Error
+	//err := r.Conn.Preload("Store").Preload("User").Preload("User.Role").First(&placedOrderModel, id).Error
+	err := r.Conn.Preload("User").
+				  Preload("Store").
+		     	  First(&placedOrderModel, id).Error
 	if err != nil {
 		return nil, err
 	}
@@ -61,6 +68,8 @@ func (r *repo) FindPlacedOrderByOrderCode(orderCode string)(*models.PlacedOrder,
 	}).
 	Preload("ServiceOrders").
 	Preload("ServiceOrders.Service").
+	Preload("User").
+	Preload("Store").
 	First(&placeOrder).Error
 
 	if err != nil {
@@ -81,12 +90,13 @@ func (r *repo) Create(placedOrder *models.PlacedOrder) (*models.PlacedOrder, err
 }
 
 func (r *repo) Update(updatePlacedOrder *models.PlacedOrder) (*models.PlacedOrder, error) {
-	var tempPlacedOrder models.Role
-	err := r.Conn.Preload("OrderStatuses").First(&tempPlacedOrder,updatePlacedOrder.ID).Error
-	if err != nil{
-		return nil, err
-	}
-	err = r.Conn.Save(updatePlacedOrder).Error
+	//var tempPlacedOrder models.Role
+	//err := r.Conn.Preload("OrderStatuses").First(&tempPlacedOrder,updatePlacedOrder.ID).Error
+	//if err != nil{
+	//	return nil, err
+	//}
+
+	err := r.Conn.Save(updatePlacedOrder).Error
 	if err != nil {
 		return nil, err
 	}
@@ -106,3 +116,9 @@ func (r *repo) Delete(id int) (bool, error) {
 	return true, nil
 }
 
+
+func (r *repo) UpdateOrderStatusId(placedOrder *models.PlacedOrder) (*models.PlacedOrder, error){
+
+	//r.Conn.Model(&placedOrder).Select("order_status_id").Updates(map[string]interface{}{"name": "hello",})
+	return nil,nil
+}

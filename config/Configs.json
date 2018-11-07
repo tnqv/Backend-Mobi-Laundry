@@ -9,7 +9,9 @@
           "DBPort" : 3306,
           "DBPassword" : ""
       },
-      "notificationAddress": "127.0.0.1:9000"
+      "notificationAddress": "127.0.0.1:9000",
+      "firebaseUrl" : "https://ldds-84f6a.firebaseio.com",
+      "redisAddress": "127.0.0.1:6379"
   },
   "production" : {
       "serverAddress": ":8080",
@@ -20,7 +22,9 @@
           "DBPort" : 3306,
           "DBPassword" : "ldds21122018"
       },
-      "notificationAddress": "127.0.0.1:9000"
+      "notificationAddress": "127.0.0.1:9000",
+      "firebaseUrl" : "https://ldds-84f6a.firebaseio.com",
+      "redisAddress": "127.0.0.1:6379"
   },
   "facebook_credentials": {
      "appId" : "2259251500796826",

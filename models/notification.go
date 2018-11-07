@@ -13,5 +13,5 @@ type Notification struct {
 	Content            		string 			`form:"content" json:"content" binding:"exists"`
 	//Customer
 	UserID    				uint          	`form:"user_id" json:"user_id" binding:"exists"`
-	UserModel 				accounts.User 	`json:"-"`
+	User 				accounts.User 	`json:"-" gorm:"save_associations:false"`
 }

@@ -10,6 +10,10 @@ import (
 	"strconv"
 	"time"
 	"d2d-backend/models"
+	"d2d-backend/user"
+
+	"encoding/json"
+	"log"
 )
 
 type ResponseError struct {
@@ -19,6 +23,7 @@ type ResponseError struct {
 type HttpPlacedOrderHandler struct {
 	placedOrderService placedOrder.PlacedOrderService
 	orderStatusService orderStatus.OrderStatusService
+	userSer user.UserService
 }
 
 type HttpOrderStatusHandler struct {
@@ -32,12 +37,17 @@ func NewPlacedOrderHttpHandler(e *gin.RouterGroup,
 		placedOrderService: service,
 		orderStatusService: osService,
 	}
+
 	handler.UnauthorizedRoutes(e)
 	return handler
 }
 
-func (s *HttpPlacedOrderHandler) UnauthorizedRoutes(e *gin.RouterGroup){
+func (s *HttpPlacedOrderHandler) SetUserService(userServ user.UserService){
+		s.userSer = userServ
+}
 
+func (s *HttpPlacedOrderHandler) UnauthorizedRoutes(e *gin.RouterGroup){
+	e.PUT("/:id/status/:statusId",s.UpdateStatusPlacedOrder)
 }
 
 func (s *HttpPlacedOrderHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
@@ -47,7 +57,6 @@ func (s *HttpPlacedOrderHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
 	e.POST("/", s.CreatePlacedOrder)
 	e.PUT("/:id",s.UpdatePlacedOrder)
 	e.DELETE("/:id", s.DeletePlacedOrder)
-	e.PUT("/:id/status/:statusId",s.UpdateStatusPlacedOrder)
 }
 
 
@@ -196,6 +205,7 @@ func (s *HttpPlacedOrderHandler) DeletePlacedOrder(c *gin.Context){
 }
 
 func (s *HttpPlacedOrderHandler) UpdateStatusPlacedOrder(c *gin.Context) {
+
 	id := c.Param("id")
 	if id == "" {
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Mã order không hợp lệ")))
@@ -215,7 +225,7 @@ func (s *HttpPlacedOrderHandler) UpdateStatusPlacedOrder(c *gin.Context) {
 		return
 	}
 
-	idStatusNum,err := strconv.ParseUint(id,10,32)
+	idStatusNum,err := strconv.ParseUint(statusId,10,32)
 
 	if err != nil {
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format status id")))
@@ -232,7 +242,14 @@ func (s *HttpPlacedOrderHandler) UpdateStatusPlacedOrder(c *gin.Context) {
 	userId := c.PostForm("user_id")
 	userIdNum,err := strconv.ParseUint(userId,10,32)
 	if err != nil {
-		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format status id")))
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format user_id")))
+		return
+
+	}
+
+	userModel,err := s.userSer.GetUserById(int(userIdNum))
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("param", errors.New("Tài khoản không hợp lệ")))
 		return
 
 	}
@@ -240,10 +257,26 @@ func (s *HttpPlacedOrderHandler) UpdateStatusPlacedOrder(c *gin.Context) {
 	switch(idStatusNum){
 		case 2:
 
+				if userModel.StoreId == 0{
+					c.JSON(http.StatusUnprocessableEntity, common.NewError("param", errors.New("Tài khoản hiện tại không hợp lệ cho chức năng này")))
+					return
+				}
 				//Store accept order
-				s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(2,uint(userIdNum),placedOrderUpdate)
-				//insert to firebase to delivery
-				//Push notification
+				placedOrderUpdate,err = s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(2,uint(userIdNum),placedOrderUpdate)
+				if err != nil {
+					c.JSON(http.StatusUnprocessableEntity, common.NewError("param", errors.New("Lỗi xảy ra khi cập nhật")))
+					return
+				}
+
+
+				//message queue
+				orderBytes, err := json.Marshal(placedOrderUpdate)
+				if err != nil {
+					// handle error
+					log.Print(err)
+				}
+
+				common.GetFirebaseMQ().PublishBytes(orderBytes)
 
 		case 3:
 			//Delivery take order

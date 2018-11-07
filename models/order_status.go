@@ -28,9 +28,9 @@ type OrderStatus struct {
 	StatusID 			uint		`form:"status_id" json:"status_id"`
 	//Who change status
 	UserId				uint		`form:"user_id" json:"user_id"`
-	User				User		`json:"-"`
+	User				User		`json:"-" gorm:"save_associations:false"`
 	StatusChangedTime 	time.Time	`form:"status_changed_time" json:"status_changed_time"`
 	Description 		string 		`form:"description" json:"description"`
 	PlacedOrderID		uint 		`form:"placed_order_id" json:"-"`
-	PlacedOrder 		PlacedOrder `json:"-"`
+	PlacedOrder 		PlacedOrder `json:"-" gorm:"save_associations:false"`
 }

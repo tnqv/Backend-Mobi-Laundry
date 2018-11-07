@@ -20,6 +20,7 @@ func Init(connection string) *gorm.DB {
 		fmt.Println("db err: ", err)
 		panic(err)
 	}
+	db.LogMode(true)
 	db.DB().SetMaxIdleConns(10)
 	db.Set("gorm:table_options","ENGINE=InnoDB CHARSET=utf8")
 	//db.LogMode(true)

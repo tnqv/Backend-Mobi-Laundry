@@ -1,0 +1,14 @@
+version: '3'
+services:
+  api_service:
+    container_name: ldds_api
+    build: .
+    ports:
+     - "8080:8080"
+  push_notif_service:
+    container_name: push_notif_service
+    image: appleboy/gorush
+    volumes:
+      - ./notificationService/config.yml:/config.yml
+    ports:
+      - "9000:9000"
