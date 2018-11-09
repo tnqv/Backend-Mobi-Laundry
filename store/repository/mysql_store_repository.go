@@ -45,6 +45,16 @@ func (r *repo) FindByStoreName(name string) (*models.Store, error){
 	return &storeModel,nil
 }
 
+func (r *repo) FindAllStore() ([]*models.Store, error) {
+	var stores []*models.Store
+	err := r.Conn.Find(&stores).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return stores,nil
+}
+
 
 func (r *repo) FindAll(limit int,page int) (*pagination.Paginator, error){
 

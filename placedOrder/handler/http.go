@@ -15,6 +15,7 @@ import (
 	//models2 "d2d-backend/models/message"
 	"encoding/json"
 	"d2d-backend/serviceOrder"
+	"d2d-backend/store"
 )
 
 type ResponseError struct {
@@ -25,6 +26,7 @@ type HttpPlacedOrderHandler struct {
 	placedOrderService placedOrder.PlacedOrderService
 	orderStatusService orderStatus.OrderStatusService
 	serviceOrderService serviceOrder.ServiceOrderService
+	storeService store.StoreService
 	userSer user.UserService
 }
 
@@ -35,12 +37,15 @@ type HttpOrderStatusHandler struct {
 func NewPlacedOrderHttpHandler(e *gin.RouterGroup,
 							   service placedOrder.PlacedOrderService,
 							   	osService orderStatus.OrderStatusService,
-							   		servOrdService serviceOrder.ServiceOrderService) (*HttpPlacedOrderHandler){
+							   		servOrdService serviceOrder.ServiceOrderService,
+							   			sService store.StoreService) (*HttpPlacedOrderHandler){
 	handler := &HttpPlacedOrderHandler{
 		placedOrderService: service,
 		orderStatusService: osService,
 		serviceOrderService: servOrdService,
+		storeService: sService,
 	}
+
 
 	handler.UnauthorizedRoutes(e)
 	return handler
@@ -134,7 +139,7 @@ func (s *HttpPlacedOrderHandler) CreatePlacedOrder(c *gin.Context){
 	placedOrderModel.TimePlaced = time.Now()
 	placedOrderModel.OrderCode = time.Now().Format("20060102150405")
 	var tempOrderStatus models.OrderStatus
-	tempOrderStatus.StatusID = 1
+	tempOrderStatus.StatusID = common.ORDER_CREATED_STATUS
 	tempOrderStatus.UserId = placedOrderModel.UserID
 	tempOrderStatus.StatusChangedTime = time.Now()
 	newOrderStatusModel , err := orderStatus.OrderStatusService.CreateNewOrderStatus(s.orderStatusService, &tempOrderStatus)
@@ -157,8 +162,47 @@ func (s *HttpPlacedOrderHandler) CreatePlacedOrder(c *gin.Context){
 		return
 	}
 
+	//Mapping order
+
+	stores,err := s.storeService.GetAllStores()
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+
+	var shortestDistanceStoreId uint
+	var shortestDistance float64
+	shortestDistanceStoreId = 0
+	for i:= 0; i < len(stores); i++ {
+
+		distance := common.Distance(float64(placedOrderModel.DeliveryLatitude),float64(placedOrderModel.DeliveryLongitude),float64(stores[i].Latitude),float64(stores[i].Longitude))
+		if i == 0 && distance != 0 {
+			shortestDistance = distance
+			shortestDistanceStoreId = stores[i].ID
+		}
+
+		if distance < shortestDistance {
+			shortestDistance = distance
+			shortestDistanceStoreId =  stores[i].ID
+		}
+	}
+
+	if shortestDistance == 0 || shortestDistanceStoreId == 0 {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", errors.New("Lỗi cửa hàng")))
+		return
+	}
+
+	placedOrderModel.StoreID = shortestDistanceStoreId
+	_,err = s.placedOrderService.UpdatePlacedOrder(&placedOrderModel)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
 	//Insert to firebase store
+	common.ProduceMessage(common.FIREBASE_QUEUE,placedOrderModel)
+
 	// push notification
+	common.ProduceMessage(common.NOTIFICATION_QUEUE,placedOrderModel)
 
 	c.JSON(http.StatusOK, placedOrderModel)
 }
@@ -278,6 +322,7 @@ func (s *HttpPlacedOrderHandler) UpdateStatusPlacedOrder(c *gin.Context) {
 
 		case common.ORDER_ACCEPTED_BY_DELIVERY:
 			//Delivery take order
+			placedOrderUpdate.DeliveryID = userModel.ID
 			placedOrderUpdate,err = s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_ACCEPTED_BY_DELIVERY,uint(userIdNum),placedOrderUpdate)
 			if err != nil {
 				c.JSON(http.StatusUnprocessableEntity, common.NewError("param", errors.New("Lỗi xảy ra khi cập nhật")))

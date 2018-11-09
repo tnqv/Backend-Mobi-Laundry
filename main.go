@@ -159,7 +159,7 @@ func main() {
 	//PlacedOrder
 	placedOrderRepo := placedOrderRepository.NewMysqlPlacedOrderRepository()
 	placedOrderService := placeOrderService.NewPlacedOrderService(placedOrderRepo,orderStatusRepo)
-	placedOrderHttpHandler := placedOrderHandler.NewPlacedOrderHttpHandler(v1.Group("/placedorder"), placedOrderService, orderStatusServ,serviceOrderServ)
+	placedOrderHttpHandler := placedOrderHandler.NewPlacedOrderHttpHandler(v1.Group("/placedorder"), placedOrderService, orderStatusServ,serviceOrderServ,storeServ)
 
 	//User
 	userRepo := userRepository.NewMysqlUserRepository()

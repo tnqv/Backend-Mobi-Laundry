@@ -24,6 +24,14 @@ func (storeService *storeService) GetStoreById(store *models.Store)(*models.Stor
 		return storeModel,nil
 }
 
+func (storeService *storeService) GetAllStores()([]*models.Store, error){
+	stores,err := storeService.storeRepos.FindAllStore()
+	if err != nil {
+		return nil,err
+	}
+	return stores,nil
+}
+
 func (storeService *storeService) GetStores(limit int, page int)(*pagination.Paginator,error){
 	paginate,err := storeService.storeRepos.FindAll(limit,page)
 	if err != nil {
