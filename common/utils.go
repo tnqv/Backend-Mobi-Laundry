@@ -13,12 +13,27 @@ import (
 	"github.com/gin-gonic/gin"
 	//"github.com/appleboy/gorush/rpc/proto"
 	//"context"
+	"encoding/json"
+	"log"
 )
 
 const (
 	TEMPLATE_DB_CONSTRING = `%s:%s@tcp(%s:%s)/%s`
 	FacebookProvider = "FACEBOOK"
 	NormalProvider = "NORMAL"
+)
+
+const (
+	ORDER_CREATED_STATUS = 1
+	ORDER_ACCEPTED_BY_STORE = 2
+	ORDER_ACCEPTED_BY_DELIVERY = 3
+	ORDER_CONFIRM = 4
+	ORDER_IN_STORE = 5
+	ORDER_LAUNDRYING = 6
+	ORDER_FINISH_LAUNDRYING = 7
+	ORDER_DELIVERY_BACK_TO_CUSTOMER = 8
+	ORDER_COMPLETE = 9
+	ORDER_CANCEL = 10
 )
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 
@@ -93,4 +108,19 @@ func NewError(key string, err error) CommonError {
 func Bind(c *gin.Context, obj interface{}) error {
 	b := binding.Default(c.Request.Method, c.ContentType())
 	return c.ShouldBindWith(obj, b)
+}
+
+func ProduceMessage(queue string,message interface{}){
+	messageBytes, err := json.Marshal(message)
+	if err != nil {
+		// handle error
+		log.Print(err)
+	}
+
+	switch(queue){
+		case FIREBASE_QUEUE:
+			GetFirebaseMQ().PublishBytes(messageBytes)
+		case NOTIFICATION_QUEUE:
+			GetNotificationMQ().PublishBytes(messageBytes)
+	}
 }

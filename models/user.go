@@ -14,6 +14,7 @@ type User struct {
 	RoleId				uint		`form:"role_id" json:"role_id"`
 	Role				Role		`gorm:"auto_preload" json:"role" gorm:"save_associations:false"`
 	AccountId			uint 		`gorm:"not null;unique" form:"account_id" json:"-"`
+	Account				Account		`json:"account" gorm:"save_associations:false"`
 	StoreId				uint		`form:"storeid" json:"store_id"`
 	Store 				Store		`json:"store,omitempty" gorm:"save_associations:false"`
 	Address 			string		`form:"address" json:"address"`

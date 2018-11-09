@@ -10,7 +10,7 @@ type Account struct {
 	gorm.Model			`json:"-"`
 	Email 		string	`gorm:"not null;unique" form:"email" json:"email"`
 	Username 	string	`form:"username" json:"username"`
-	Password 	string	`form:"password" json:"password"`
+	Password 	string	`form:"password" json:"-"`
 	Provider 	string	`form:"provider" json:"provider"`
 	AccessToken string	`form:"access_token" json:"access_token"`
 	FcmToken 	string	`form:"fcm_token" json:"fcm_token"`

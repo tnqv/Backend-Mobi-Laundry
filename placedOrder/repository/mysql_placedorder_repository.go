@@ -25,6 +25,9 @@ func (r *repo) Find(id int) (*models.PlacedOrder, error) {
 	//err := r.Conn.Preload("Store").Preload("User").Preload("User.Role").First(&placedOrderModel, id).Error
 	err := r.Conn.Preload("User").
 				  Preload("Store").
+				  Preload("User.Account").
+		          Preload("Delivery").
+				  Preload("Delivery.Account").
 		     	  First(&placedOrderModel, id).Error
 	if err != nil {
 		return nil, err

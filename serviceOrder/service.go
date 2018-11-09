@@ -10,5 +10,6 @@ type ServiceOrderService interface {
 	GetServiceOrders(limit int, page int) (*pagination.Paginator, error)
 	GetServiceOrderById(id int) (*models.ServiceOrder, error)
 	UpdateServiceOrder(updateServiceOrder *models.ServiceOrder) (*models.ServiceOrder, error)
+	CreateListServiceOrders(newServiceOrder []*models.ServiceOrder) ([]*models.ServiceOrder, error)
 	DeleteServiceOrder(id int) (bool, error)
 }

@@ -12,8 +12,9 @@ import (
 	"d2d-backend/models"
 	"d2d-backend/user"
 
+	//models2 "d2d-backend/models/message"
 	"encoding/json"
-	"log"
+	"d2d-backend/serviceOrder"
 )
 
 type ResponseError struct {
@@ -23,6 +24,7 @@ type ResponseError struct {
 type HttpPlacedOrderHandler struct {
 	placedOrderService placedOrder.PlacedOrderService
 	orderStatusService orderStatus.OrderStatusService
+	serviceOrderService serviceOrder.ServiceOrderService
 	userSer user.UserService
 }
 
@@ -32,10 +34,12 @@ type HttpOrderStatusHandler struct {
 
 func NewPlacedOrderHttpHandler(e *gin.RouterGroup,
 							   service placedOrder.PlacedOrderService,
-							   	osService orderStatus.OrderStatusService) (*HttpPlacedOrderHandler){
+							   	osService orderStatus.OrderStatusService,
+							   		servOrdService serviceOrder.ServiceOrderService) (*HttpPlacedOrderHandler){
 	handler := &HttpPlacedOrderHandler{
 		placedOrderService: service,
 		orderStatusService: osService,
+		serviceOrderService: servOrdService,
 	}
 
 	handler.UnauthorizedRoutes(e)
@@ -255,64 +259,99 @@ func (s *HttpPlacedOrderHandler) UpdateStatusPlacedOrder(c *gin.Context) {
 	}
 
 	switch(idStatusNum){
-		case 2:
+		case common.ORDER_ACCEPTED_BY_STORE:
 
 				if userModel.StoreId == 0{
 					c.JSON(http.StatusUnprocessableEntity, common.NewError("param", errors.New("Tài khoản hiện tại không hợp lệ cho chức năng này")))
 					return
 				}
 				//Store accept order
-				placedOrderUpdate,err = s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(2,uint(userIdNum),placedOrderUpdate)
+				placedOrderUpdate,err = s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_ACCEPTED_BY_STORE,uint(userIdNum),placedOrderUpdate)
 				if err != nil {
 					c.JSON(http.StatusUnprocessableEntity, common.NewError("param", errors.New("Lỗi xảy ra khi cập nhật")))
 					return
 				}
-
-
 				//message queue
-				orderBytes, err := json.Marshal(placedOrderUpdate)
-				if err != nil {
-					// handle error
-					log.Print(err)
-				}
 
-				common.GetFirebaseMQ().PublishBytes(orderBytes)
+				common.ProduceMessage(common.FIREBASE_QUEUE,placedOrderUpdate)
+				common.ProduceMessage(common.NOTIFICATION_QUEUE,placedOrderUpdate)
 
-		case 3:
+		case common.ORDER_ACCEPTED_BY_DELIVERY:
 			//Delivery take order
-			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(3,uint(userIdNum),placedOrderUpdate)
+			placedOrderUpdate,err = s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_ACCEPTED_BY_DELIVERY,uint(userIdNum),placedOrderUpdate)
+			if err != nil {
+				c.JSON(http.StatusUnprocessableEntity, common.NewError("param", errors.New("Lỗi xảy ra khi cập nhật")))
+				return
+			}
 			// delete from firebase
+			common.ProduceMessage(common.FIREBASE_QUEUE,placedOrderUpdate)
 			// push notification to user
-		case 4:
+			common.ProduceMessage(common.NOTIFICATION_QUEUE,placedOrderUpdate)
+		case common.ORDER_CONFIRM:
 			//Delivery confirm order
-			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(4,uint(userIdNum),placedOrderUpdate)
+			serviceOrdersJson := c.PostForm("service_orders")
+			var serviceOrdersReq []*models.ServiceOrder
+			err = json.Unmarshal([]byte(serviceOrdersJson),&serviceOrdersReq)
+			if err != nil {
+				c.JSON(http.StatusUnprocessableEntity, common.NewError("param", errors.New("Dịch vụ đơn hàng không hợp lệ")))
+				return
+			}
+
+			serviceOrdersReq,err := s.serviceOrderService.CreateListServiceOrders(serviceOrdersReq)
+
+			if err != nil {
+				c.JSON(http.StatusUnprocessableEntity, common.NewError("param", errors.New("Lỗi tạo đơn")))
+				return
+			}
+
+			placedOrderUpdate,err = s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_CONFIRM,uint(userIdNum),placedOrderUpdate)
+			if err != nil {
+				c.JSON(http.StatusUnprocessableEntity, common.NewError("param", errors.New("Lỗi xảy ra khi cập nhật")))
+				return
+			}
+
+
 			// push notification to user
+			common.ProduceMessage(common.NOTIFICATION_QUEUE,placedOrderUpdate)
 
-
-		case 5:
+		case common.ORDER_IN_STORE:
 			//Delivery has deliveried to Store
-			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(5,uint(userIdNum),placedOrderUpdate)
-			// push notification
+			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_IN_STORE,uint(userIdNum),placedOrderUpdate)
 
-		case 6:
-			//Store change status to laundring
-			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(6,uint(userIdNum),placedOrderUpdate)
-			// push notification to user & delivery
-		case 7:
-			//Store change status to finish
-			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(7,uint(userIdNum),placedOrderUpdate)
-			// push notification to user & delivery
-
-		case 8:
-			//Delivery change status to deliver
-			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(8,uint(userIdNum),placedOrderUpdate)
 			// push notification to user
-		case 9:
+			common.ProduceMessage(common.NOTIFICATION_QUEUE,placedOrderUpdate)
+
+		case common.ORDER_LAUNDRYING:
+			//Store change status to laundring
+			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_LAUNDRYING,uint(userIdNum),placedOrderUpdate)
+
+			// push notification to user & delivery
+			common.ProduceMessage(common.NOTIFICATION_QUEUE,placedOrderUpdate)
+		case common.ORDER_FINISH_LAUNDRYING:
+			//Store change status to finish
+			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_FINISH_LAUNDRYING,uint(userIdNum),placedOrderUpdate)
+
+			// push notification to user & delivery
+			common.ProduceMessage(common.NOTIFICATION_QUEUE,placedOrderUpdate)
+
+		case common.ORDER_DELIVERY_BACK_TO_CUSTOMER:
+			//Delivery change status to deliver
+			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_DELIVERY_BACK_TO_CUSTOMER,uint(userIdNum),placedOrderUpdate)
+
+			// push notification to user
+			common.ProduceMessage(common.NOTIFICATION_QUEUE,placedOrderUpdate)
+		case common.ORDER_COMPLETE:
 			//Customer pay
-			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(9,uint(userIdNum),placedOrderUpdate)
-		case 10:
+			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_COMPLETE,uint(userIdNum),placedOrderUpdate)
+
+			//Push notification to user
+			common.ProduceMessage(common.NOTIFICATION_QUEUE,placedOrderUpdate)
+		case common.ORDER_CANCEL:
 			//Store cancel order
-			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(10,uint(userIdNum),placedOrderUpdate)
+			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_CANCEL,uint(userIdNum),placedOrderUpdate)
+
+			//Push notification to user
+			common.ProduceMessage(common.NOTIFICATION_QUEUE,placedOrderUpdate)
 		default :
 			c.JSON(http.StatusBadRequest,common.NewError("param",errors.New("Sai thông tin trạng thái")))
 			return

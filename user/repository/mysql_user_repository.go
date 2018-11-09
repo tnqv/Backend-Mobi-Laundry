@@ -19,7 +19,7 @@ func NewMysqlUserRepository() user.UserRepository {
 
 func (r *repo) Find(id int) (*models.User, error) {
 	var userModel models.User
-	err := r.Conn.Preload("Role").Preload("Store").First(&userModel,id).Error
+	err := r.Conn.Preload("Account").Preload("Role").Preload("Store").First(&userModel,id).Error
 	if err != nil {
 		return nil,err
 	}

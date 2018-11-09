@@ -14,6 +14,15 @@ func NewServiceOrderService(serviceOrderRepository serviceOrder.ServiceOrderRepo
 	return &serviceOrderService{serviceOrderRepository}
 }
 
+func (serviceOrderService *serviceOrderService) CreateListServiceOrders(newServiceOrders []*models.ServiceOrder) ([]*models.ServiceOrder, error) {
+	newServiceOrders,err := serviceOrderService.serviceOrderRepos.CreateServiceOrders(newServiceOrders)
+	if err != nil {
+		return nil,err
+	}
+
+	return newServiceOrders,nil
+}
+
 func (serviceOrderService *serviceOrderService) CreateNewServiceOrder(newServiceOrder *models.ServiceOrder) (*models.ServiceOrder, error) {
 	_, err := serviceOrderService.serviceOrderRepos.Create(newServiceOrder)
 	if err != nil {

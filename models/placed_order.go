@@ -19,6 +19,8 @@ type PlacedOrder struct {
 	//Customer
 	UserID 					uint					`form:"user_id" json:"user_id"`
 	User					User					`json:"user" gorm:"save_associations:false"`
+	DeliveryID				uint					`form:"delivery_id" json:"delivery_id"`
+	Delivery				User					`json:"delivery" gorm:"save_associations:false"`
 	//OrderInformation
 	ReceiverName			string 					`form:"receiver_name" json:"receiver_name"`
 	ReceiverPhone			string					`form:"receiver_phone" json:"receiver_phone"`

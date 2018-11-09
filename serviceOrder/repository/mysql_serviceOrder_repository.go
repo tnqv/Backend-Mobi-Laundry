@@ -36,6 +36,30 @@ func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error) {
 	return paginator, nil
 }
 
+func (r *repo) CreateServiceOrders(serviceorders []*models.ServiceOrder)([]*models.ServiceOrder,error){
+	tx := r.Conn.Begin()
+	for i:= 0; i < len(serviceorders); i++ {
+		if err := tx.Create(&serviceorders[i]).Error; err != nil{
+					tx.Rollback()
+					return nil,err
+		}
+
+	}
+	//for k := range serviceorders{
+	//	if err := tx.Create(&k).Error; err != nil{
+	//		tx.Rollback()
+	//		return nil,err
+	//	}
+	//
+	//}
+
+	err := tx.Commit().Error
+	if err != nil{
+		return nil,err
+	}
+
+	return serviceorders,nil
+}
 func (r *repo) Create(serviceOrder *models.ServiceOrder) (*models.ServiceOrder, error) {
 	err := r.Conn.Create(serviceOrder).Error
 	if err != nil {
