@@ -1,7 +1,7 @@
 package models
 
 import (
-	"d2d-backend/accounts"
+
 
 	"github.com/jinzhu/gorm"
 )
@@ -13,5 +13,5 @@ type Notification struct {
 	Content            		string 			`form:"content" json:"content" binding:"exists"`
 	//Customer
 	UserID    				uint          	`form:"user_id" json:"user_id" binding:"exists"`
-	User 				accounts.User 	`json:"-" gorm:"save_associations:false"`
+	User 					User 			`json:"-" gorm:"save_associations:false"`
 }

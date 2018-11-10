@@ -1,10 +1,20 @@
 version: '3'
 services:
+  redis:
+    image: redis
+    command: ["redis-server","--appendonly","yes"]
+    hostname: redis
+    ports:
+         - "6379:6379"
+    networks:
+         - ldds-network
   api_service:
     container_name: ldds_api
     build: ./d2d-backend
     networks:
      - ldds-network
+    depends_on:
+      - redis
     ports:
      - "8080:8080"
   push_notif_service:
@@ -21,16 +31,10 @@ services:
       build: ./ldds-message-queue
       networks:
        - ldds-network
+      depends_on:
+       - redis
       ports:
        - "8082:8082"
-  redis:
-    image: redis
-    command: ["redis-server","--appendonly","yes"]
-    hostname: redis
-    ports:
-         - "6379:6379"
-    networks:
-         - ldds-network
 networks:
      ldds-network:
        driver: "bridge"
