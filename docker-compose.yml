@@ -31,6 +31,6 @@ services:
          - "6379:6379"
     networks:
          - ldds-network
-  networks:
+networks:
      ldds-network:
        driver: "bridge"
