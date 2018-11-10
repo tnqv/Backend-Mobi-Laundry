@@ -1,8 +1,8 @@
 package account
 
 import (
-"d2d-backend/common"
-"github.com/gin-gonic/gin"
+	"d2d-backend/common"
+	"github.com/gin-gonic/gin"
 	"d2d-backend/models"
 )
 
