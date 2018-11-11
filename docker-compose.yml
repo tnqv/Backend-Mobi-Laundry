@@ -21,7 +21,7 @@ services:
     container_name: push_notif_service
     image: appleboy/gorush
     volumes:
-      - ../d2d-backend/notificationService/config.yml:/config.yml
+      - ./d2d-backend/notificationService/config.yml:/config.yml
     networks:
       - ldds-network
     ports:
