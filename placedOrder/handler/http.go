@@ -147,7 +147,7 @@ func (s *HttpPlacedOrderHandler) CreatePlacedOrder(c *gin.Context){
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
-	placedOrderModel.OrderStatusId = newOrderStatusModel.ID
+	placedOrderModel.OrderStatusId = newOrderStatusModel.StatusID
 	_, err = s.placedOrderService.CreateNewPlacedOrder(&placedOrderModel)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))

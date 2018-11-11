@@ -85,7 +85,12 @@ func (r *repo) FindPlacedOrderByOrderCode(orderCode string)(*models.PlacedOrder,
 
 
 func (r *repo) Create(placedOrder *models.PlacedOrder) (*models.PlacedOrder, error) {
-	err := r.Conn.Create(placedOrder).Error
+	err := r.Conn.
+		Create(placedOrder).Preload("User").
+		Preload("Store").
+		Preload("User.Account").
+		Preload("Delivery").
+		Preload("Delivery.Account").First(placedOrder).Error
 	if err != nil {
 		return nil,err
 	}
