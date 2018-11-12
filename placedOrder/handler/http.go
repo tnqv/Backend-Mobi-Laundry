@@ -136,6 +136,11 @@ func (s *HttpPlacedOrderHandler) CreatePlacedOrder(c *gin.Context){
 		return
 	}
 
+	if !common.IsLocationaInHoChiMinhCity(placedOrderModel.DeliveryLatitude,placedOrderModel.DeliveryLongitude) {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("Invalid params", errors.New("Địa điểm không nằm trong Hồ Chí Minh")))
+		return
+	}
+
 	placedOrderModel.TimePlaced = time.Now()
 	placedOrderModel.OrderCode = time.Now().Format("20060102150405")
 	var tempOrderStatus models.OrderStatus

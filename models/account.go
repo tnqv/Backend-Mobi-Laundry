@@ -12,7 +12,7 @@ type Account struct {
 	Username 	string	`form:"username" json:"username"`
 	Password 	string	`form:"password" json:"-"`
 	Provider 	string	`form:"provider" json:"provider"`
-	AccessToken string	`form:"access_token" json:"access_token"`
+	AccessToken string	`form:"access_token" json:"-"`
 	FcmToken 	string	`form:"fcm_token" json:"fcm_token"`
 	ApnToken 	string	`form:"apn_token" json:"apn_token"`
 }

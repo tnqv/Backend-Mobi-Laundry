@@ -36,6 +36,13 @@ const (
 	ORDER_COMPLETE = 9
 	ORDER_CANCEL = 10
 )
+
+const (
+	HCM_LOWER_LATITUDE  =  10.6925
+	HCM_UPPER_LATITUDE  =  10.8610
+	HCM_LOWER_LONGITUDE = 106.5583
+	HCM_UPPER_LONGITUDE = 106.7753
+)
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 
 // A helper function to generate random string
@@ -156,4 +163,14 @@ func Distance(lat1, lon1, lat2, lon2 float64) float64 {
 	h := hsin(la2-la1) + math.Cos(la1)*math.Cos(la2)*hsin(lo2-lo1)
 
 	return 2 * r * math.Asin(math.Sqrt(h))
+}
+
+//Check if location is in ho chi minh
+func IsLocationaInHoChiMinhCity(lat float32,long float32) bool{
+	if lat >= HCM_LOWER_LATITUDE && lat <= HCM_UPPER_LATITUDE{
+		if long >= HCM_LOWER_LONGITUDE && long <= HCM_UPPER_LONGITUDE{
+			return true
+		}
+	}
+	return false;
 }

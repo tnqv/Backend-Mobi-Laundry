@@ -108,6 +108,13 @@ func (r *repo) Update(updatePlacedOrder *models.PlacedOrder) (*models.PlacedOrde
 	if err != nil {
 		return nil, err
 	}
+	if updatePlacedOrder.DeliveryID != 0 {
+		r.Conn.Preload("Delivery").
+			Preload("Delivery.Account").First(updatePlacedOrder)
+	}
+	if updatePlacedOrder.StoreID != 0 {
+		r.Conn.Preload("Store").First(updatePlacedOrder)
+	}
 	return updatePlacedOrder, nil
 }
 
