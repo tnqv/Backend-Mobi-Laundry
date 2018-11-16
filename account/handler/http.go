@@ -80,6 +80,93 @@ func (s *HttpAccountHandler) GetAccountById(c *gin.Context){
 	}
 	c.JSON(http.StatusOK, account)
 }
+//
+//func (s *HttpAccountHandler) CreateDriverAccount(c *gin.Context){
+//
+//	driverValidator := account.NewDriverLoginValidator()
+//	if err := driverValidator.Bind(c); err != nil {
+//		c.JSON(http.StatusUnprocessableEntity, common.NewValidatorError(err))
+//		return
+//	}
+//
+//	if driverValidator.Account.Username == ""{
+//		c.JSON(http.StatusUnprocessableEntity, common.NewError("validation", errors.New("Chưa khai báo Email")))
+//		return
+//	}
+//
+//	if driverValidator.Account.Password == ""{
+//		c.JSON(http.StatusUnprocessableEntity, common.NewError("validation", errors.New("Chưa khai báo password")))
+//		return
+//	}
+//
+//	driverValidator.AccountModel.Provider = common.NormalProvider
+//	driverValidator.AccountModel.DeletedAt = nil
+//
+//	if driverValidator.AccountModel.Password != common.NBRandomPassword {
+//		driverValidator.AccountModel.SetPassword(driverValidator.AccountModel.Password)
+//	}
+//
+//	var user models.User
+//	user.Name = c.PostForm("name")
+//	if user.Name == ""{
+//		c.JSON(http.StatusUnprocessableEntity, common.NewError("validation", errors.New("Chưa khai báo tên")))
+//		return
+//	}
+//	user.PhoneNumber = c.PostForm("phone_number")
+//	if user.PhoneNumber == ""{
+//		c.JSON(http.StatusUnprocessableEntity, common.NewError("validation", errors.New("Số điện thoại không hợp lệ")))
+//		return
+//	}
+//
+//	userTemp := &models.User{PhoneNumber:""}
+//	accountTemp := &models.Account{Username: ""}
+//
+//	userTemp,_ = s.userService.GetUserByPhoneNumber(user.PhoneNumber)
+//
+//	if userTemp != nil{
+//		c.JSON(http.StatusForbidden, common.NewError("database", errors.New("Số điện thoại đã bị trùng")))
+//		return
+//	}
+//
+//	accountTemp,_ = s.accountService.GetAccountByUsername(driverValidator.Account.Username)
+//
+//	if accountTemp != nil{
+//		c.JSON(http.StatusForbidden,common.NewError("database",errors.New("Tài khoản đã bị trùng")))
+//		return
+//	}
+//
+//	_, err = s.accountService.CreateNewAccount(&accountModel)
+//	if err != nil {
+//		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+//		return
+//	}
+//
+//	user.AccountId = accountModel.ID
+//	user.RoleId = 1
+//
+//	_,err = s.userService.CreateNewUser(&user)
+//	if err != nil {
+//		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+//		return
+//	}
+//
+//	c.Set("user_model", accountModel)
+//
+//	serializer := account.AccountSerializer{c}
+//	c.JSON(http.StatusOK, gin.H{
+//		"account": serializer.Response(),
+//		"user": user,
+//	})
+//
+//
+//
+//
+//	c.JSON(http.StatusOK, gin.H{
+//		"account": serializer.Response(),
+//		"user": userRequested ,
+//	})
+//
+//}
 
 func (s *HttpAccountHandler) CreateAccount(c *gin.Context){
 	var accountModel models.Account
