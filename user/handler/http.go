@@ -44,11 +44,59 @@ func (s *HttpUserHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
 	e.GET("/:id", s.GetUserById)
 	e.GET("/:id/notifications", s.GetNotificationsByUserId)
 	e.GET("/:id/notifications/unread", s.GetTotalUnreadMessage)
+	e.GET("/:id/delivery/active",s.GetActivePlacedOrderByDeliveryId)
+	e.GET("/:id/delivery/instore",s.GetInStorePlacedOrderByDeliveryId)
+	e.GET("/:id/store/active",s.GetActivePlacedOrderByStoreId)
 	e.GET("/:id/placedorders", s.GetPlacedOrdersByUserId)
 	e.POST("/", s.CreateUser)
 	e.PUT("/:id", s.UpdateUser)
 	e.DELETE("/:id", s.DeleteUser)
 
+}
+
+
+
+func (s *HttpUserHandler) GetActivePlacedOrderByDeliveryId(c *gin.Context){
+	page, _ := strconv.Atoi(c.DefaultQuery(common.Page, common.PageDefault))
+	limit, _ := strconv.Atoi(c.DefaultQuery(common.Limit, common.LimitDefault))
+	id := c.Param("id")
+	if id == ""{
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
+		return
+	}
+	idNum, err := strconv.ParseUint(id,10,32)
+	if err != nil {
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
+		return
+	}
+	list, err := s.placedOrderService.GetListActiveOrdersByDeliveryId(uint(idNum),limit, page)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+	c.JSON(http.StatusOK, list)
+
+}
+
+func (s *HttpUserHandler) GetInStorePlacedOrderByDeliveryId(c *gin.Context){
+	page, _ := strconv.Atoi(c.DefaultQuery(common.Page, common.PageDefault))
+	limit, _ := strconv.Atoi(c.DefaultQuery(common.Limit, common.LimitDefault))
+	id := c.Param("id")
+	if id == ""{
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
+		return
+	}
+	idNum, err := strconv.ParseUint(id,10,32)
+	if err != nil {
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
+		return
+	}
+	list, err := s.placedOrderService.GetInStorePlacedOrdersByDeliveryId(uint(idNum),limit, page)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+	c.JSON(http.StatusOK, list)
 }
 
 func (s *HttpUserHandler) GetAllUser(c *gin.Context) {
@@ -75,35 +123,35 @@ func  (s *HttpUserHandler) GetUserById(c *gin.Context){
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
 		return
 	}
-	user,err := s.userService.GetUserById(int(idNum))
+	userModel,err := s.userService.GetUserById(int(idNum))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
-	c.JSON(http.StatusOK,user)
+	c.JSON(http.StatusOK,userModel)
 }
 
 func  (s *HttpUserHandler) CreateUser(c *gin.Context){
-	var user models.User
-	err:= common.Bind(c,&user)
+	var userModel models.User
+	err:= common.Bind(c,&userModel)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
 		return
 	}
-	if user.Name == "" || strings.TrimSpace(user.Name) == ""{
+	if userModel.Name == "" || strings.TrimSpace(userModel.Name) == ""{
 		c.JSON(http.StatusNotAcceptable, common.NewError("Empty name",errors.New("Name is empty")))
 		return
 	}
-	if user.PhoneNumber == "" || strings.TrimSpace(user.PhoneNumber) == ""{
+	if userModel.PhoneNumber == "" || strings.TrimSpace(userModel.PhoneNumber) == ""{
 		c.JSON(http.StatusNotAcceptable, common.NewError("Empty description",errors.New("Phone number is empty")))
 		return
 	}
-	_,err = s.userService.CreateNewUser(&user)
+	_,err = s.userService.CreateNewUser(&userModel)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
-	c.JSON(http.StatusOK,user)
+	c.JSON(http.StatusOK,userModel)
 }
 
 func  (s *HttpUserHandler) UpdateUser(c *gin.Context){
@@ -112,32 +160,32 @@ func  (s *HttpUserHandler) UpdateUser(c *gin.Context){
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
 		return
 	}
-	var user models.User
+	var userModel models.User
 	idNum,err := strconv.ParseUint(id,10,32)
 	if err != nil {
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
 		return
 	}
-	user.ID = uint(idNum)
-	err = common.Bind(c,&user)
+	userModel.ID = uint(idNum)
+	err = common.Bind(c,&userModel)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
 		return
 	}
-	if user.Name == "" || strings.TrimSpace(user.Name) == ""{
+	if userModel.Name == "" || strings.TrimSpace(userModel.Name) == ""{
 		c.JSON(http.StatusNotAcceptable, common.NewError("Empty name",errors.New("Name is empty")))
 		return
 	}
-	if user.PhoneNumber == "" || strings.TrimSpace(user.PhoneNumber) == ""{
+	if userModel.PhoneNumber == "" || strings.TrimSpace(userModel.PhoneNumber) == ""{
 		c.JSON(http.StatusNotAcceptable, common.NewError("Empty description",errors.New("Description is empty")))
 		return
 	}
-	_,err = s.userService.UpdateUser(&user)
+	_,err = s.userService.UpdateUser(&userModel)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Database", err))
 		return
 	}
-	c.JSON(http.StatusOK,&user)
+	c.JSON(http.StatusOK,&userModel)
 }
 
 func (s *HttpUserHandler) DeleteUser(c *gin.Context){
@@ -151,12 +199,12 @@ func (s *HttpUserHandler) DeleteUser(c *gin.Context){
 		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
 		return
 	}
-	bool,err := s.userService.DeleteUser(int(idNum))
+	isDeleted,err := s.userService.DeleteUser(int(idNum))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("Database", err))
 		return
 	}
-	c.JSON(http.StatusOK,ResponseError{Message: strconv.FormatBool(bool)})
+	c.JSON(http.StatusOK,ResponseError{Message: strconv.FormatBool(isDeleted)})
 }
 
 
@@ -203,7 +251,6 @@ func (s *HttpUserHandler) GetTotalUnreadMessage(c *gin.Context)  {
 	})
 }
 
-
 func (s *HttpUserHandler) GetPlacedOrdersByUserId(c *gin.Context)  {
 	page, _ := strconv.Atoi(c.DefaultQuery(common.Page, common.PageDefault))
 	limit, _ := strconv.Atoi(c.DefaultQuery(common.Limit, common.LimitDefault))
@@ -218,6 +265,28 @@ func (s *HttpUserHandler) GetPlacedOrdersByUserId(c *gin.Context)  {
 		return
 	}
 	list, err := s.placedOrderService.GetListOrdersByUserId(limit, page, int(idNum))
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+	c.JSON(http.StatusOK, list)
+}
+
+
+
+
+func (s *HttpUserHandler) GetActivePlacedOrderByStoreId(c *gin.Context){
+	id := c.Param("id")
+	if id == ""{
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
+		return
+	}
+	idNum, err := strconv.ParseUint(id,10,32)
+	if err != nil {
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
+		return
+	}
+	list, err := s.placedOrderService.GetListActivePlacedOrdersByStoreId(uint(idNum))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return

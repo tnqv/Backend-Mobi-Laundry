@@ -97,5 +97,27 @@ func (placedOrderService *placedOrderService) GetListOrdersByUserId(limit int, p
 	return paginate, nil
 }
 
+func (placedOrderService *placedOrderService) GetListActiveOrdersByDeliveryId(deliveryId uint, limit int, page int) (*pagination.Paginator, error){
+	paginate,err := placedOrderService.placedOrderRepos.FindActivePlacedOrdersByDeliveryId(deliveryId,limit, page)
+	if err != nil {
+		return nil, err
+	}
+	return paginate, nil
+}
 
+func (placedOrderService *placedOrderService) GetListActivePlacedOrdersByStoreId(storeId uint) ([]*models.PlacedOrder, error){
+	placedOrders,err := placedOrderService.placedOrderRepos.FindActivePlacedOrdersByStoreId(storeId)
+	if err != nil {
+		return nil, err
+	}
+	return placedOrders, nil
+}
+
+func (placedOrderService *placedOrderService) GetInStorePlacedOrdersByDeliveryId(deliveryId uint,limit int,page int)(*pagination.Paginator, error){
+	paginator,err := placedOrderService.placedOrderRepos.FindInStorePlacedOrdersByDeliveryId(deliveryId,limit,page)
+	if err != nil {
+		return nil, err
+	}
+	return paginator, nil
+}
 

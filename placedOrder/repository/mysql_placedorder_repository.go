@@ -28,6 +28,11 @@ func (r *repo) Find(id int) (*models.PlacedOrder, error) {
 				  Preload("User.Account").
 		          Preload("Delivery").
 				  Preload("Delivery.Account").
+				  Preload("OrderStatuses",func(db *gorm.DB) *gorm.DB{
+						return db.Order("status_id DESC")
+		          }).
+				  Preload("ServiceOrders").
+				  Preload("ServiceOrders.Service").
 		     	  First(&placedOrderModel, id).Error
 	if err != nil {
 		return nil, err
@@ -53,7 +58,16 @@ func (r *repo) FindByUserId(limit int, page int, id int) (*pagination.Paginator,
 func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error) {
 	var placedOrders []*models.PlacedOrder
 	paginator := pagination.Pagging(&pagination.Param{
-		DB: r.Conn,
+		DB: r.Conn.Preload("User").
+			Preload("Store").
+			Preload("User.Account").
+			Preload("Delivery").
+			Preload("Delivery.Account").
+			Preload("OrderStatuses",func(db *gorm.DB) *gorm.DB{
+				return db.Order("status_id DESC")
+			}).
+			Preload("ServiceOrders").
+			Preload("ServiceOrders.Service"),
 		Page: page,
 		Limit: limit,
 		ShowSQL: true,
@@ -136,4 +150,62 @@ func (r *repo) UpdateOrderStatusId(placedOrder *models.PlacedOrder) (*models.Pla
 
 	//r.Conn.Model(&placedOrder).Select("order_status_id").Updates(map[string]interface{}{"name": "hello",})
 	return nil,nil
+}
+
+func (r *repo) FindInStorePlacedOrdersByDeliveryId(deliveryId uint,limit int,page int)(*pagination.Paginator, error){
+	var placedOrders []*models.PlacedOrder
+	paginator := pagination.Pagging(&pagination.Param{
+		DB: r.Conn.Where("order_status_id in (5,6,7,8) AND delivery_id = ?",deliveryId).
+			Preload("OrderStatuses",func(db *gorm.DB) *gorm.DB{
+				return db.Order("status_id DESC")
+			}).
+			Preload("ServiceOrders").
+			Preload("ServiceOrders.Service").
+			Preload("Delivery").
+			Preload("User").
+			Preload("Store"),
+		Page: page,
+		Limit: limit,
+		ShowSQL: true,
+	}, &placedOrders)
+
+	return paginator,nil
+}
+
+func (r *repo) FindActivePlacedOrdersByDeliveryId(deliveryId uint,limit int,page int)(*pagination.Paginator, error){
+	var placedOrders []*models.PlacedOrder
+	paginator := pagination.Pagging(&pagination.Param{
+		DB: r.Conn.Where("order_status_id in (3,4) AND delivery_id = ?",deliveryId).
+			Preload("OrderStatuses",func(db *gorm.DB) *gorm.DB{
+				return db.Order("status_id DESC")
+			}).
+			Preload("ServiceOrders").
+			Preload("ServiceOrders.Service").
+			Preload("Delivery").
+			Preload("User").
+			Preload("Store"),
+		Page: page,
+		Limit: limit,
+		ShowSQL: true,
+	}, &placedOrders)
+
+	return paginator,nil
+}
+
+func (r *repo) FindActivePlacedOrdersByStoreId(storeId uint)([]*models.PlacedOrder,error){
+	var placedOrders []*models.PlacedOrder
+	if err := r.Conn.Where("order_status_id in (2,3,4,5,6,7) AND store_id = ?",storeId).
+		Preload("OrderStatuses",func(db *gorm.DB) *gorm.DB{
+			return db.Order("status_id DESC")
+		}).
+		Preload("ServiceOrders").
+		Preload("ServiceOrders.Service").
+		Preload("Delivery").
+		Preload("User").
+		Preload("Store").Find(&placedOrders).Error; err != nil{
+
+		return nil,err
+
+	}
+	return placedOrders,nil
 }

@@ -56,19 +56,19 @@ func (s *HttpPlacedOrderHandler) SetUserService(userServ user.UserService){
 }
 
 func (s *HttpPlacedOrderHandler) UnauthorizedRoutes(e *gin.RouterGroup){
-	e.PUT("/:id/status/:statusId",s.UpdateStatusPlacedOrder)
+
 }
 
 func (s *HttpPlacedOrderHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
 	e.GET("/", s.GetAllPlacedOrders)
 	e.GET("/:id", s.GetPlacedOrderById)
+	e.PUT("/:id/status/:statusId",s.UpdateStatusPlacedOrder)
 	//e.GET("/order-code/:orderCode",s.GetPlacedOrderByOrderCode)
 	e.POST("/", s.CreatePlacedOrder)
 	e.PUT("/:id",s.UpdatePlacedOrder)
 	e.DELETE("/:id", s.DeletePlacedOrder)
+
 }
-
-
 
 func (s *HttpPlacedOrderHandler) GetAllPlacedOrders(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery(common.Page, common.PageDefault))
@@ -403,6 +403,25 @@ func (s *HttpPlacedOrderHandler) UpdateStatusPlacedOrder(c *gin.Context) {
 			//Push notification to user
 			common.ProduceMessage(common.NOTIFICATION_QUEUE,placedOrderUpdate)
 			// delete from firebase
+			common.ProduceMessage(common.FIREBASE_QUEUE,placedOrderUpdate)
+		case common.DELIVERY_CANNOT_RECEIVE_CLOTHES:
+			//Store cancel order
+			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.DELIVERY_CANNOT_RECEIVE_CLOTHES,uint(userIdNum),placedOrderUpdate)
+
+			//Push notification to user
+			common.ProduceMessage(common.NOTIFICATION_QUEUE,placedOrderUpdate)
+
+		case common.DELIVERY_CANNOT_GIVE_BACK_CLOTHES:
+			//Store cancel order
+			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.DELIVERY_CANNOT_GIVE_BACK_CLOTHES,uint(userIdNum),placedOrderUpdate)
+
+			//Push notification to user
+			common.ProduceMessage(common.NOTIFICATION_QUEUE,placedOrderUpdate)
+		case common.DELIVERY_REFUSE_TO_DELIVER:
+			//Store cancel order
+			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.DELIVERY_REFUSE_TO_DELIVER,uint(userIdNum),placedOrderUpdate)
+
+			// Insert back to firebase
 			common.ProduceMessage(common.FIREBASE_QUEUE,placedOrderUpdate)
 		default :
 			c.JSON(http.StatusBadRequest,common.NewError("param",errors.New("Sai thông tin trạng thái")))
