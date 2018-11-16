@@ -404,8 +404,8 @@ func (s *HttpAccountHandler) StoreLogin(c *gin.Context){
 	}
 
 	middlewares.UpdateContextUserModel(c, accountModel.ID)
-	serializer := account.AccountSerializer{c}
-	userRequested,err := s.userService.GetUserById(int(accountModel.ID))
+	serializer := account.DriverAccountSerializer{c}
+	userRequested,err := s.userService.GetUserByAccountId(accountModel.ID)
 	c.JSON(http.StatusOK, gin.H{
 		"account": serializer.Response(),
 		"user": userRequested ,
@@ -440,8 +440,8 @@ func (s *HttpAccountHandler) DriverLogin(c *gin.Context){
 	}
 
 	middlewares.UpdateContextUserModel(c, accountModel.ID)
-	serializer := account.AccountSerializer{c}
-	userRequested,err := s.userService.GetUserById(int(accountModel.ID))
+	serializer := account.DriverAccountSerializer{c}
+	userRequested,err := s.userService.GetUserByAccountId(accountModel.ID)
 	c.JSON(http.StatusOK, gin.H{
 		"account": serializer.Response(),
 		"user": userRequested ,
