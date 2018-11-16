@@ -162,7 +162,7 @@ func main() {
 
 
 	//Account
-	accountRepo := accountRepository.NewMysqlAccounteRepository()
+	accountRepo := accountRepository.NewMysqlAccountRepository()
 	accountServ := accountService.NewAccountService(accountRepo)
 	accountHttpHandler := accountHandler.NewAccountHttpHandler(v1.Group("/account"), accountServ, userServ)
 

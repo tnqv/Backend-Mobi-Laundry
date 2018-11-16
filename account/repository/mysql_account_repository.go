@@ -12,7 +12,7 @@ type repo struct {
 	Conn *gorm.DB
 }
 
-func NewMysqlAccounteRepository() account.AccountRepository {
+func NewMysqlAccountRepository() account.AccountRepository {
 	return &repo{common.GetDB()}
 }
 
