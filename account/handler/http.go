@@ -237,7 +237,7 @@ func (s *HttpAccountHandler) CreateAccount(c *gin.Context){
 		return
 	}
 
-	c.Set("user_model", accountModel)
+	c.Set("user_model", &accountModel)
 
 	serializer := account.AccountSerializer{c}
 	c.JSON(http.StatusOK, gin.H{
