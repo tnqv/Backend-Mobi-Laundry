@@ -402,6 +402,8 @@ func (s *HttpPlacedOrderHandler) UpdateStatusPlacedOrder(c *gin.Context) {
 
 			//Push notification to user
 			common.ProduceMessage(common.NOTIFICATION_QUEUE,placedOrderUpdate)
+			// delete from firebase
+			common.ProduceMessage(common.FIREBASE_QUEUE,placedOrderUpdate)
 		default :
 			c.JSON(http.StatusBadRequest,common.NewError("param",errors.New("Sai thông tin trạng thái")))
 			return
