@@ -410,6 +410,7 @@ func (s *HttpPlacedOrderHandler) UpdateStatusPlacedOrder(c *gin.Context) {
 
 			//Push notification to user
 			common.ProduceMessage(common.NOTIFICATION_QUEUE,placedOrderUpdate)
+			//common.ProduceMessage(common.FIREBASE_QUEUE,placedOrderUpdate)
 
 		case common.DELIVERY_CANNOT_GIVE_BACK_CLOTHES:
 			//Store cancel order
@@ -422,7 +423,7 @@ func (s *HttpPlacedOrderHandler) UpdateStatusPlacedOrder(c *gin.Context) {
 			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.DELIVERY_REFUSE_TO_DELIVER,uint(userIdNum),placedOrderUpdate)
 
 			// Insert back to firebase
-			common.ProduceMessage(common.FIREBASE_QUEUE,placedOrderUpdate)
+			//common.ProduceMessage(common.FIREBASE_QUEUE,placedOrderUpdate)
 		default :
 			c.JSON(http.StatusBadRequest,common.NewError("param",errors.New("Sai thông tin trạng thái")))
 			return

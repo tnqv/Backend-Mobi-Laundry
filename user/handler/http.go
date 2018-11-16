@@ -291,5 +291,5 @@ func (s *HttpUserHandler) GetActivePlacedOrderByStoreId(c *gin.Context){
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
-	c.JSON(http.StatusOK, list)
+	c.JSON(http.StatusOK,gin.H{"records": list})
 }
