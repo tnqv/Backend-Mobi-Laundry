@@ -469,7 +469,7 @@ func (s *HttpAccountHandler) AccountsLogin(c *gin.Context){
 	}
 	middlewares.UpdateContextUserModel(c, accountModel.ID)
 	serializer := account.AccountSerializer{c}
-	userRequested,err := s.userService.GetUserById(int(accountModel.ID))
+	userRequested,err := s.userService.GetUserByAccountId(accountModel.ID)
 	c.JSON(http.StatusOK, gin.H{
 		"account": serializer.Response(),
 		"user": userRequested ,
