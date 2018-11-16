@@ -8,7 +8,7 @@ type Review struct {
 	gorm.Model						`json:"-"`
 	Content 	   string			`json:"content"`
 	Rate           int		   		`json:"rate"`
-	UserRate       User  	`json:"user"`
+	UserRate       User  			`json:"user" gorm:"save_associations:false"`
 	UserID		   int				`json:"-"`
 	User		   User 			`json:"user" gorm:"save_associations:false"`
 }

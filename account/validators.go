@@ -59,7 +59,7 @@ type LoginValidator struct {
 
 type DriverLoginValidator struct {
 	Account struct {
-		Username    string `form:"username" json:"username" binding:"exists,email"`
+		Username    string `form:"username" json:"username" binding:"exists"`
 		Password string `form:"password" json:"password" binding:"exists,min=8,max=255"`
 	} `json:"account"`
 	AccountModel models.Account `json:"-"`
