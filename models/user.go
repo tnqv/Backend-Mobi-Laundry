@@ -18,7 +18,7 @@ type User struct {
 	StoreId				uint		`form:"storeid" json:"store_id"`
 	Store 				Store		`json:"store,omitempty" gorm:"save_associations:false"`
 	Address 			string		`form:"address" json:"address"`
-	IdentifyNumber		uint		`form:"identify_number" json:"identify_number"`
+	IdentifyNumber		string		`form:"identify_number" json:"identify_number"`
 	Capacity			uint		`form:"capacity" json:"capacity"`
 	Imageurl			string		`form:"imageurl" json:"imageurl"`
 }
