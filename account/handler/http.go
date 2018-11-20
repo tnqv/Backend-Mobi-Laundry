@@ -36,6 +36,8 @@ func NewAccountHttpHandler(e *gin.RouterGroup,
 
 func (s *HttpAccountHandler) UnauthorizedRoutes(e *gin.RouterGroup){
 	e.POST("/", s.CreateAccount)
+	e.POST("/store", s.CreateAccountStore)
+	e.POST("/delivery", s.CreateAccountDelivery)
 	e.POST("/login",s.AccountsLogin)
 	e.POST("/facebook/auth",s.FacebookAccountsLogin)
 	e.POST("/driver/login",s.DriverLogin)
@@ -177,12 +179,12 @@ func (s *HttpAccountHandler) CreateAccount(c *gin.Context){
 	}
 
 	if accountModel.Email == ""{
-		c.JSON(http.StatusUnprocessableEntity, common.NewError("validation", errors.New("Chưa khai báo Email")))
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("validation", errors.New("Chưa khai báo tài khoản ")))
 		return
 	}
 
 	if accountModel.Password == ""{
-		c.JSON(http.StatusUnprocessableEntity, common.NewError("validation", errors.New("Chưa khai báo password")))
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("validation", errors.New("Chưa khai báo mật khẩu")))
 		return
 	}
 
@@ -230,6 +232,164 @@ func (s *HttpAccountHandler) CreateAccount(c *gin.Context){
 
 	user.AccountId = accountModel.ID
 	user.RoleId = 1
+
+	_,err = s.userService.CreateNewUser(&user)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+
+	c.Set("user_model", &accountModel)
+
+	serializer := account.AccountSerializer{c}
+	c.JSON(http.StatusOK, gin.H{
+		"account": serializer.Response(),
+		"user": user,
+	})
+}
+
+
+func (s *HttpAccountHandler) CreateAccountDelivery(c *gin.Context){
+	var accountModel models.Account
+	err := common.Bind(c, &accountModel)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
+		return
+	}
+
+	if accountModel.Username == ""{
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("validation", errors.New("Chưa khai báo tài khoản")))
+		return
+	}
+
+	if accountModel.Password == ""{
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("validation", errors.New("Chưa khai báo mật khẩu")))
+		return
+	}
+
+	accountModel.Provider = common.NormalProvider
+	accountModel.DeletedAt = nil
+
+	if accountModel.Password != common.NBRandomPassword {
+		accountModel.SetPassword(accountModel.Password)
+	}
+
+	var user models.User
+	user.Name = c.PostForm("name")
+	if user.Name == ""{
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("validation", errors.New("Chưa khai báo tên")))
+		return
+	}
+	user.PhoneNumber = c.PostForm("phone_number")
+	if user.PhoneNumber == ""{
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("validation", errors.New("Số điện thoại không hợp lệ")))
+		return
+	}
+
+	userTemp := &models.User{PhoneNumber:""}
+	accountTemp := &models.Account{Username: ""}
+
+	userTemp,_ = s.userService.GetUserByPhoneNumber(user.PhoneNumber)
+
+	if userTemp != nil{
+		c.JSON(http.StatusForbidden, common.NewError("database", errors.New("Số điện thoại đã bị trùng")))
+		return
+	}
+
+	accountTemp,_ = s.accountService.FindOneAccount(accountModel.Username)
+
+	if accountTemp != nil{
+		c.JSON(http.StatusForbidden,common.NewError("database",errors.New("Tài khoản đã bị trùng")))
+		return
+	}
+
+	_, err = s.accountService.CreateNewAccount(&accountModel)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+
+	user.AccountId = accountModel.ID
+	user.RoleId = 2
+
+	_,err = s.userService.CreateNewUser(&user)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+
+	c.Set("user_model", &accountModel)
+
+	serializer := account.AccountSerializer{c}
+	c.JSON(http.StatusOK, gin.H{
+		"account": serializer.Response(),
+		"user": user,
+	})
+}
+
+
+func (s *HttpAccountHandler) CreateAccountStore(c *gin.Context){
+	var accountModel models.Account
+	err := common.Bind(c, &accountModel)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
+		return
+	}
+
+	if accountModel.Username == ""{
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("validation", errors.New("Chưa khai báo tài khoản")))
+		return
+	}
+
+	if accountModel.Password == ""{
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("validation", errors.New("Chưa khai báo mật khẩu")))
+		return
+	}
+
+	accountModel.Provider = common.NormalProvider
+	accountModel.DeletedAt = nil
+
+	if accountModel.Password != common.NBRandomPassword {
+		accountModel.SetPassword(accountModel.Password)
+	}
+
+	var user models.User
+	user.Name = c.PostForm("name")
+	if user.Name == ""{
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("validation", errors.New("Chưa khai báo tên")))
+		return
+	}
+	user.PhoneNumber = c.PostForm("phone_number")
+	if user.PhoneNumber == ""{
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("validation", errors.New("Số điện thoại không hợp lệ")))
+		return
+	}
+
+	userTemp := &models.User{PhoneNumber:""}
+	accountTemp := &models.Account{Username: ""}
+
+	userTemp,_ = s.userService.GetUserByPhoneNumber(user.PhoneNumber)
+
+	if userTemp != nil{
+		c.JSON(http.StatusForbidden, common.NewError("database", errors.New("Số điện thoại đã bị trùng")))
+		return
+	}
+
+	accountTemp,_ = s.accountService.FindOneAccount(accountModel.Username)
+
+	if accountTemp != nil{
+		c.JSON(http.StatusForbidden,common.NewError("database",errors.New("Tài khoản đã bị trùng")))
+		return
+	}
+
+	_, err = s.accountService.CreateNewAccount(&accountModel)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		return
+	}
+
+	user.AccountId = accountModel.ID
+	user.RoleId = 3
 
 	_,err = s.userService.CreateNewUser(&user)
 	if err != nil {

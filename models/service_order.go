@@ -12,5 +12,5 @@ type ServiceOrder struct {
 	Service 		Service				`json:"service"  gorm:"save_associations:false"`
 	Description 	string				`form:"description" json:"description"`
 	Quantity 		uint				`form:"quantity" json:"quantity"`
-	Price 			uint				`form:"price" json:"price"`
+	Price 			float32				`form:"price" json:"price"`
 }

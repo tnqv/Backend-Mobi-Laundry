@@ -43,9 +43,9 @@ func (placedOrderService *placedOrderService) GetPlacedOrderByOrderCode(orderCod
 	return placedOrderModel,nil
 }
 
-func (placedOrderService *placedOrderService) UpdatePlacedOrderAndCreateNewOrderStatus(statusId uint,userId uint,order *models.PlacedOrder)(*models.PlacedOrder,error){
+func (placedOrderService *placedOrderService) UpdatePlacedOrderAndCreateNewOrderStatus(statusId uint,userId uint,description string,order *models.PlacedOrder)(*models.PlacedOrder,error){
 	var newOrderStatus models.OrderStatus
-	newOrderStatus = models.OrderStatus{StatusID:statusId,UserId: userId,StatusChangedTime:time.Now(),PlacedOrderID: order.ID}
+	newOrderStatus = models.OrderStatus{StatusID:statusId,Description: description ,UserId: userId,StatusChangedTime:time.Now(),PlacedOrderID: order.ID}
 	order.OrderStatusId = statusId
 
 	placedOrderService.orderStatusRepos.Create(&newOrderStatus)

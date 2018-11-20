@@ -16,6 +16,7 @@ import (
 	"encoding/json"
 	"d2d-backend/serviceOrder"
 	"d2d-backend/store"
+	"fmt"
 )
 
 type ResponseError struct {
@@ -147,6 +148,7 @@ func (s *HttpPlacedOrderHandler) CreatePlacedOrder(c *gin.Context){
 	tempOrderStatus.StatusID = common.ORDER_CREATED_STATUS
 	tempOrderStatus.UserId = placedOrderModel.UserID
 	tempOrderStatus.StatusChangedTime = time.Now()
+	tempOrderStatus.Description = fmt.Sprintf(common.MESSAGE_PATTERN_STATUS_1,placedOrderModel.OrderCode)
 	newOrderStatusModel , err := orderStatus.OrderStatusService.CreateNewOrderStatus(s.orderStatusService, &tempOrderStatus)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
@@ -203,6 +205,7 @@ func (s *HttpPlacedOrderHandler) CreatePlacedOrder(c *gin.Context){
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
 		return
 	}
+
 	//Insert to firebase store
 	common.ProduceMessage(common.FIREBASE_QUEUE,placedOrderModel)
 
@@ -307,6 +310,38 @@ func (s *HttpPlacedOrderHandler) UpdateStatusPlacedOrder(c *gin.Context) {
 
 	}
 
+//case 1:
+//	message =	fmt.Sprintf(common.MESSAGE_PATTERN_STATUS_1,notifMess.OrderCode)
+//	tokensPush = append(tokensPush,notifMess.User.Account.FcmToken)
+//	case 2:
+//	message =	fmt.Sprintf(common.MESSAGE_PATTERN_STATUS_2,notifMess.OrderCode,notifMess.Store.Name)
+//	tokensPush = append(tokensPush,notifMess.User.Account.FcmToken)
+//	case 3:
+//	message =	fmt.Sprintf(common.MESSAGE_PATTERN_STATUS_3,notifMess.Delivery.Name)
+//	tokensPush = append(tokensPush,notifMess.User.Account.FcmToken)
+//	case 4:
+//	message =	fmt.Sprintf(common.MESSAGE_PATTERN_STATUS_4,notifMess.OrderCode)
+//	tokensPush = append(tokensPush,notifMess.User.Account.FcmToken)
+//	case 5:
+//	message =	fmt.Sprintf(common.MESSAGE_PATTERN_STATUS_5,notifMess.OrderCode)
+//	tokensPush = append(tokensPush,notifMess.User.Account.FcmToken)
+//	case 6:
+//	message =	fmt.Sprintf(common.MESSAGE_PATTERN_STATUS_6,notifMess.OrderCode)
+//	tokensPush = append(tokensPush,notifMess.User.Account.FcmToken)
+//	tokensPush = append(tokensPush,notifMess.Delivery.Account.FcmToken)
+//	case 7:
+//	message =	fmt.Sprintf(common.MESSAGE_PATTERN_STATUS_7,notifMess.OrderCode)
+//	tokensPush = append(tokensPush,notifMess.User.Account.FcmToken)
+//	tokensPush = append(tokensPush,notifMess.Delivery.Account.FcmToken)
+//	case 8:
+//	message =	fmt.Sprintf(common.MESSAGE_PATTERN_STATUS_8,notifMess.OrderCode)
+//	tokensPush = append(tokensPush,notifMess.User.Account.FcmToken)
+//	case 9:
+//	message =	fmt.Sprintf(common.MESSAGE_PATTERN_STATUS_9)
+//	tokensPush = append(tokensPush,notifMess.User.Account.FcmToken)
+//	case 10:
+//	message = fmt.Sprintf(common.MESSAGE_PATTERN_STATUS_10,notifMess.OrderCode)
+//	tokensPush = append(tokensPush,notifMess.User.Account.FcmToken)
 	switch(idStatusNum){
 		case common.ORDER_ACCEPTED_BY_STORE:
 
@@ -315,7 +350,9 @@ func (s *HttpPlacedOrderHandler) UpdateStatusPlacedOrder(c *gin.Context) {
 					return
 				}
 				//Store accept order
-				placedOrderUpdate,err = s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_ACCEPTED_BY_STORE,uint(userIdNum),placedOrderUpdate)
+
+				description := fmt.Sprintf(common.MESSAGE_PATTERN_STATUS_2,placedOrderUpdate.OrderCode,placedOrderUpdate.Store.Name)
+				placedOrderUpdate,err = s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_ACCEPTED_BY_STORE,uint(userIdNum),description,placedOrderUpdate)
 				if err != nil {
 					c.JSON(http.StatusUnprocessableEntity, common.NewError("param", errors.New("Lỗi xảy ra khi cập nhật")))
 					return
@@ -328,7 +365,8 @@ func (s *HttpPlacedOrderHandler) UpdateStatusPlacedOrder(c *gin.Context) {
 		case common.ORDER_ACCEPTED_BY_DELIVERY:
 			//Delivery take order
 			placedOrderUpdate.DeliveryID = userModel.ID
-			placedOrderUpdate,err = s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_ACCEPTED_BY_DELIVERY,uint(userIdNum),placedOrderUpdate)
+			description := fmt.Sprintf(common.MESSAGE_PATTERN_STATUS_3,userModel.Name)
+			placedOrderUpdate,err = s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_ACCEPTED_BY_DELIVERY,uint(userIdNum),description,placedOrderUpdate)
 			if err != nil {
 				c.JSON(http.StatusUnprocessableEntity, common.NewError("param", errors.New("Lỗi xảy ra khi cập nhật")))
 				return
@@ -354,7 +392,15 @@ func (s *HttpPlacedOrderHandler) UpdateStatusPlacedOrder(c *gin.Context) {
 				return
 			}
 
-			placedOrderUpdate,err = s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_CONFIRM,uint(userIdNum),placedOrderUpdate)
+			var total float32
+			for _,value := range serviceOrdersReq {
+					total += value.Price
+			}
+
+			description  :=	fmt.Sprintf(common.MESSAGE_PATTERN_STATUS_4,placedOrderUpdate.OrderCode)
+			placedOrderUpdate.ServiceTotalPrice = total
+
+			placedOrderUpdate,err = s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_CONFIRM,uint(userIdNum),description,placedOrderUpdate)
 			if err != nil {
 				c.JSON(http.StatusUnprocessableEntity, common.NewError("param", errors.New("Lỗi xảy ra khi cập nhật")))
 				return
@@ -366,64 +412,73 @@ func (s *HttpPlacedOrderHandler) UpdateStatusPlacedOrder(c *gin.Context) {
 
 		case common.ORDER_IN_STORE:
 			//Delivery has deliveried to Store
-			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_IN_STORE,uint(userIdNum),placedOrderUpdate)
+			description :=	fmt.Sprintf(common.MESSAGE_PATTERN_STATUS_5,placedOrderUpdate.OrderCode)
+			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_IN_STORE,uint(userIdNum),description,placedOrderUpdate)
 
 			// push notification to user
 			common.ProduceMessage(common.NOTIFICATION_QUEUE,placedOrderUpdate)
 
 		case common.ORDER_LAUNDRYING:
 			//Store change status to laundring
-			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_LAUNDRYING,uint(userIdNum),placedOrderUpdate)
+			description :=	fmt.Sprintf(common.MESSAGE_PATTERN_STATUS_6,placedOrderUpdate.OrderCode)
+			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_LAUNDRYING,uint(userIdNum),description,placedOrderUpdate)
 
 			// push notification to user & delivery
 			common.ProduceMessage(common.NOTIFICATION_QUEUE,placedOrderUpdate)
 		case common.ORDER_FINISH_LAUNDRYING:
+			description :=	fmt.Sprintf(common.MESSAGE_PATTERN_STATUS_7,placedOrderUpdate.OrderCode)
 			//Store change status to finish
-			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_FINISH_LAUNDRYING,uint(userIdNum),placedOrderUpdate)
+			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_FINISH_LAUNDRYING,uint(userIdNum),description,placedOrderUpdate)
 
 			// push notification to user & delivery
 			common.ProduceMessage(common.NOTIFICATION_QUEUE,placedOrderUpdate)
 
 		case common.ORDER_DELIVERY_BACK_TO_CUSTOMER:
+			description :=	fmt.Sprintf(common.MESSAGE_PATTERN_STATUS_8,placedOrderUpdate.OrderCode)
 			//Delivery change status to deliver
-			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_DELIVERY_BACK_TO_CUSTOMER,uint(userIdNum),placedOrderUpdate)
+			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_DELIVERY_BACK_TO_CUSTOMER,uint(userIdNum),description,placedOrderUpdate)
 
 			// push notification to user
 			common.ProduceMessage(common.NOTIFICATION_QUEUE,placedOrderUpdate)
 		case common.ORDER_COMPLETE:
+			description :=	fmt.Sprintf(common.MESSAGE_PATTERN_STATUS_9,placedOrderUpdate.OrderCode)
 			//Customer pay
-			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_COMPLETE,uint(userIdNum),placedOrderUpdate)
+			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_COMPLETE,uint(userIdNum),description,placedOrderUpdate)
 
 			//Push notification to user
 			common.ProduceMessage(common.NOTIFICATION_QUEUE,placedOrderUpdate)
 		case common.ORDER_CANCEL:
+			description :=	fmt.Sprintf(common.MESSAGE_PATTERN_STATUS_10,placedOrderUpdate.OrderCode)
 			//Store cancel order
-			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_CANCEL,uint(userIdNum),placedOrderUpdate)
+			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_CANCEL,uint(userIdNum),description,placedOrderUpdate)
 
 			//Push notification to user
 			common.ProduceMessage(common.NOTIFICATION_QUEUE,placedOrderUpdate)
 			// delete from firebase
 			common.ProduceMessage(common.FIREBASE_QUEUE,placedOrderUpdate)
 		case common.DELIVERY_CANNOT_RECEIVE_CLOTHES:
+			description := ""
 			//Store cancel order
-			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.DELIVERY_CANNOT_RECEIVE_CLOTHES,uint(userIdNum),placedOrderUpdate)
+			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.DELIVERY_CANNOT_RECEIVE_CLOTHES,uint(userIdNum),description,placedOrderUpdate)
 
 			//Push notification to user
 			common.ProduceMessage(common.NOTIFICATION_QUEUE,placedOrderUpdate)
 			//common.ProduceMessage(common.FIREBASE_QUEUE,placedOrderUpdate)
 
 		case common.DELIVERY_CANNOT_GIVE_BACK_CLOTHES:
+			description := ""
 			//Store cancel order
-			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.DELIVERY_CANNOT_GIVE_BACK_CLOTHES,uint(userIdNum),placedOrderUpdate)
+			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.DELIVERY_CANNOT_GIVE_BACK_CLOTHES,uint(userIdNum),description,placedOrderUpdate)
 
 			//Push notification to user
 			common.ProduceMessage(common.NOTIFICATION_QUEUE,placedOrderUpdate)
 		case common.DELIVERY_REFUSE_TO_DELIVER:
+			description := ""
 			//Store cancel order
-			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.DELIVERY_REFUSE_TO_DELIVER,uint(userIdNum),placedOrderUpdate)
+			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.DELIVERY_REFUSE_TO_DELIVER,uint(userIdNum),description,placedOrderUpdate)
 
 			// Insert back to firebase
-			//common.ProduceMessage(common.FIREBASE_QUEUE,placedOrderUpdate)
+			common.ProduceMessage(common.FIREBASE_QUEUE,placedOrderUpdate)
 		default :
 			c.JSON(http.StatusBadRequest,common.NewError("param",errors.New("Sai thông tin trạng thái")))
 			return

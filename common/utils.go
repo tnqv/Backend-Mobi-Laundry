@@ -46,6 +46,19 @@ const (
 	HCM_LOWER_LONGITUDE = 106.5583
 	HCM_UPPER_LONGITUDE = 106.7753
 )
+
+const (
+	MESSAGE_PATTERN_STATUS_1 = `Bạn vừa tạo đơn hàng #%s`
+	MESSAGE_PATTERN_STATUS_2 = `Đơn hàng #%s của bạn đã được cửa hàng %s xác nhận `
+	MESSAGE_PATTERN_STATUS_3 = `Shipper %s đã tiếp nhận đơn hàng`
+	MESSAGE_PATTERN_STATUS_4 = `Đơn hàng #%s đã được xác nhận dịch vụ giặt`
+	MESSAGE_PATTERN_STATUS_5 = `Đơn hàng #%s đã được vận chuyển tới cửa hàng`
+	MESSAGE_PATTERN_STATUS_6 = `Đơn hàng #%s đang trong quá trình giặt`
+	MESSAGE_PATTERN_STATUS_7 = `Đơn hàng #%s của bạn đã hoàn thành`
+	MESSAGE_PATTERN_STATUS_8 = `Đơn hàng #%s của bạn đang được đem trả`
+	MESSAGE_PATTERN_STATUS_9 = `Đơn hàng #%s của bạn đã hoàn thành, cảm ơn bạn đã tin tưởng và sử dụng dịch vụ của chúng tôi`
+	MESSAGE_PATTERN_STATUS_10 = `Đơn hàng #%s của bạn tạm thời chưa được xử lý`
+)
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 
 // A helper function to generate random string

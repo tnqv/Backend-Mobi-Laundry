@@ -16,5 +16,5 @@ type PlacedOrderService interface {
 	GetListActivePlacedOrdersByStoreId(storeId uint) ([]*models.PlacedOrder, error)
 	GetPlacedOrderByOrderCode(orderCode string)(*models.PlacedOrder,error)
 	GetInStorePlacedOrdersByDeliveryId(deliveryId uint,limit int,page int)(*pagination.Paginator, error)
-	UpdatePlacedOrderAndCreateNewOrderStatus(statusId uint,userId uint,order *models.PlacedOrder)(*models.PlacedOrder,error)
+	UpdatePlacedOrderAndCreateNewOrderStatus(statusId uint,userId uint,description string,order *models.PlacedOrder)(*models.PlacedOrder,error)
 }
