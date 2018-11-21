@@ -6,6 +6,7 @@ import (
 	"github.com/biezhi/gorm-paginator/pagination"
 	"github.com/jinzhu/gorm"
 	"d2d-backend/models"
+	"log"
 )
 
 type repo struct {
@@ -118,10 +119,12 @@ func (r *repo) Update(updatePlacedOrder *models.PlacedOrder) (*models.PlacedOrde
 	//	return nil, err
 	//}
 
-	err := r.Conn.Save(updatePlacedOrder).Error
+	err := r.Conn.Save(updatePlacedOrder).Preload("Delivery").
+			Preload("Delivery.Account").Preload("Store").First(updatePlacedOrder).Error
 	if err != nil {
 		return nil, err
 	}
+	log.Println(updatePlacedOrder.Delivery.Account.FcmToken)
 	//if updatePlacedOrder.DeliveryID != 0 {
 	//	r.Conn.Preload("Delivery").
 	//		Preload("Delivery.Account").First(updatePlacedOrder)
