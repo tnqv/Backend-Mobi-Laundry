@@ -118,17 +118,17 @@ func (r *repo) Update(updatePlacedOrder *models.PlacedOrder) (*models.PlacedOrde
 	//	return nil, err
 	//}
 
-	err := r.Conn.Save(updatePlacedOrder).Error
+	err := r.Conn.Save(updatePlacedOrder).Preload("Delivery").Preload("Delivery.Account").Preload("Store").First(updatePlacedOrder).Error
 	if err != nil {
 		return nil, err
 	}
-	if updatePlacedOrder.DeliveryID != 0 {
-		r.Conn.Preload("Delivery").
-			Preload("Delivery.Account").First(updatePlacedOrder)
-	}
-	if updatePlacedOrder.StoreID != 0 {
-		r.Conn.Preload("Store").First(updatePlacedOrder)
-	}
+	//if updatePlacedOrder.DeliveryID != 0 {
+	//	r.Conn.Preload("Delivery").
+	//		Preload("Delivery.Account").First(updatePlacedOrder)
+	//}
+	//if updatePlacedOrder.StoreID != 0 {
+	//	r.Conn.Preload("Store").First(updatePlacedOrder)
+	//}
 	return updatePlacedOrder, nil
 }
 

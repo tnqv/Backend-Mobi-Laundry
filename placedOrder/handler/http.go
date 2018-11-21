@@ -421,7 +421,12 @@ func (s *HttpPlacedOrderHandler) UpdateStatusPlacedOrder(c *gin.Context) {
 		case common.ORDER_LAUNDRYING:
 			//Store change status to laundring
 			description :=	fmt.Sprintf(common.MESSAGE_PATTERN_STATUS_6,placedOrderUpdate.OrderCode)
-			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_LAUNDRYING,uint(userIdNum),description,placedOrderUpdate)
+			placedOrderUpdate,err = s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_LAUNDRYING,uint(userIdNum),description,placedOrderUpdate)
+			if err != nil {
+				c.JSON(http.StatusUnprocessableEntity, common.NewError("param", errors.New("Lỗi xảy ra khi cập nhật")))
+				return
+			}
+
 
 			// push notification to user & delivery
 			common.ProduceMessage(common.NOTIFICATION_QUEUE,placedOrderUpdate)
