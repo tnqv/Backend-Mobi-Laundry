@@ -26,7 +26,7 @@ type PlacedOrder struct {
 	ReceiverPhone			string					`form:"receiver_phone" json:"receiver_phone"`
 	Note 					string					`form:"note" json:"note"`
 	Capacity 				float32					`form:"capacity" json:"capacity"`
-	EstimatedCapacity 		float32					`form:"estimated_capacity" json:"estimated_capacity"`
+	//EstimatedCapacity 		float32					`form:"estimated_capacity" json:"estimated_capacity"`
 	//EstimatedDeliveryTime	time.Time				`form:"-" json:"estimated_delivery_time"`
 	//ActualDeliveryTime			time.Time				`form:"-" json:"actual_delivery_time"`
 	DeliveryAddress 		string					`form:"delivery_address" json:"delivery_address"`

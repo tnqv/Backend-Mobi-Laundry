@@ -13,7 +13,7 @@ type User struct {
 	Latitude			uint		`form:"latitude" json:"latitude"`
 	RoleId				uint		`form:"role_id" json:"role_id"`
 	Role				Role		`gorm:"auto_preload" json:"role" gorm:"save_associations:false"`
-	AccountId			uint 		`gorm:"not null;unique" form:"account_id" json:"-"`
+	AccountId			uint 		`gorm:"not null;unique" form:"account_id" json:"account_id"`
 	Account				Account		`json:"account" gorm:"save_associations:false"`
 	StoreId				uint		`form:"storeid" json:"store_id"`
 	Store 				Store		`json:"store,omitempty" gorm:"save_associations:false"`

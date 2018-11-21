@@ -58,13 +58,13 @@ func (s *HttpPlacedOrderHandler) SetUserService(userServ user.UserService){
 }
 
 func (s *HttpPlacedOrderHandler) UnauthorizedRoutes(e *gin.RouterGroup){
-	e.PUT("/:id/status/:statusId",s.UpdateStatusPlacedOrder)
+
 }
 
 func (s *HttpPlacedOrderHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
 	e.GET("/", s.GetAllPlacedOrders)
 	e.GET("/:id", s.GetPlacedOrderById)
-
+	e.PUT("/:id/status/:statusId",s.UpdateStatusPlacedOrder)
 	//e.GET("/order-code/:orderCode",s.GetPlacedOrderByOrderCode)
 	e.POST("/", s.CreatePlacedOrder)
 	e.PUT("/:id",s.UpdatePlacedOrder)
