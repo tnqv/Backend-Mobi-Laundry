@@ -368,7 +368,7 @@ func (s *HttpAccountHandler) CreateAccountStore(c *gin.Context){
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("validation", errors.New("Số điện thoại không hợp lệ")))
 		return
 	}
-	
+
 	user.IdentifyNumber = c.PostForm("identify_number")
 	user.Address = c.PostForm("address")
 

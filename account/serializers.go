@@ -13,7 +13,7 @@ type DriverAccountSerializer struct {
 type DriverAccountResponse struct {
 	Username    string  `json:"username"`
 	Token    string  `json:"token"`
-	ID		 uint	  `json:"-"`
+	ID		 uint	  `json:"id"`
 }
 
 func (self *DriverAccountSerializer) Response() *DriverAccountResponse {
@@ -25,6 +25,7 @@ func (self *DriverAccountSerializer) Response() *DriverAccountResponse {
 	//}
 
 	user := DriverAccountResponse{
+		ID   : 	  accountModel.ID,
 		Username:    accountModel.Username,
 		Token:    common.GenToken(accountModel.ID),
 	}
@@ -38,7 +39,7 @@ type AccountSerializer struct {
 type AccountResponse struct {
 	Email    string  `json:"email"`
 	Token    string  `json:"token"`
-	ID		 uint	  `json:"-"`
+	ID		 uint	  `json:"id"`
 }
 
 func (self *AccountSerializer) Response() *AccountResponse {
@@ -50,6 +51,7 @@ func (self *AccountSerializer) Response() *AccountResponse {
 	//}
 
 	user := AccountResponse{
+		ID   : 	  accountModel.ID,
 		Email:    accountModel.Email,
 		Token:    common.GenToken(accountModel.ID),
 	}
