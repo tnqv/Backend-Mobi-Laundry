@@ -56,9 +56,9 @@ func (r *repo) FindByUserId(limit int, page int, id int) (*pagination.Paginator,
 	return paginator,nil
 }
 
-func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error) {
+func (r *repo) FindAll(limit int, page int) (*common.Paginator, error) {
 	var placedOrders []*models.PlacedOrder
-	paginator := pagination.Pagging(&pagination.Param{
+	paginator := common.Pagging(&common.Param{
 		DB: r.Conn.Preload("User").
 			Preload("Store").
 			Preload("User.Account").

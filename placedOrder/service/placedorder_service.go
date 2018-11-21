@@ -6,6 +6,7 @@ import (
 	"d2d-backend/models"
 	"time"
 	"d2d-backend/orderStatus"
+	"d2d-backend/common"
 )
 
 type placedOrderService struct {
@@ -27,7 +28,7 @@ func (placedOrderService *placedOrderService) CreateNewPlacedOrder(newPlacedOrde
 
 
 
-func (placedOrderService *placedOrderService) GetPlacedOrders(limit int, page int) (*pagination.Paginator, error) {
+func (placedOrderService *placedOrderService) GetPlacedOrders(limit int, page int) (*common.Paginator, error) {
 	paginate,err := placedOrderService.placedOrderRepos.FindAll(limit, page)
 	if err != nil {
 		return nil, err
