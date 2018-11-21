@@ -17,6 +17,7 @@ import (
 	"d2d-backend/serviceOrder"
 	"d2d-backend/store"
 	"fmt"
+	"log"
 )
 
 type ResponseError struct {
@@ -406,6 +407,7 @@ func (s *HttpPlacedOrderHandler) UpdateStatusPlacedOrder(c *gin.Context) {
 				return
 			}
 
+			log.Println(placedOrderUpdate.Delivery.Account.FcmToken)
 
 			// push notification to user
 			common.ProduceMessage(common.NOTIFICATION_QUEUE,placedOrderUpdate)

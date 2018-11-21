@@ -118,7 +118,7 @@ func (r *repo) Update(updatePlacedOrder *models.PlacedOrder) (*models.PlacedOrde
 	//	return nil, err
 	//}
 
-	err := r.Conn.Save(updatePlacedOrder).Set("gorm:auto_preload",true).Find(updatePlacedOrder).Error
+	err := r.Conn.Save(updatePlacedOrder).Error
 	if err != nil {
 		return nil, err
 	}
