@@ -50,7 +50,7 @@ func (r *repo) Update(updatedService *models.Service) (*models.Service, error) {
 	if err != nil{
 		return nil, err
 	}
-	err = r.Conn.Save(updatedService).Error
+	err = r.Conn.Model(&updatedService).Update(&updatedService).Error
 	if err != nil {
 		return nil, err
 	}

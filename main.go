@@ -27,6 +27,9 @@ import (
 	storeHandler "d2d-backend/store/handler"
 	storeRepository "d2d-backend/store/repository"
 	storeService "d2d-backend/store/service"
+	reportRepository "d2d-backend/report/repository"
+	reportService "d2d-backend/report/service"
+	reportHandler "d2d-backend/report/handler"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -166,6 +169,13 @@ func main() {
 	accountServ := accountService.NewAccountService(accountRepo)
 	accountHttpHandler := accountHandler.NewAccountHttpHandler(v1.Group("/account"), accountServ, userServ)
 
+	//Report
+
+	reportRepo := reportRepository.NewMysqlReportRepository()
+	reportServ := reportService.NewReportService(reportRepo)
+	reportHttpHandler := reportHandler.NewHttpReportHandler(v1.Group("/report"),reportServ)
+
+
 	//Authorized
 	v1.Use(middlewares.AuthMiddleware(true))
 	storeHttpHandler.AuthorizedRequiredRoutes(v1.Group("/store"))
@@ -179,6 +189,7 @@ func main() {
 	userHttpHandler.AuthorizedRequiredRoutes(v1.Group("/user"))	
 	placedOrderHttpHandler.AuthorizedRequiredRoutes(v1.Group("/placedorder"))
 	notificationHttpHandler.AuthorizedRequiredRoutes(v1.Group("/notification"))
+	reportHttpHandler.AuthorizedRequiredRoutes(v1.Group("/report"))
 
 	// users.UserRegister(v1.Group("/user"))	// users.ProfileRegister(v1.Group("/profiles"))
 

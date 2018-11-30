@@ -51,7 +51,7 @@ func (r *repo) Update(updateCategory *models.Category) (*models.Category, error)
 	if err != nil{
 		return nil, err
 	}
-	err = r.Conn.Save(updateCategory).Error
+	err = r.Conn.Model(&updateCategory).Update(&updateCategory).Error
 	if err != nil {
 		return nil, err
 	}

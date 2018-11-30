@@ -15,4 +15,5 @@ func AutoMigrate(){
 	db.AutoMigrate(&ServiceOrder{})
 	db.AutoMigrate(&Store{})
 	db.AutoMigrate(&User{})
+	db.AutoMigrate(&Report{})
 }

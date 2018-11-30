@@ -10,7 +10,7 @@ type PlacedOrder struct {
 	StoreID					uint					`form:"store_id" json:"store_id"`
 	Store	 				Store					`json:"store" gorm:"save_associations:false"`
 	TimePlaced 				time.Time				`form:"time_placed" json:"time_placed"`
-	Detail 					string					`form:"detail" json:"detail"`
+	//Detail 					string					`form:"detail" json:"detail"`
 	//OrderStatusId 		uint					`form:"order_status_id" json:"order_status_id"`
 	OrderStatusId			uint					`json:"current_status_id"`
 	//OrderStatus				OrderStatus				`json:"order_status"`
@@ -22,6 +22,7 @@ type PlacedOrder struct {
 	DeliveryID				uint					`form:"delivery_id" json:"delivery_id"`
 	Delivery				User					`json:"delivery" gorm:"save_associations:false"`
 	//OrderInformation
+	VerifyCode				string					`form:"verify_code" json:"verify_code"`
 	ReceiverName			string 					`form:"receiver_name" json:"receiver_name"`
 	ReceiverPhone			string					`form:"receiver_phone" json:"receiver_phone"`
 	Note 					string					`form:"note" json:"note"`

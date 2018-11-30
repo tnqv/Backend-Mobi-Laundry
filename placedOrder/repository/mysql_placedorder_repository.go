@@ -3,7 +3,6 @@ package repository
 import (
 	"d2d-backend/common"
 	"d2d-backend/placedOrder"
-	"github.com/biezhi/gorm-paginator/pagination"
 	"github.com/jinzhu/gorm"
 	"d2d-backend/models"
 	"log"
@@ -41,14 +40,14 @@ func (r *repo) Find(id int) (*models.PlacedOrder, error) {
 	return &placedOrderModel, nil
 }
 
-func (r *repo) FindByUserId(limit int, page int, id int) (*pagination.Paginator, error) {
+func (r *repo) FindByUserId(limit int, page int, id int) (*common.Paginator, error) {
 	var placedOrders []*models.PlacedOrder
 	db := r.Conn
 	db = db.Where("user_id = ?", id)
-	paginator := pagination.Pagging(&pagination.Param{
+	paginator := common.Pagging(&common.Param{
 		DB: db.Preload("ServiceOrders").Preload("ServiceOrders.Service").Preload("OrderStatuses", func(db *gorm.DB) *gorm.DB{
 				return db.Order("status_id DESC")
-		}),
+		}).Order("created_at desc"),
 		Page: page,
 		Limit: limit,
 		ShowSQL: true,
@@ -155,9 +154,9 @@ func (r *repo) UpdateOrderStatusId(placedOrder *models.PlacedOrder) (*models.Pla
 	return nil,nil
 }
 
-func (r *repo) FindInStorePlacedOrdersByDeliveryId(deliveryId uint,limit int,page int)(*pagination.Paginator, error){
+func (r *repo) FindInStorePlacedOrdersByDeliveryId(deliveryId uint,limit int,page int)(*common.Paginator, error){
 	var placedOrders []*models.PlacedOrder
-	paginator := pagination.Pagging(&pagination.Param{
+	paginator := common.Pagging(&common.Param{
 		DB: r.Conn.Where("order_status_id in (5,6,7,8) AND delivery_id = ?",deliveryId).
 			Preload("OrderStatuses",func(db *gorm.DB) *gorm.DB{
 				return db.Order("status_id DESC")
@@ -175,9 +174,9 @@ func (r *repo) FindInStorePlacedOrdersByDeliveryId(deliveryId uint,limit int,pag
 	return paginator,nil
 }
 
-func (r *repo) FindActivePlacedOrdersByDeliveryId(deliveryId uint,limit int,page int)(*pagination.Paginator, error){
+func (r *repo) FindActivePlacedOrdersByDeliveryId(deliveryId uint,limit int,page int)(*common.Paginator, error){
 	var placedOrders []*models.PlacedOrder
-	paginator := pagination.Pagging(&pagination.Param{
+	paginator := common.Pagging(&common.Param{
 		DB: r.Conn.Where("order_status_id in (3,4) AND delivery_id = ?",deliveryId).
 			Preload("OrderStatuses",func(db *gorm.DB) *gorm.DB{
 				return db.Order("status_id DESC")

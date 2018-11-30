@@ -5,7 +5,7 @@ import (
 )
 
 type ServiceOrder struct {
-	gorm.Model							`json:"-"`
+	gorm.Model
 	PlacedOrderID	uint				`form:"placed_order_id" json:"placed_order_id"`
 	PlacedOrder 	PlacedOrder			`json:"-"  gorm:"save_associations:false"`
 	ServiceID		uint				`form:"service_id" json:"service_id"`

@@ -2,7 +2,6 @@ package service
 
 import (
 	"d2d-backend/placedOrder"
-	"github.com/biezhi/gorm-paginator/pagination"
 	"d2d-backend/models"
 	"time"
 	"d2d-backend/orderStatus"
@@ -90,7 +89,7 @@ func (placedOrderService *placedOrderService) DeletePlacedOrder(id int) (bool, e
 	return isDeleted, nil
 }
 
-func (placedOrderService *placedOrderService) GetListOrdersByUserId(limit int, page int, id int) (*pagination.Paginator, error) {
+func (placedOrderService *placedOrderService) GetListOrdersByUserId(limit int, page int, id int) (*common.Paginator, error) {
 	paginate,err := placedOrderService.placedOrderRepos.FindByUserId(limit, page, id)
 	if err != nil {
 		return nil, err
@@ -98,7 +97,7 @@ func (placedOrderService *placedOrderService) GetListOrdersByUserId(limit int, p
 	return paginate, nil
 }
 
-func (placedOrderService *placedOrderService) GetListActiveOrdersByDeliveryId(deliveryId uint, limit int, page int) (*pagination.Paginator, error){
+func (placedOrderService *placedOrderService) GetListActiveOrdersByDeliveryId(deliveryId uint, limit int, page int) (*common.Paginator, error){
 	paginate,err := placedOrderService.placedOrderRepos.FindActivePlacedOrdersByDeliveryId(deliveryId,limit, page)
 	if err != nil {
 		return nil, err
@@ -114,7 +113,7 @@ func (placedOrderService *placedOrderService) GetListActivePlacedOrdersByStoreId
 	return placedOrders, nil
 }
 
-func (placedOrderService *placedOrderService) GetInStorePlacedOrdersByDeliveryId(deliveryId uint,limit int,page int)(*pagination.Paginator, error){
+func (placedOrderService *placedOrderService) GetInStorePlacedOrdersByDeliveryId(deliveryId uint,limit int,page int)(*common.Paginator, error){
 	paginator,err := placedOrderService.placedOrderRepos.FindInStorePlacedOrdersByDeliveryId(deliveryId,limit,page)
 	if err != nil {
 		return nil, err

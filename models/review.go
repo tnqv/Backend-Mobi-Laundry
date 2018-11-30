@@ -5,7 +5,7 @@ import (
 )
 
 type Review struct {
-	gorm.Model						`json:"-"`
+	gorm.Model
 	Content 	   string			`json:"content"`
 	Rate           int		   		`json:"rate"`
 	UserRate       User  			`json:"user" gorm:"save_associations:false"`

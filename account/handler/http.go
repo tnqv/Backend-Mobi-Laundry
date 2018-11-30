@@ -288,7 +288,7 @@ func (s *HttpAccountHandler) CreateAccountDelivery(c *gin.Context){
 
 	user.IdentifyNumber = c.PostForm("identify_number")
 	user.Address = c.PostForm("address")
-
+	user.Imageurl = c.PostForm("imageurl")
 
 	userTemp := &models.User{PhoneNumber:""}
 	accountTemp := &models.Account{Username: ""}
@@ -371,6 +371,7 @@ func (s *HttpAccountHandler) CreateAccountStore(c *gin.Context){
 
 	user.IdentifyNumber = c.PostForm("identify_number")
 	user.Address = c.PostForm("address")
+	user.Imageurl = c.PostForm("imageurl")
 
 	userTemp := &models.User{PhoneNumber:""}
 	accountTemp := &models.Account{Username: ""}

@@ -51,7 +51,7 @@ func (r *repo) Update(updateRole *models.Role) (*models.Role, error) {
 	if err != nil{
 		return nil, err
 	}
-	err = r.Conn.Save(updateRole).Error
+	err = r.Conn.Model(&updateRole).Update(&updateRole).Error
 	if err != nil {
 		return nil, err
 	}

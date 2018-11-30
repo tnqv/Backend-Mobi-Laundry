@@ -24,7 +24,7 @@ import (
 // 9 : Order completed
 
 type OrderStatus struct {
-	gorm.Model						`json:"-"`
+	gorm.Model
 	StatusID 			uint		`form:"status_id" json:"status_id"`
 	//Who change status
 	UserId				uint		`form:"user_id" json:"user_id"`

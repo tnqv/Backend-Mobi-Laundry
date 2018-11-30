@@ -5,7 +5,7 @@ import (
 )
 
 type Role struct {
-	gorm.Model				`json:"-"`
+	gorm.Model
 	Name		string		`form:"name" json:"name" binding:"exists"`
 	Description string		`form:"description" json:"description" binding:"exists"`
 }
