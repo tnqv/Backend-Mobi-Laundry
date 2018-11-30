@@ -145,6 +145,7 @@ func (s *HttpPlacedOrderHandler) CreatePlacedOrder(c *gin.Context){
 
 	placedOrderModel.TimePlaced = time.Now()
 	placedOrderModel.OrderCode = time.Now().Format("20060102150405")
+	placedOrderModel.VerifyCode = common.RandNumberString(6)
 	var tempOrderStatus models.OrderStatus
 	tempOrderStatus.StatusID = common.ORDER_CREATED_STATUS
 	tempOrderStatus.UserId = placedOrderModel.UserID
@@ -378,6 +379,13 @@ func (s *HttpPlacedOrderHandler) UpdateStatusPlacedOrder(c *gin.Context) {
 			common.ProduceMessage(common.NOTIFICATION_QUEUE,placedOrderUpdate)
 		case common.ORDER_CONFIRM:
 			//Delivery confirm order
+			verifyCode := c.PostForm("verify_code")
+
+			if placedOrderUpdate.VerifyCode != verifyCode {
+				c.JSON(http.StatusUnprocessableEntity, common.NewError("param", errors.New("Mã xác nhận không hợp lệ")))
+				return
+			}
+
 			serviceOrdersJson := c.PostForm("service_orders")
 			var serviceOrdersReq []*models.ServiceOrder
 			err = json.Unmarshal([]byte(serviceOrdersJson),&serviceOrdersReq)
@@ -413,6 +421,12 @@ func (s *HttpPlacedOrderHandler) UpdateStatusPlacedOrder(c *gin.Context) {
 			common.ProduceMessage(common.NOTIFICATION_QUEUE,placedOrderUpdate)
 
 		case common.ORDER_IN_STORE:
+			verifyCode := c.PostForm("verify_code")
+
+			if placedOrderUpdate.VerifyCode != verifyCode {
+				c.JSON(http.StatusUnprocessableEntity, common.NewError("param", errors.New("Mã xác nhận không hợp lệ")))
+				return
+			}
 			//Delivery has deliveried to Store
 			description :=	fmt.Sprintf(common.MESSAGE_PATTERN_STATUS_5,placedOrderUpdate.OrderCode)
 			s.placedOrderService.UpdatePlacedOrderAndCreateNewOrderStatus(common.ORDER_IN_STORE,uint(userIdNum),description,placedOrderUpdate)

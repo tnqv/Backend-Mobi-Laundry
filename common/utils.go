@@ -60,12 +60,21 @@ const (
 	MESSAGE_PATTERN_STATUS_10 = `Đơn hàng #%s của bạn tạm thời chưa được xử lý`
 )
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+var numbers = []rune("123456789")
 
 // A helper function to generate random string
 func RandString(n int) string {
 	b := make([]rune, n)
 	for i := range b {
 		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
+}
+
+func RandNumberString(n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = numbers[rand.Intn(len(numbers))]
 	}
 	return string(b)
 }
