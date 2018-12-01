@@ -38,6 +38,7 @@ func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error) {
 }
 
 func (r *repo) Create(role *models.Role) (*models.Role, error) {
+	role.DeletedAt = nil
 	err := r.Conn.Create(role).Error
 	if err != nil {
 		return nil,err
@@ -51,6 +52,7 @@ func (r *repo) Update(updateRole *models.Role) (*models.Role, error) {
 	if err != nil{
 		return nil, err
 	}
+	updateRole.DeletedAt = nil
 	err = r.Conn.Model(&updateRole).Update(&updateRole).Error
 	if err != nil {
 		return nil, err

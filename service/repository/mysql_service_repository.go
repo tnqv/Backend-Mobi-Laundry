@@ -37,6 +37,7 @@ func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error) {
 }
 
 func (r *repo) Create(service *models.Service) (*models.Service, error) {
+	service.DeletedAt = nil
 	err := r.Conn.Create(service).Error
 	if err != nil {
 		return nil, err
@@ -50,6 +51,7 @@ func (r *repo) Update(updatedService *models.Service) (*models.Service, error) {
 	if err != nil{
 		return nil, err
 	}
+	updatedService.DeletedAt = nil
 	err = r.Conn.Model(&updatedService).Update(&updatedService).Error
 	if err != nil {
 		return nil, err

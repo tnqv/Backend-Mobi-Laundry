@@ -39,6 +39,7 @@ func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error) {
 }
 
 func (r *repo) Create(notification *models.Notification) (*models.Notification, error) {
+	notification.DeletedAt = nil
 	err := r.Conn.Create(notification).Error
 	if err != nil {
 		return nil, err
@@ -52,6 +53,7 @@ func (r *repo) Update(updateNotification *models.Notification) (*models.Notifica
 	if err != nil {
 		return nil, err
 	}
+	updateNotification.DeletedAt = nil
 	err = r.Conn.Save(updateNotification).Error
 	if err != nil {
 		return nil, err

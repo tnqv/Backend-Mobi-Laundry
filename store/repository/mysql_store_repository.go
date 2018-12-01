@@ -71,6 +71,7 @@ func (r *repo) FindAll(limit int,page int) (*pagination.Paginator, error){
 }
 
 func (r *repo) Create(store *models.Store) (*models.Store,error){
+	store.DeletedAt = nil
 	err := r.Conn.Create(store).Error
 	if err != nil {
 		return nil,err

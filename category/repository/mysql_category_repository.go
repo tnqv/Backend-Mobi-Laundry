@@ -38,7 +38,8 @@ func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error) {
 }
 
 func (r *repo) Create(category *models.Category) (*models.Category, error) {
-	err := r.Conn.Create(&category).Error
+	category.DeletedAt = nil
+	err := r.Conn.Create(category).Error
 	if err != nil {
 		return nil,err
 	}
@@ -51,6 +52,7 @@ func (r *repo) Update(updateCategory *models.Category) (*models.Category, error)
 	if err != nil{
 		return nil, err
 	}
+	updateCategory.DeletedAt = nil
 	err = r.Conn.Model(&updateCategory).Update(&updateCategory).Error
 	if err != nil {
 		return nil, err

@@ -61,6 +61,7 @@ func (r *repo) CreateServiceOrders(serviceorders []*models.ServiceOrder)([]*mode
 	return serviceorders,nil
 }
 func (r *repo) Create(serviceOrder *models.ServiceOrder) (*models.ServiceOrder, error) {
+	serviceOrder.DeletedAt = nil
 	err := r.Conn.Create(serviceOrder).Error
 	if err != nil {
 		return nil, err
@@ -74,6 +75,7 @@ func (r *repo) Update(updateServiceOrder *models.ServiceOrder) (*models.ServiceO
 	if err != nil{
 		return nil, err
 	}
+	updateServiceOrder.DeletedAt = nil
 	err = r.Conn.Save(updateServiceOrder).Error
 	if err != nil {
 		return nil, err
