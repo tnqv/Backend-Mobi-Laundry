@@ -89,8 +89,18 @@ func (r *repo) FindUserByAccountId(accountId uint)(*models.User,error){
 	if err := r.Conn.Where("account_id = ?",accountId).
 						Preload("Role").
 						Preload("Store").
+						Preload("ShippingLocations").
 						First(&tempUser).Error; err != nil{
 		return nil,err
 	}
 	return &tempUser,nil
+}
+
+func (r *repo) SaveNewUserLocation(location *models.UserShippingLocation) (*models.UserShippingLocation,error) {
+	location.DeletedAt = nil
+	err := r.Conn.Create(location).Error
+	if err != nil {
+		return nil,err
+	}
+	return location,nil
 }

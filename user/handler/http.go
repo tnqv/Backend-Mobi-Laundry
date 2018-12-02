@@ -51,6 +51,7 @@ func (s *HttpUserHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
 	e.POST("/", s.CreateUser)
 	e.PUT("/:id", s.UpdateUser)
 	e.DELETE("/:id", s.DeleteUser)
+	e.POST("/:id/location",s.AddNewUserShippingLocation)
 
 }
 
@@ -292,4 +293,45 @@ func (s *HttpUserHandler) GetActivePlacedOrderByStoreId(c *gin.Context){
 		return
 	}
 	c.JSON(http.StatusOK,gin.H{"records": list})
+}
+
+func (s *HttpUserHandler) AddNewUserShippingLocation(c *gin.Context){
+	var userShippingModel models.UserShippingLocation
+	err:= common.Bind(c,&userShippingModel)
+	if err != nil {
+		//c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Lỗi khi đồng bộ địa chỉ")))
+		return
+	}
+	id := c.Param("id")
+	if id == ""{
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
+		return
+	}
+	userId, err := strconv.ParseUint(id,10,32)
+	if err != nil {
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Mã tài khoản kh6ong hợp lệ")))
+		return
+	}
+
+	userShippingModel.UserId = uint(userId)
+
+	if userShippingModel.Latitude == 0 || userShippingModel.Longitude == 0 || userShippingModel.PhoneNumber  == "" ||
+			userShippingModel.ReceiverName == "" || userShippingModel.ShippingAddress == "" {
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Địa chỉ không hợp lệ")))
+		return
+	}
+
+	if strings.TrimSpace(userShippingModel.PhoneNumber)  == "" ||
+		strings.TrimSpace(userShippingModel.ReceiverName) == "" || strings.TrimSpace(userShippingModel.ShippingAddress) == "" {
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Địa chỉ không hợp lệ")))
+		return
+	}
+
+	addedUserShippingLocation,err := s.userService.SaveNewShippingLocation(&userShippingModel)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("param", errors.New("Địa chỉ không hợp lệ")))
+		return
+	}
+
+	c.JSON(http.StatusOK, addedUserShippingLocation)
 }

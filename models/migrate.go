@@ -16,4 +16,5 @@ func AutoMigrate(){
 	db.AutoMigrate(&Store{})
 	db.AutoMigrate(&User{})
 	db.AutoMigrate(&Report{})
+	db.AutoMigrate(&UserShippingLocation{})
 }

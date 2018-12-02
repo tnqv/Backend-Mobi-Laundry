@@ -13,4 +13,5 @@ type UserRepository interface{
 	Delete(id int) (bool,error)
 	FindUserByPhoneNumber(phoneNumber string)(*models.User,error)
 	FindUserByAccountId(accountId uint)(*models.User,error)
+	SaveNewUserLocation(location *models.UserShippingLocation) (*models.UserShippingLocation,error)
 }

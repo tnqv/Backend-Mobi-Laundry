@@ -75,3 +75,11 @@ func (userService *userService) GetUserByAccountId(accountId uint)(*models.User,
 	}
 	return userModel,nil
 }
+
+func (userService *userService) SaveNewShippingLocation(shippingLocation *models.UserShippingLocation)(*models.UserShippingLocation,error) {
+	userShippingLocation,err := userService.userRepos.SaveNewUserLocation(shippingLocation)
+	if err != nil {
+		return nil,err
+	}
+	return userShippingLocation,nil
+}
