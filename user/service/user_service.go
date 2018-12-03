@@ -83,3 +83,11 @@ func (userService *userService) SaveNewShippingLocation(shippingLocation *models
 	}
 	return userShippingLocation,nil
 }
+
+func (userService *userService) UpdateUserLocation(shippingLocation *models.UserShippingLocation)(*models.UserShippingLocation,error){
+	updatedUserShippingLocation,err := userService.userRepos.UpdateUserLocation(shippingLocation)
+	if err != nil {
+		return nil,err
+	}
+	return updatedUserShippingLocation,nil
+}

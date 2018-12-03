@@ -52,6 +52,7 @@ func (s *HttpUserHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
 	e.PUT("/:id", s.UpdateUser)
 	e.DELETE("/:id", s.DeleteUser)
 	e.POST("/:id/location",s.AddNewUserShippingLocation)
+	e.PUT("/:id/location/:locationId",s.EditUserShippingLocation)
 
 }
 
@@ -334,4 +335,40 @@ func (s *HttpUserHandler) AddNewUserShippingLocation(c *gin.Context){
 	}
 
 	c.JSON(http.StatusOK, addedUserShippingLocation)
+}
+
+func (s *HttpUserHandler) EditUserShippingLocation(c *gin.Context){
+	var userShippingModel models.UserShippingLocation
+	err:= common.Bind(c,&userShippingModel)
+	if err != nil {
+		//c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Lỗi khi đồng bộ địa chỉ")))
+		return
+	}
+	id := c.Param("id")
+	if id == ""{
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
+		return
+	}
+
+	locationId := c.Param("locationId")
+	if locationId == ""{
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
+		return
+	}
+
+	locationIdNum, err := strconv.ParseUint(locationId,10,32)
+	if err != nil {
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Mã tài khoản kh6ong hợp lệ")))
+		return
+	}
+
+	userShippingModel.ID = uint(locationIdNum)
+
+	updatedModel,err := s.userService.UpdateUserLocation(&userShippingModel)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("param", err))
+		return
+	}
+
+	c.JSON(http.StatusOK, updatedModel)
 }

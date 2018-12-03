@@ -14,4 +14,5 @@ type UserRepository interface{
 	FindUserByPhoneNumber(phoneNumber string)(*models.User,error)
 	FindUserByAccountId(accountId uint)(*models.User,error)
 	SaveNewUserLocation(location *models.UserShippingLocation) (*models.UserShippingLocation,error)
+	UpdateUserLocation(location *models.UserShippingLocation) (*models.UserShippingLocation,error)
 }

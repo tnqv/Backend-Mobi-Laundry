@@ -15,5 +15,6 @@ type UserService interface {
 	GetUserByPhoneNumber(phoneNumber string) (*models.User, error)
 	GetUserByAccountId(accountId uint)(*models.User,error)
 	SaveNewShippingLocation(shippingLocation *models.UserShippingLocation)(*models.UserShippingLocation,error)
+	UpdateUserLocation(shippingLocation *models.UserShippingLocation)(*models.UserShippingLocation,error)
 }
 

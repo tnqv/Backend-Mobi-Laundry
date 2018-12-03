@@ -104,3 +104,17 @@ func (r *repo) SaveNewUserLocation(location *models.UserShippingLocation) (*mode
 	}
 	return location,nil
 }
+
+func (r *repo) UpdateUserLocation(location *models.UserShippingLocation) (*models.UserShippingLocation,error) {
+	var locationTemp models.UserShippingLocation
+	err := r.Conn.First(&locationTemp, location.ID).Error
+	if err != nil{
+		return nil, err
+	}
+	location.DeletedAt = nil
+	err = r.Conn.Model(&location).Update(&location).First(&locationTemp).Error
+	if err != nil {
+		return nil, err
+	}
+	return &locationTemp,nil
+}
