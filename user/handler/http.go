@@ -300,7 +300,7 @@ func (s *HttpUserHandler) AddNewUserShippingLocation(c *gin.Context){
 	var userShippingModel models.UserShippingLocation
 	err:= common.Bind(c,&userShippingModel)
 	if err != nil {
-		//c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Lỗi khi đồng bộ địa chỉ")))
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Lỗi khi đồng bộ địa chỉ")))
 		return
 	}
 	id := c.Param("id")
