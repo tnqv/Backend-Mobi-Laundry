@@ -67,6 +67,11 @@ func (s *HttpReportHandler) CreateNewReport(c *gin.Context){
 		c.JSON(http.StatusNotAcceptable, common.NewError("Empty description",errors.New("Mã đơn hàng không hợp lệ")))
 		return
 	}
+
+	//if newReport.PlacedOrderId == 0 {
+	//	c.JSON(http.StatusNotAcceptable, common.NewError("Empty description",errors.New("Mã đơn hàng không hợp lệ")))
+	//	return
+	//}
 	createdReport, err := s.reportService.CreateNewReport(&newReport)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))

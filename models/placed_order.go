@@ -34,7 +34,6 @@ type PlacedOrder struct {
 	DeliveryLatitude 		float32					`form:"delivery_latitude" json:"delivery_latitude"`
 	DeliveryLongitude 		float32					`form:"delivery_longitude" json:"delivery_longitude"`
 	ServiceTotalPrice 		float32					`form:"total" json:"total"`
-	Priority 				int						`form:"priority" json:"priority"`
 	OrderCode 				string					`form:"order_code" json:"order_code"`
 	//Review
 	ReviewID 				uint					`form:"" json:"review_id"`
