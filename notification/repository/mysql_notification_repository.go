@@ -77,7 +77,7 @@ func (r *repo) Delete(id int) (bool, error) {
 func (r *repo) FindByUserId(limit int, page int, id int) (*pagination.Paginator, error) {
 	var notifications []*models.Notification
 	db := r.Conn
-	db = db.Where("user_id = ?", id)
+	db = db.Where("user_id = ?", id).Order("created_at desc")
 	paginator := pagination.Pagging(&pagination.Param{
 		DB: db,
 		Page: page,
