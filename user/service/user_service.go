@@ -91,3 +91,11 @@ func (userService *userService) UpdateUserLocation(shippingLocation *models.User
 	}
 	return updatedUserShippingLocation,nil
 }
+
+func (userService *userService) DeleteUserLocation(id uint) (bool,error) {
+	bool,err := userService.userRepos.DeleteUserLocation(id)
+	if err != nil {
+		return false,err
+	}
+	return bool,nil
+}

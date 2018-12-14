@@ -118,3 +118,16 @@ func (r *repo) UpdateUserLocation(location *models.UserShippingLocation) (*model
 	}
 	return &locationTemp,nil
 }
+
+func (r *repo) DeleteUserLocation(id uint) (bool,error) {
+	var tempUserShippingLocation models.UserShippingLocation
+	err := r.Conn.First(&tempUserShippingLocation,id).Error
+	if err != nil {
+		return false,err
+	}
+	err = r.Conn.Delete(&tempUserShippingLocation).Error
+	if err != nil {
+		return false,err
+	}
+	return true,nil
+}

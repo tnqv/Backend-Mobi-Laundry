@@ -16,5 +16,6 @@ type UserService interface {
 	GetUserByAccountId(accountId uint)(*models.User,error)
 	SaveNewShippingLocation(shippingLocation *models.UserShippingLocation)(*models.UserShippingLocation,error)
 	UpdateUserLocation(shippingLocation *models.UserShippingLocation)(*models.UserShippingLocation,error)
+	DeleteUserLocation(id uint) (bool,error)
 }
 

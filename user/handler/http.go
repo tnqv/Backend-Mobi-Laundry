@@ -53,6 +53,7 @@ func (s *HttpUserHandler) AuthorizedRequiredRoutes(e *gin.RouterGroup){
 	e.DELETE("/:id", s.DeleteUser)
 	e.POST("/:id/location",s.AddNewUserShippingLocation)
 	e.PUT("/:id/location/:locationId",s.EditUserShippingLocation)
+	e.DELETE("/:id/location/:locationId",s.DeleteUserShippingLocation)
 
 }
 
@@ -310,7 +311,7 @@ func (s *HttpUserHandler) AddNewUserShippingLocation(c *gin.Context){
 	}
 	userId, err := strconv.ParseUint(id,10,32)
 	if err != nil {
-		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Mã tài khoản kh6ong hợp lệ")))
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Mã tài khoản khong hợp lệ")))
 		return
 	}
 
@@ -358,7 +359,7 @@ func (s *HttpUserHandler) EditUserShippingLocation(c *gin.Context){
 
 	locationIdNum, err := strconv.ParseUint(locationId,10,32)
 	if err != nil {
-		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Mã tài khoản kh6ong hợp lệ")))
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Mã tài khoản khong hợp lệ")))
 		return
 	}
 
@@ -371,4 +372,40 @@ func (s *HttpUserHandler) EditUserShippingLocation(c *gin.Context){
 	}
 
 	c.JSON(http.StatusOK, updatedModel)
+}
+
+func (s *HttpUserHandler) DeleteUserShippingLocation(c *gin.Context){
+	var userShippingModel models.UserShippingLocation
+	err:= common.Bind(c,&userShippingModel)
+	if err != nil {
+		//c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Lỗi khi đồng bộ địa chỉ")))
+		return
+	}
+	id := c.Param("id")
+	if id == ""{
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
+		return
+	}
+
+	locationId := c.Param("locationId")
+	if locationId == ""{
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
+		return
+	}
+
+	locationIdNum, err := strconv.ParseUint(locationId,10,32)
+	if err != nil {
+		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Mã tài khoản kh6ong hợp lệ")))
+		return
+	}
+
+	deleted,err := s.userService.DeleteUserLocation(uint(locationIdNum))
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("param", err))
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  deleted,
+	})
 }

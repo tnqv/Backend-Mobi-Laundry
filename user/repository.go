@@ -15,4 +15,5 @@ type UserRepository interface{
 	FindUserByAccountId(accountId uint)(*models.User,error)
 	SaveNewUserLocation(location *models.UserShippingLocation) (*models.UserShippingLocation,error)
 	UpdateUserLocation(location *models.UserShippingLocation) (*models.UserShippingLocation,error)
+	DeleteUserLocation(id uint) (bool,error)
 }
