@@ -8,7 +8,7 @@ type User struct {
 	gorm.Model
 	Name 				string					`form:"name" json:"name" binding:"exists"`
 	ShippingLocations	[]UserShippingLocation	`json:"shipping_locations"`
-	PhoneNumber			string					`json:"phong_number"`
+	PhoneNumber			string					`json:"phone_number"`
 	RoleId				uint					`form:"role_id" json:"role_id"`
 	Role				Role					`gorm:"auto_preload" json:"role" gorm:"save_associations:false"`
 	AccountId			uint 					`gorm:"not null;unique" form:"account_id" json:"account_id"`

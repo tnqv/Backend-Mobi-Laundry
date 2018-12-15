@@ -9,6 +9,7 @@ import (
 	"strings"
 	"errors"
 	"d2d-backend/models"
+	"d2d-backend/placedOrder"
 )
 
 type ResponseError struct {
@@ -17,11 +18,13 @@ type ResponseError struct {
 
 type HttpReviewHandler struct {
 	reviewService review.ReviewService
+	placedOrderService placedOrder.PlacedOrderService
 }
 
-func NewReviewHttpHandler(e *gin.RouterGroup, service review.ReviewService)(*HttpReviewHandler) {
+func NewReviewHttpHandler(e *gin.RouterGroup, service review.ReviewService,placedOrderService placedOrder.PlacedOrderService)(*HttpReviewHandler) {
 	handler := &HttpReviewHandler{
 		reviewService: service,
+		placedOrderService: placedOrderService,
 	}
 
 	handler.UnauthorizedRoutes(e)
@@ -63,30 +66,49 @@ func  (s *HttpReviewHandler) CreateReview(c *gin.Context){
 	content := c.PostForm("content")
 
 	if content == "" || strings.TrimSpace(content) == ""{
-		c.JSON(http.StatusNotAcceptable, common.NewError("Empty content",errors.New("Content not valid")))
+		c.JSON(http.StatusNotAcceptable, common.NewError("Empty content",errors.New("Chưa nhập nội dung")))
 		return
 	}
 
 	rate := c.PostForm("rate")
 
 	if rate == "" {
-		c.JSON(http.StatusNotAcceptable, common.NewError("Empty rate",errors.New("Rate is empty")))
+		c.JSON(http.StatusNotAcceptable, common.NewError("Empty rate",errors.New("Chưa nhập điểm ")))
 		return
 	}
 
 	rateNum,err := strconv.Atoi(rate)
 
 	if err != nil {
-		c.JSON(http.StatusNotAcceptable,common.NewError("Rate is not valid", errors.New("Rate is not valid")))
+		c.JSON(http.StatusNotAcceptable,common.NewError("Rate is not valid", errors.New("Điểm không hợp lệ")))
 		return
 	}
 
 	userId, err := strconv.Atoi(c.PostForm("user_id"))
 
 	if err != nil {
-		c.JSON(http.StatusNotAcceptable, common.NewError("Invalid user_id", err))
+		c.JSON(http.StatusNotAcceptable, common.NewError("Mã người dùng không hợp lệ", err))
 		return
 	}
+
+	placedOrderId,err := strconv.Atoi(c.PostForm("placed_order_id"))
+
+	if err != nil {
+		c.JSON(http.StatusNotAcceptable, common.NewError("Mã hoá đơn không hợp lệ", err))
+		return
+	}
+
+	placedOrder,err := s.placedOrderService.GetPlacedOrderById(placedOrderId)
+	if err != nil {
+		c.JSON(http.StatusNotAcceptable, common.NewError("Mã hoá đơn không tồn tại", err))
+		return
+	}
+
+	if placedOrder.ReviewID != 0 {
+		c.JSON(http.StatusNotAcceptable, common.NewError("Hoá đơn không thể đánh giá", err))
+		return
+	}
+
 
 	var newReview models.Review
 
@@ -97,8 +119,17 @@ func  (s *HttpReviewHandler) CreateReview(c *gin.Context){
 	_,err = s.reviewService.CreateNewReview(&newReview)
 
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, common.NewError("Invalid user", err))
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("Lỗi khi tạo đánh giá", err))
 		return
+	}
+
+	if newReview.ID != 0 {
+		placedOrder.ReviewID = newReview.ID
+		_,err := s.placedOrderService.UpdatePlacedOrder(placedOrder)
+		if err != nil {
+			c.JSON(http.StatusUnprocessableEntity, common.NewError("Lỗi cập nhật đánh giá cho đơn hàng", err))
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK,newReview)

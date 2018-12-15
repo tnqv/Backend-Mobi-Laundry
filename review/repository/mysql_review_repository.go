@@ -44,7 +44,7 @@ func (r *repo) FindAll(limit int, page int) (*pagination.Paginator, error){
 	var reviews []models.Review
 
 	paginator := pagination.Pagging(&pagination.Param{
-		DB: r.Conn,
+		DB: r.Conn.Order("created_at desc"),
 		Page: page,
 		Limit: limit,
 		ShowSQL: true,

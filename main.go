@@ -110,11 +110,6 @@ func main() {
 	v1.Use(middlewares.AuthMiddleware(false))
 
 
-	//Review
-	reviewRepo := reviewRepository.NewMysqlReviewRepository()
-	reviewServ := reviewService.NewReviewService(reviewRepo)
-	reviewHttpHandler := reviewHandler.NewReviewHttpHandler(v1.Group("/review"), reviewServ)
-
 	//Store
 	storeRepo := storeRepository.NewMysqlStoreRepository()
 	storeServ := storeService.NewStoreService(storeRepo)
@@ -155,6 +150,11 @@ func main() {
 	placedOrderRepo := placedOrderRepository.NewMysqlPlacedOrderRepository()
 	placedOrderService := placeOrderService.NewPlacedOrderService(placedOrderRepo,orderStatusRepo)
 	placedOrderHttpHandler := placedOrderHandler.NewPlacedOrderHttpHandler(v1.Group("/placedorder"), placedOrderService, orderStatusServ,serviceOrderServ,storeServ)
+
+	//Review
+	reviewRepo := reviewRepository.NewMysqlReviewRepository()
+	reviewServ := reviewService.NewReviewService(reviewRepo)
+	reviewHttpHandler := reviewHandler.NewReviewHttpHandler(v1.Group("/review"), reviewServ,placedOrderService)
 
 	//User
 	userRepo := userRepository.NewMysqlUserRepository()
