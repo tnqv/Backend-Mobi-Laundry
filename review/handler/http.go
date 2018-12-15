@@ -66,46 +66,46 @@ func  (s *HttpReviewHandler) CreateReview(c *gin.Context){
 	content := c.PostForm("content")
 
 	if content == "" || strings.TrimSpace(content) == ""{
-		c.JSON(http.StatusNotAcceptable, common.NewError("Empty content",errors.New("Chưa nhập nội dung")))
+		c.JSON(http.StatusNotAcceptable, common.NewError("error",errors.New("Chưa nhập nội dung")))
 		return
 	}
 
 	rate := c.PostForm("rate")
 
 	if rate == "" {
-		c.JSON(http.StatusNotAcceptable, common.NewError("Empty rate",errors.New("Chưa nhập điểm ")))
+		c.JSON(http.StatusNotAcceptable, common.NewError("error",errors.New("Chưa nhập điểm ")))
 		return
 	}
 
 	rateNum,err := strconv.Atoi(rate)
 
 	if err != nil {
-		c.JSON(http.StatusNotAcceptable,common.NewError("Rate is not valid", errors.New("Điểm không hợp lệ")))
+		c.JSON(http.StatusNotAcceptable,common.NewError("error", errors.New("Điểm không hợp lệ")))
 		return
 	}
 
 	userId, err := strconv.Atoi(c.PostForm("user_id"))
 
 	if err != nil {
-		c.JSON(http.StatusNotAcceptable, common.NewError("Mã người dùng không hợp lệ", err))
+		c.JSON(http.StatusNotAcceptable, common.NewError("error", errors.New("Mã người dùng không hợp lệ")))
 		return
 	}
 
 	placedOrderId,err := strconv.Atoi(c.PostForm("placed_order_id"))
 
 	if err != nil {
-		c.JSON(http.StatusNotAcceptable, common.NewError("Mã hoá đơn không hợp lệ", err))
+		c.JSON(http.StatusNotAcceptable, common.NewError("error", errors.New("Mã hoá đơn không hợp lệ")))
 		return
 	}
 
 	placedOrder,err := s.placedOrderService.GetPlacedOrderById(placedOrderId)
 	if err != nil {
-		c.JSON(http.StatusNotAcceptable, common.NewError("Mã hoá đơn không tồn tại", err))
+		c.JSON(http.StatusNotAcceptable, common.NewError("error", errors.New("Hoá đơn không tồn tại")))
 		return
 	}
 
 	if placedOrder.ReviewID != 0 {
-		c.JSON(http.StatusNotAcceptable, common.NewError("Hoá đơn không thể đánh giá", err))
+		c.JSON(http.StatusNotAcceptable, common.NewError("error", errors.New("Hoá đơn không thể đánh giá")))
 		return
 	}
 
@@ -119,7 +119,7 @@ func  (s *HttpReviewHandler) CreateReview(c *gin.Context){
 	_,err = s.reviewService.CreateNewReview(&newReview)
 
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, common.NewError("Lỗi khi tạo đánh giá", err))
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("error",errors.New("Lỗi khi tạo đánh giá")))
 		return
 	}
 
@@ -127,7 +127,7 @@ func  (s *HttpReviewHandler) CreateReview(c *gin.Context){
 		placedOrder.ReviewID = newReview.ID
 		_,err := s.placedOrderService.UpdatePlacedOrder(placedOrder)
 		if err != nil {
-			c.JSON(http.StatusUnprocessableEntity, common.NewError("Lỗi cập nhật đánh giá cho đơn hàng", err))
+			c.JSON(http.StatusUnprocessableEntity, common.NewError("error",errors.New("Lỗi cập nhật đánh giá cho đơn hàng")))
 			return
 		}
 	}
