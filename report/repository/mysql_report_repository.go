@@ -47,6 +47,7 @@ func (r *repo) FindUnresolvedReports(limit int,page int) (*common.Paginator, err
 }
 
 func (r *repo) Create(report *models.Report) (*models.Report,error){
+	report.DeletedAt = nil
 	err := r.Conn.Create(&report).Error
 	if err != nil {
 		return nil,err

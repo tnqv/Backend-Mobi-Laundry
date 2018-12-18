@@ -60,11 +60,11 @@ func (s *HttpReportHandler) CreateNewReport(c *gin.Context){
 		return
 	}
 	if newReport.Content == "" || strings.TrimSpace(newReport.Content) == "" {
-		c.JSON(http.StatusNotAcceptable, common.NewError("Empty name",errors.New("Nội dung báo cáo trống")))
+		c.JSON(http.StatusNotAcceptable, common.NewError("error",errors.New("Nội dung báo cáo trống")))
 		return
 	}
 	if newReport.PlacedOrderId == 0 {
-		c.JSON(http.StatusNotAcceptable, common.NewError("Empty description",errors.New("Mã đơn hàng không hợp lệ")))
+		c.JSON(http.StatusNotAcceptable, common.NewError("error",errors.New("Mã đơn hàng không hợp lệ")))
 		return
 	}
 

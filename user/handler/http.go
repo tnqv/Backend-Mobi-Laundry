@@ -138,20 +138,20 @@ func  (s *HttpUserHandler) CreateUser(c *gin.Context){
 	var userModel models.User
 	err:= common.Bind(c,&userModel)
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("error", err))
 		return
 	}
 	if userModel.Name == "" || strings.TrimSpace(userModel.Name) == ""{
-		c.JSON(http.StatusNotAcceptable, common.NewError("Empty name",errors.New("Name is empty")))
+		c.JSON(http.StatusNotAcceptable, common.NewError("error",errors.New("Tên còn trống")))
 		return
 	}
 	if userModel.PhoneNumber == "" || strings.TrimSpace(userModel.PhoneNumber) == ""{
-		c.JSON(http.StatusNotAcceptable, common.NewError("Empty description",errors.New("Phone number is empty")))
+		c.JSON(http.StatusNotAcceptable, common.NewError("error",errors.New("Số điện thoại còn trống")))
 		return
 	}
 	_,err = s.userService.CreateNewUser(&userModel)
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("error", err))
 		return
 	}
 	c.JSON(http.StatusOK,userModel)
@@ -160,32 +160,32 @@ func  (s *HttpUserHandler) CreateUser(c *gin.Context){
 func  (s *HttpUserHandler) UpdateUser(c *gin.Context){
 	id := c.Param("id")
 	if id == ""{
-		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid id")))
+		c.JSON(http.StatusNotAcceptable, common.NewError("error", errors.New("Invalid id")))
 		return
 	}
 	var userModel models.User
 	idNum,err := strconv.ParseUint(id,10,32)
 	if err != nil {
-		c.JSON(http.StatusNotAcceptable, common.NewError("param", errors.New("Invalid format id")))
+		c.JSON(http.StatusNotAcceptable, common.NewError("error", errors.New("Invalid format id")))
 		return
 	}
 	userModel.ID = uint(idNum)
 	err = common.Bind(c,&userModel)
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, common.NewError("Error binding", err))
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("error", err))
 		return
 	}
 	if userModel.Name == "" || strings.TrimSpace(userModel.Name) == ""{
-		c.JSON(http.StatusNotAcceptable, common.NewError("Empty name",errors.New("Name is empty")))
+		c.JSON(http.StatusNotAcceptable, common.NewError("error",errors.New("Tên còn trống")))
 		return
 	}
 	if userModel.PhoneNumber == "" || strings.TrimSpace(userModel.PhoneNumber) == ""{
-		c.JSON(http.StatusNotAcceptable, common.NewError("Empty description",errors.New("Description is empty")))
+		c.JSON(http.StatusNotAcceptable, common.NewError("error",errors.New("Chưa nhập số điện thoại")))
 		return
 	}
 	_,err = s.userService.UpdateUser(&userModel)
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, common.NewError("Database", err))
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("error", err))
 		return
 	}
 	c.JSON(http.StatusOK,&userModel)

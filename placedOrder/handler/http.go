@@ -345,6 +345,8 @@ func (s *HttpPlacedOrderHandler) UpdateStatusPlacedOrder(c *gin.Context) {
 //	message = fmt.Sprintf(common.MESSAGE_PATTERN_STATUS_10,notifMess.OrderCode)
 //	tokensPush = append(tokensPush,notifMess.User.Account.FcmToken)
 	switch(idStatusNum){
+		case common.ORDER_CREATED_STATUS:
+
 		case common.ORDER_ACCEPTED_BY_STORE:
 
 				if userModel.StoreId == 0{
