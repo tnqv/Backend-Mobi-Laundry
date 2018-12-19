@@ -5,7 +5,6 @@ import (
 	"d2d-backend/placedOrder"
 	"github.com/jinzhu/gorm"
 	"d2d-backend/models"
-	"log"
 )
 
 type repo struct {
@@ -123,7 +122,7 @@ func (r *repo) Update(updatePlacedOrder *models.PlacedOrder) (*models.PlacedOrde
 	if err != nil {
 		return nil, err
 	}
-	log.Println(updatePlacedOrder.Delivery.Account.FcmToken)
+	//log.Println(updatePlacedOrder.Delivery.Account.FcmToken)
 	//if updatePlacedOrder.DeliveryID != 0 {
 	//	r.Conn.Preload("Delivery").
 	//		Preload("Delivery.Account").First(updatePlacedOrder)

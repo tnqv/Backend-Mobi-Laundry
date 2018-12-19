@@ -390,6 +390,12 @@ func (s *HttpAccountHandler) CreateAccountStore(c *gin.Context){
 		return
 	}
 
+	storeNum,err := strconv.ParseUint(c.PostForm("store_id"),10,64)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, common.NewError("error", errors.New("Sai thông tin cửa hàng")))
+		return
+	}
+
 	_, err = s.accountService.CreateNewAccount(&accountModel)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
@@ -398,6 +404,7 @@ func (s *HttpAccountHandler) CreateAccountStore(c *gin.Context){
 
 	user.AccountId = accountModel.ID
 	user.RoleId = 3
+	user.StoreId = uint(storeNum)
 
 	_,err = s.userService.CreateNewUser(&user)
 	if err != nil {
