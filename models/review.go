@@ -9,6 +9,6 @@ type Review struct {
 	Content 	   string			`json:"content"`
 	Rate           int		   		`json:"rate"`
 	UserRate       User  			`json:"user" gorm:"save_associations:false"`
-	UserID		   int				`json:"-"`
+	UserID		   int				`json:"user_id"`
 	User		   User 			`json:"user" gorm:"save_associations:false"`
 }
