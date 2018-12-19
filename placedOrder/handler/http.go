@@ -346,6 +346,27 @@ func (s *HttpPlacedOrderHandler) UpdateStatusPlacedOrder(c *gin.Context) {
 //	tokensPush = append(tokensPush,notifMess.User.Account.FcmToken)
 	switch(idStatusNum){
 		case common.ORDER_CREATED_STATUS:
+				storeId := c.PostForm("change_store_id")
+
+				storeNum,err := strconv.ParseUint(storeId, 10, 64)
+				if err != nil {
+					c.JSON(http.StatusUnprocessableEntity, common.NewError("param", errors.New("Cửa hàng không hợp lệ")))
+					return
+				}
+
+				if storeNum == 0 {
+					c.JSON(http.StatusUnprocessableEntity, common.NewError("param", errors.New("Cửa hàng không hợp lệ")))
+					return
+				}
+				placedOrderUpdate.StoreID = uint(storeNum)
+				placedOrderUpdate.OrderStatusId = 1
+				placedOrderUpdate,err := s.placedOrderService.UpdatePlacedOrder(placedOrderUpdate)
+				if err != nil {
+					c.JSON(http.StatusUnprocessableEntity, common.NewError("param", err))
+					return
+				}
+
+				common.ProduceMessage(common.FIREBASE_QUEUE,placedOrderUpdate)
 
 		case common.ORDER_ACCEPTED_BY_STORE:
 
