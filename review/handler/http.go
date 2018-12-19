@@ -84,7 +84,7 @@ func  (s *HttpReviewHandler) CreateReview(c *gin.Context){
 		return
 	}
 
-	userId, err := strconv.Atoi(c.PostForm("user_id"))
+	userId, err := strconv.ParseUint(c.PostForm("user_id"),10,64)
 
 	if err != nil {
 		c.JSON(http.StatusNotAcceptable, common.NewError("error", errors.New("Mã người dùng không hợp lệ")))
@@ -112,7 +112,7 @@ func  (s *HttpReviewHandler) CreateReview(c *gin.Context){
 
 	var newReview models.Review
 
-	newReview.UserID = userId
+	newReview.UserID = uint(userId)
 	newReview.Content = content
 	newReview.Rate = rateNum
 
