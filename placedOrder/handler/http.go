@@ -417,6 +417,11 @@ func (s *HttpPlacedOrderHandler) UpdateStatusPlacedOrder(c *gin.Context) {
 				return
 			}
 
+			for _, element := range serviceOrdersReq {
+				element.ID = 0
+				// element is the element from someSlice for where we are
+			}
+
 			serviceOrdersReq,err := s.serviceOrderService.CreateListServiceOrders(serviceOrdersReq)
 
 			if err != nil {
